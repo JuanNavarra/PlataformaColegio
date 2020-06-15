@@ -1,12 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +29,6 @@ namespace Colegio
                 options.IdleTimeout = TimeSpan.FromMinutes(1);
             });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-
             //Provide a secret key to Encrypt and Decrypt the Token
             var SecretKey = Encoding.ASCII.GetBytes
                  ("YourKey-2374-OFFKDI940NG7:56753253-tyuw-5769-0921-kfirox29zoxv");
@@ -86,6 +82,18 @@ namespace Colegio
             app.UseRouting();
 
             app.UseSession();
+
+            //Permite el acceso a Autenticacion de usuarios
+            app.Use(async (context, next) =>
+            {
+                var JWToken = context.Session.GetString("JWToken");
+                if (!string.IsNullOrEmpty(JWToken))
+                {
+                    context.Request.Headers.Add("Authorization", "Bearer " + JWToken);
+                }
+                await next();
+            });
+
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>

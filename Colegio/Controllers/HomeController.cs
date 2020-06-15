@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Colegio.Models;
 using Colegio.Services;
 using Microsoft.AspNetCore.Http;
@@ -25,8 +20,11 @@ namespace Colegio.Controllers
             if (userToken != null)
             {
                 //Save token in session object
-                HttpContext.Session.SetString("JWToken", userToken);
-                bool islogin = User.Identity.IsAuthenticated;
+                HttpContext.Session.SetString("JWToken", userToken.AuthenticationType);
+                if (userToken.IsAuthenticated)
+                {
+                    Console.WriteLine("sas");
+                }
             }
             return Redirect("~/Home/Index");
         }
