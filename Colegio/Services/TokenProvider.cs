@@ -10,6 +10,7 @@ using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,6 +23,14 @@ namespace Colegio.Services
         {
             this.contexto = contexto;
         }
+
+        /// <summary>
+        /// Pregunta por un usuario existente, verifica la contraseña encriptada, genera codigo token que 
+        /// expira en un dia, este token servira para la url local
+        /// </summary>
+        /// <param name="usuario">Nombre del usuario</param>
+        /// <param name="contrasena">Contraseña del usuario</param>
+        /// <returns>Objeto tipo ClaimsIdentity</returns>
         public ClaimsIdentity LoginUser(string usuario, string contrasena)
         {
             try
@@ -59,12 +68,16 @@ namespace Colegio.Services
             }
             catch (Exception)
             {
-
                 throw;
             }
-            
+
         }
 
+        /// <summary>
+        /// Crea los Clamis para generar el jwt
+        /// </summary>
+        /// <param name="user">Objeto de tipo Col_Usuarios</param>
+        /// <returns></returns>
         private IEnumerable<Claim> GetUserClaims(Col_Usuarios user)
         {
             IEnumerable<Claim> claims = new Claim[]
@@ -73,6 +86,22 @@ namespace Colegio.Services
                 new Claim("Usuario", user.Usuario),
             };
             return claims;
+        }
+
+        /// <summary>
+        /// Metodo static que encripta la contraseña a SHA256
+        /// </summary>
+        /// <param name="str">Parametro tipo string que se desea encriptar</param>
+        /// <returns>Cadena encriptada</returns>
+        public static string SHA256(string contraseña)
+        {
+            SHA256 sha256 = SHA256Managed.Create();
+            ASCIIEncoding encoding = new ASCIIEncoding();
+            byte[] stream = null;
+            StringBuilder sb = new StringBuilder();
+            stream = sha256.ComputeHash(encoding.GetBytes(contraseña));
+            for (int i = 0; i < stream.Length; i++) sb.AppendFormat("{0:x2}", stream[i]);
+            return sb.ToString();
         }
     }
 }

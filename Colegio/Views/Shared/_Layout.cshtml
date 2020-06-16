@@ -3,37 +3,51 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Colegio</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <title>Aula Virtual</title>
     @*<link rel="stylesheet" href="~/css/site.css" />*@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="~/css/plantilla/fontawesome-free/css/all.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-
     <!-- Theme style -->
     <link rel="stylesheet" href="~/css/plantilla/adminlte.min.css">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 </head>
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
-    <div class="wrapper">
-        @if (User.Identity.IsAuthenticated)
-        {
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="wrapper">
             @Html.Partial("_SlideBar")
-        }
-    </div>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class=" footer text-muted">
-        <div class="container">
-            &copy; 2020 - Colegio - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
-    </footer>
+        <div class="content-wrapper">
+            <main role="main" class="pb-3">
+                <!-- Main content -->
+                <section class="content">
+                    <div class="container-fluid">
+                        @RenderBody()
+                    </div><!--/. container-fluid -->
+                </section>
+                <!-- /.content -->
+            </main>
+        </div>
+        <footer class="main-footer">
+            <strong>Copyright &copy; 2020 <a href="#">Juan Navarra</a></strong>
+            All rights reserved.
+            <div class="float-right d-none d-sm-inline-block">
+                <b>Version</b> 1.0.0
+            </div>
+        </footer>
+    }
+    else
+    {
+        <div class="container">
+            <main class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+    }
 
     @RenderSection("Scripts", required: false)
 </body>
