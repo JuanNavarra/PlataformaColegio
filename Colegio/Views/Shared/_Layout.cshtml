@@ -19,7 +19,7 @@
     @if (User.Identity.IsAuthenticated)
     {
         <div class="wrapper">
-            @Html.Partial("_SlideBar")
+            @await Html.PartialAsync("_SlideBar")
         </div>
         <div class="content-wrapper">
             <main role="main" class="pb-3">

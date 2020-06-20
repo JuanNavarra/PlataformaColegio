@@ -10,5 +10,8 @@ namespace Colegio.Models
         public DateTime FechaCreacion { get; set; }
         public DateTime? FechaActualizacion { get; set; }
         public int RolId { get; set; }
+        public string Estado { get; set; }
+        public DateTime? UltimoLogin { get; set; }
+        public string UltimaContrasena { get; set; }
     }
 }
