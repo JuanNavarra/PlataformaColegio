@@ -1,6 +1,6 @@
-﻿  <!-- overlayScrollbars -->
-<link rel="stylesheet" href="~/js/plantilla/overlayScrollbars/css/OverlayScrollbars.min.css">
-
+﻿@{ 
+    ViewBag.Usuario = User.Claims.ToList()[1].Value.ToString();
+}
 <!-- Navbar -->
 <nav class="main-header navbar navbar-expand navbar-white navbar-light" style=" position: relative !important;">
 
@@ -121,12 +121,16 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
-
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="info">
+                <a href="#" class="d-block">Bienvenido <b>@ViewBag.Usuario</b></a>
+            </div>
+        </div>
         <!-- Sidebar Menu -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class
-                     with font-awesome or any other icon font library -->
+                 with font-awesome or any other icon font library -->
                 <li class="nav-item has-treeview menu-open">
                     <a href="#" class="nav-link active">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -137,7 +141,7 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="@Url.Action("Index","Perfiles")" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Perfiles</p>
                             </a>
@@ -174,26 +178,3 @@
     </div>
     <!-- /.sidebar -->
 </aside>
-
-<script src="~/js/plantilla/jquery/jquery.min.js"></script>
-<script src="~/js/plantilla/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-<!-- overlayScrollbars -->
-<script src="~/js/plantilla/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
-<!-- AdminLTE App -->
-<script src="~/js/plantilla/adminlte.js"></script>
-
-<!-- OPTIONAL SCRIPTS -->
-<script src="~/js/plantilla/demo.js"></script>
-
-<!-- PAGE PLUGINS -->
-<!-- jQuery Mapael -->
-<script src="~/js/plantilla/jquery-mousewheel/jquery.mousewheel.js"></script>
-<script src="~/js/plantilla/raphael/raphael.min.js"></script>
-<script src="~/js/plantilla/jquery-mapael/jquery.mapael.min.js"></script>
-<script src="~/js/plantilla/jquery-mapael/maps/usa_states.min.js"></script>
-<!-- ChartJS -->
-<script src="~/js/plantilla/chart.js/Chart.min.js"></script>
-
-<!-- PAGE SCRIPTS -->
-<script src="~/js/plantilla/dashboard2.js"></script> 

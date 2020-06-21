@@ -14,6 +14,42 @@
     <link rel="stylesheet" href="~/css/plantilla/adminlte.min.css">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+    @* Login scripts *@
+    <script src="~/js/plantilla/jquery/jquery.min.js"></script>
+    <script src="~/js/plantilla/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/plantilla/adminlte.min.js"></script>
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <!-- Login estilos -->
+        <link rel="stylesheet" href="~/css/plantilla/icheck-bootstrap/icheck-bootstrap.min.css">
+    }
+    else
+    {
+        <!--estilos dashboard perfiles-->
+        <link rel="stylesheet" href="~/css/plantilla/datatable/dataTables.bootstrap4.min.css">
+        <link rel="stylesheet" href="~/css/plantilla/datatable/responsive.bootstrap4.min.css">
+        <!--estilos dashboard layout-->
+        <link rel="stylesheet" href="~/js/plantilla/overlayScrollbars/css/OverlayScrollbars.min.css">
+
+        <!--scripts dashboard perfiles-->
+        <script src="~/lib/datatable/jquery.dataTables.min.js"></script>
+        <script src="~/lib/datatable/dataTables.bootstrap4.min.js"></script>
+        <script src="~/lib/datatable/dataTables.responsive.min.js"></script>
+        <script src="~/lib/datatable/responsive.bootstrap4.min.js"></script>
+        <script src="~/js/plantilla/demo.js"></script>
+        <!--scripts dashboard layout-->
+        <script src="~/js/plantilla/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+        <script src="~/js/plantilla/adminlte.js"></script>
+        <script src="~/js/plantilla/demo.js"></script>
+        <script src="~/js/plantilla/jquery-mousewheel/jquery.mousewheel.js"></script>
+        <script src="~/js/plantilla/raphael/raphael.min.js"></script>
+        <script src="~/js/plantilla/jquery-mapael/jquery.mapael.min.js"></script>
+        <script src="~/js/plantilla/jquery-mapael/maps/usa_states.min.js"></script>
+        <script src="~/js/plantilla/chart.js/Chart.min.js"></script>
+        <script src="~/js/plantilla/dashboard2.js"></script>
+        <script src="~/js/global.js"></script>
+    }
 </head>
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
     @if (User.Identity.IsAuthenticated)

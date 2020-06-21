@@ -81,6 +81,7 @@ namespace Colegio.Services
             {
                 new Claim(ClaimTypes.Name, user.Usuario),
                 new Claim("Usuario", user.Usuario),
+                new Claim("Id", user.Id.ToString())
             };
             return claims;
         }

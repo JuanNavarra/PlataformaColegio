@@ -34,7 +34,7 @@ namespace Colegio
             services.AddScoped<ITokenProvider, TokenProvider>();
             services.AddDistributedMemoryCache();
             services.AddSession(options => {
-                options.IdleTimeout = TimeSpan.FromMinutes(1);
+                options.IdleTimeout = TimeSpan.FromMinutes(10);
             });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             //Provide a secret key to Encrypt and Decrypt the Token

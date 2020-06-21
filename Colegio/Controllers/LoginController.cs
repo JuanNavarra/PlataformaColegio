@@ -4,6 +4,7 @@ using Colegio.Models;
 using Microsoft.AspNetCore.Http;
 using Colegio.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using System.Linq;
 
 namespace Colegio.Controllers
 {
