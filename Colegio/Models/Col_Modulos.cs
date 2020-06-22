@@ -9,12 +9,12 @@ namespace Colegio.Models
     {
         public int ModuloId { get; set; }
         public string Nombre { get; set; }
-        public string Descripccion { get; set; }
+        public string Descripcion { get; set; }
         public DateTime FechaCreacion { get; set; }
         public bool EsPadre { get; set; }
-        public string SubModulo { get; set; }
         public DateTime? FechaActualizacion { get; set; }
         public string Estado { get; set; }
         public int RolId { get; set; }
+        public string EtiquetaDom { get; set; }
     }
 }

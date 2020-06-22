@@ -32,6 +32,7 @@ namespace Colegio
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<ITokenProvider, TokenProvider>();
+            services.AddScoped<IPerfilesService, PerfilesService>();
             services.AddDistributedMemoryCache();
             services.AddSession(options => {
                 options.IdleTimeout = TimeSpan.FromMinutes(10);

@@ -1,0 +1,91 @@
+﻿@{
+}
+<div class="modal fade" id="modal-lg">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Creación de módulos</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="customSwitch1" onclick="checkearRol()">
+                                <label class="custom-control-label" for="customSwitch1" id="sw_rol">Crear un nuevo rol</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4" id="row_crear_roles">
+                            <!-- text input -->
+                            <div class="form-group">
+                                <label>Nombre del perfil</label>
+                                <input type="text" class="form-control" id="modal_nombre_perfil">
+                            </div>
+                        </div>
+                        <div class="col-sm-4" style="display:none" id="row_roles_existentes">
+                            <!-- text input -->
+                            <div class="form-group">
+                                <label>Nombre del perfil</label>
+                                <select class="form-control" id="modal_nombre_perfil_existente">
+                                    <option value="0">Seleccione</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Nombre del módulo</label>
+                                <input type="text" class="form-control" id="modal_nombre_modulo">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Nombre de etiqueta</label>
+                                <input type="text" class="form-control" id="modal_nombre_etiqueta">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <!-- textarea -->
+                            <div class="form-group">
+                                <label>Descripción del módulo</label>
+                                <textarea class="form-control" rows="3" id="modal_descripcion_modulo"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="modal_es_padre" onclick="checkearPadre()">
+                                <label class="form-check-label">¿Es módulo padre?</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="row_submodulos" style="display:none">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Submódulos</label>
+                                <select multiple class="form-control" id="modal_submodulos">
+                                    <option value="1">option 1</option>
+                                    <option value="2">option 2</option>
+                                    <option value="3">option 3</option>
+                                    <option value="4">option 4</option>
+                                    <option value="5">option 5</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="modal_guardar_cambios" onclick="guardarModulos()">Guardar cambios</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>

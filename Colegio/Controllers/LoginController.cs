@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Colegio.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
+using System.Data.Entity.Validation;
 
 namespace Colegio.Controllers
 {
@@ -50,10 +51,45 @@ namespace Colegio.Controllers
                 }
                 return Redirect("~/Login/Authentication");
             }
-            catch (Exception)
+            #region catch
+            catch (DbEntityValidationException e)
             {
-                throw;
+                string err = "";
+                foreach (var eve in e.EntityValidationErrors)
+                {
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        err += ve.ErrorMessage;
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+                return null;
             }
+
+            catch (Exception e)
+            {
+                string err = "";
+                if (e.InnerException != null)
+                {
+                    if (e.InnerException.Message != null)
+                    {
+                        err = (e.InnerException.Message);
+                        if (e.InnerException.InnerException != null)
+                        {
+                            err += e.InnerException.InnerException.Message;
+                        }
+                    }
+                }
+                else
+                {
+                    err = (e.Message);
+                }
+                return null;
+            }
+            #endregion
         }
 
         /// <summary>

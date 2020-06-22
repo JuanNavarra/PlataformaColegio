@@ -8,11 +8,12 @@
     <div class="row">
         <div class="col-md-1 col-sm-2 col-12">
             <div class="info-box">
-                <span class="info-box-icon bg-primary"><i class="fas fa-plus"></i></span>
+                <span class="info-box-icon bg-primary" data-toggle="modal" data-target="#modal-lg"><i class="fas fa-plus"></i></span>
                 <!-- /.info-box-content -->
             </div>
             <!-- /.info-box -->
         </div>
     </div>
     @await Html.PartialAsync("_TablaPerfiles")
+    @await Html.PartialAsync("_ModalCrearPerfiles")
 </div>
