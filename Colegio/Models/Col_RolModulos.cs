@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 
 namespace Colegio.Models
 {
-    public class Col_SubModulos
+    public class Col_RolModulos
     {
-        public int SubModuloId { get; set; }
+        public int Id { get; set; }
+        public int RolId { get; set; }
         public int ModuloId { get; set; }
     }
 }

@@ -22,53 +22,51 @@ namespace Colegio.Services
 
         public async Task<List<Col_Roles>> CargarRol()
         {
-            try
-            {
-                var roles = await context.Col_Roles.Where(w => w.Estado.Equals("Y")).ToListAsync();
-                return roles;
-            }
-            #region catch
-            catch (DbEntityValidationException e)
-            {
-                string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+            var roles = await context.Col_Roles
+                .Where(w => w.Estado.Equals("A"))
+                .Select(s => new Col_Roles
                 {
-                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
-                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
-                    {
-                        err += ve.ErrorMessage;
-                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
-                            ve.PropertyName, ve.ErrorMessage);
-                    }
-                }
-                return null;
-            }
-
-            catch (Exception e)
-            {
-                string err = "";
-                if (e.InnerException != null)
-                {
-                    if (e.InnerException.Message != null)
-                    {
-                        err = (e.InnerException.Message);
-                        if (e.InnerException.InnerException != null)
-                        {
-                            err += e.InnerException.InnerException.Message;
-                        }
-                    }
-                }
-                else
-                {
-                    err = (e.Message);
-                }
-                return null;
-            }
-            #endregion
+                    RolId = s.RolId, NombreRol = s.NombreRol
+                })
+                .ToListAsync();
+            return roles;
         }
 
+        public async Task<List<Col_Modulos>> CargarModulos()
+        {
+            var modulos = await context.Col_Modulos
+                .Where(w => w.Estado.Equals("A"))
+                .Select(s => new Col_Modulos
+                {
+                    ModuloId = s.ModuloId,
+                    Nombre = s.Nombre
+                }).ToListAsync();
+            return modulos;
+        }
 
+        public async Task<List<Col_SubModulos>> CargarSubModulos(int[] modulos)
+        {
+            var subModulos = await context.Col_SubModulos
+                .Where(w => w.Estado.Equals("A") && modulos.Contains(w.ModuloId))
+                .Select(s => new Col_SubModulos
+                {
+                    Nombre = s.Nombre,
+                    SubModuloId = s.SubModuloId,
+                    Descripcion = context.Col_Modulos
+                        .Where(w => w.ModuloId == s.ModuloId)
+                        .Select(s => s.Nombre).FirstOrDefault(),
+                    ModuloId = s.ModuloId
+                })
+                .ToListAsync();
+            return subModulos;
+        }
+
+        public async Task<ApiCallResult> GuardarAutorizaciones(List<Col_Modulos> modulo, List<Col_SubModulos> subModulo, string rol, string autorizacion, string descripcion)
+        {
+            return null;
+        }
+
+        /*
         public async Task<ApiCallResult> GuardarAutorizaciones(Col_Modulos modulo, List<Col_SubModulos> subModulo, string rol, bool swRol)
         {
             try
@@ -204,5 +202,7 @@ namespace Colegio.Services
             }
             #endregion
         }
+         * 
+         */
     }
 }

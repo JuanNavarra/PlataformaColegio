@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Colegio.Models;
+using Colegio.Models.ModelHelper;
 using Colegio.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -29,25 +30,33 @@ namespace Colegio.Controllers
             return Redirect("~/Login/Authentication");
         }
 
-        public async Task<IActionResult> GuardarAutorizaciones(string modulo, string subModulo, string rol, bool swRol)
+        public async Task<IActionResult> GuardarAutorizaciones(string modulo, string subModulo, string rol, string autorizacion, string descripcion)
         {
             try
             {
-                var moduloComverted = JsonConvert.DeserializeObject<Col_Modulos>(modulo);
-                dynamic subModulosJson = JsonConvert.DeserializeObject(subModulo);
+                dynamic moduloJson = JsonConvert.DeserializeObject(modulo);
+                dynamic subModuloJson = JsonConvert.DeserializeObject(subModulo);
+                List<Col_Modulos> modulos = new List<Col_Modulos>();
                 List<Col_SubModulos> subModulos = new List<Col_SubModulos>();
-                if (moduloComverted.EsPadre)
+                foreach (var item in moduloJson)
                 {
-                    foreach (var item in subModulosJson)
+                    Col_Modulos _modulo = new Col_Modulos();
+                    _modulo.ModuloId = item.ModuloId;
+                    modulos.Add(_modulo);
+                }
+                if (subModuloJson.Count > 0)
+                {
+                    foreach (var item in subModuloJson)
                     {
-                        Col_SubModulos _subModulo = new Col_SubModulos();
-                        _subModulo.SubModuloId = item.SubModuloId;
-                        _subModulo.ModuloId = 0;
-                        subModulos.Add(_subModulo);
+                        Col_SubModulos _subModulos = new Col_SubModulos();
+                        _subModulos.SubModuloId = item.SubModuloId;
+                        _subModulos.ModuloId = item.ModuloId;
+                        subModulos.Add(_subModulos);
                     }
                 }
-                var modulos = await perfilesService.GuardarAutorizaciones(moduloComverted, subModulos, rol, swRol);
-                return Json(new { result = modulos.Status, title = modulos.Title, message = modulos.Message });
+
+                var result = await perfilesService.GuardarAutorizaciones(modulos,subModulos,rol,autorizacion,descripcion);
+                return Json(new { result });
             }
             #region catch
             catch (DbEntityValidationException e)
@@ -94,6 +103,18 @@ namespace Colegio.Controllers
         {
             var roles = await perfilesService.CargarRol();
             return Json(new { result = "ok", roles });
+        }
+
+        public async Task<IActionResult> CargarModulos()
+        {
+            var modulos = await perfilesService.CargarModulos();
+            return Json(new { result = "ok", data = modulos });
+        }
+
+        public async Task<IActionResult> CargarSubModulos(int[] modulos)
+        {
+            var subModulos = await perfilesService.CargarSubModulos(modulos);
+            return Json(new { result = "ok", data = subModulos });
         }
     }
 }
