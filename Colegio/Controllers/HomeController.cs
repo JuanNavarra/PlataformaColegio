@@ -8,18 +8,11 @@ namespace Colegio.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            try
+            if (User.Identity.IsAuthenticated)
             {
-                if (User.Identity.IsAuthenticated)
-                {
-                    return View();
-                }
-                return Redirect("~/Login/Authentication");
+                return View();
             }
-            catch (Exception)
-            {
-                throw;
-            }
+            return Redirect("~/Login/Authentication");
         }
     }
 }

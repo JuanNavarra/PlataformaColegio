@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity.Validation;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Colegio.Models;
-using Colegio.Models.ModelHelper;
+﻿using Colegio.Models;
 using Colegio.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity.Validation;
+using System.Threading.Tasks;
 
 namespace Colegio.Controllers
 {
@@ -21,100 +18,140 @@ namespace Colegio.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             if (User.Identity.IsAuthenticated)
             {
+                var registros = await perfilesService.MostrarAutorizaciones();
+                ViewBag.Registros = registros;
                 return View();
             }
             return Redirect("~/Login/Authentication");
         }
 
-        public async Task<IActionResult> GuardarAutorizaciones(string modulo, string subModulo, string rol, string autorizacion, string descripcion)
+        [HttpPost]
+        public async Task<IActionResult> GuardarAutorizaciones(string modulo, string subModulo, string rol, string crud, string descripcion)
         {
-            try
+            if (User.Identity.IsAuthenticated)
             {
-                dynamic moduloJson = JsonConvert.DeserializeObject(modulo);
-                dynamic subModuloJson = JsonConvert.DeserializeObject(subModulo);
-                List<Col_Modulos> modulos = new List<Col_Modulos>();
-                List<Col_SubModulos> subModulos = new List<Col_SubModulos>();
-                foreach (var item in moduloJson)
+                try
                 {
-                    Col_Modulos _modulo = new Col_Modulos();
-                    _modulo.ModuloId = item.ModuloId;
-                    modulos.Add(_modulo);
-                }
-                if (subModuloJson.Count > 0)
-                {
-                    foreach (var item in subModuloJson)
+                    dynamic moduloJson = JsonConvert.DeserializeObject(modulo);
+                    dynamic subModuloJson = JsonConvert.DeserializeObject(subModulo);
+                    dynamic crudJson = JsonConvert.DeserializeObject(crud);
+                    List<Col_Modulos> modulos = new List<Col_Modulos>();
+                    List<Col_SubModulos> subModulos = new List<Col_SubModulos>();
+                    List<Col_PermisosCrud> permisos = new List<Col_PermisosCrud>();
+                    foreach (var item in moduloJson)
                     {
-                        Col_SubModulos _subModulos = new Col_SubModulos();
-                        _subModulos.SubModuloId = item.SubModuloId;
-                        _subModulos.ModuloId = item.ModuloId;
-                        subModulos.Add(_subModulos);
+                        Col_Modulos _modulo = new Col_Modulos();
+                        _modulo.ModuloId = item.ModuloId;
+                        modulos.Add(_modulo);
                     }
-                }
-
-                var result = await perfilesService.GuardarAutorizaciones(modulos,subModulos,rol,autorizacion,descripcion);
-                return Json(new { result });
-            }
-            #region catch
-            catch (DbEntityValidationException e)
-            {
-                string err = "";
-                foreach (var eve in e.EntityValidationErrors)
-                {
-                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
-                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (var item in crudJson)
                     {
-                        err += ve.ErrorMessage;
-                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
-                            ve.PropertyName, ve.ErrorMessage);
+                        Col_PermisosCrud _permiso = new Col_PermisosCrud();
+                        _permiso.PermisoId = item.PermisoId;
+                        permisos.Add(_permiso);
                     }
-                }
-                return null;
-            }
-
-            catch (Exception e)
-            {
-                string err = "";
-                if (e.InnerException != null)
-                {
-                    if (e.InnerException.Message != null)
+                    if (subModuloJson.Count > 0)
                     {
-                        err = (e.InnerException.Message);
-                        if (e.InnerException.InnerException != null)
+                        foreach (var item in subModuloJson)
                         {
-                            err += e.InnerException.InnerException.Message;
+                            Col_SubModulos _subModulos = new Col_SubModulos();
+                            _subModulos.SubModuloId = item.SubModuloId;
+                            _subModulos.ModuloId = item.ModuloId;
+                            subModulos.Add(_subModulos);
                         }
                     }
+
+                    var result = await perfilesService.GuardarAutorizaciones(modulos, subModulos, rol, permisos, descripcion);
+                    return Json(new { result });
                 }
-                else
+                #region catch
+                catch (DbEntityValidationException e)
                 {
-                    err = (e.Message);
+                    string err = "";
+                    foreach (var eve in e.EntityValidationErrors)
+                    {
+                        Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                            eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                        foreach (var ve in eve.ValidationErrors)
+                        {
+                            err += ve.ErrorMessage;
+                            Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                                ve.PropertyName, ve.ErrorMessage);
+                        }
+                    }
+                    return null;
                 }
-                return null;
+
+                catch (Exception e)
+                {
+                    string err = "";
+                    if (e.InnerException != null)
+                    {
+                        if (e.InnerException.Message != null)
+                        {
+                            err = (e.InnerException.Message);
+                            if (e.InnerException.InnerException != null)
+                            {
+                                err += e.InnerException.InnerException.Message;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        err = (e.Message);
+                    }
+                    return null;
+                }
+                #endregion
             }
-            #endregion
+            else
+            {
+                return Redirect("~/Login/Authentication");
+            }
         }
 
+        [HttpGet]
         public async Task<IActionResult> CargarRoles()
         {
             var roles = await perfilesService.CargarRol();
             return Json(new { result = "ok", roles });
         }
 
+        [HttpGet]
         public async Task<IActionResult> CargarModulos()
         {
-            var modulos = await perfilesService.CargarModulos();
-            return Json(new { result = "ok", data = modulos });
+            if (User.Identity.IsAuthenticated)
+            {
+                var modulos = await perfilesService.CargarModulos();
+                return Json(new { result = "ok", data = modulos });
+            }
+            return Redirect("~/Login/Authentication");
         }
 
+        [HttpPost]
         public async Task<IActionResult> CargarSubModulos(int[] modulos)
         {
-            var subModulos = await perfilesService.CargarSubModulos(modulos);
-            return Json(new { result = "ok", data = subModulos });
+            if (User.Identity.IsAuthenticated)
+            {
+                var subModulos = await perfilesService.CargarSubModulos(modulos);
+                return Json(new { result = "ok", data = subModulos });
+            }
+            return Redirect("~/Login/Authentication");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CargarPermisosCRUD()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var crud = await perfilesService.CargarPermisosCRUD();
+                return Json(new { result = "ok", data = crud });
+            }
+            return Redirect("~/Login/Authentication");
         }
     }
 }

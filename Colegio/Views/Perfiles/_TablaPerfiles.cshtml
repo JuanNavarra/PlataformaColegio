@@ -1,4 +1,7 @@
-﻿<!-- /.card-header -->
+﻿
+@{
+    List<Colegio.Models.Col_Roles> registros = ViewBag.Registros;
+}
 <div class="card-body">
     <table id="detalle_perfiles_table" class="table table-bordered table-striped">
         <thead>
@@ -8,31 +11,40 @@
                 <th>Fecha Creación</th>
                 <th>Última Actualizacón</th>
                 <th>Último Login</th>
-                <th>Módulos visibles</th>
+                <th>Descripción</th>
                 <th>Estado</th>
                 <th></th>
             </tr>
         </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>Administrador</td>
-                <td>12/12/22</td>
-                <td>12/12/22</td>
-                <td>12/12/22</td>
-                <td>TODOS</td>
-                <td>ACTIVO</td>
-                <td>
-                    <a href="#">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <a href="#">
-                        <i class="fas fa-trash"></i>
-                    </a>
-                </td>
-            </tr>
+        <tbody id="autorizacion_index_table">
+            @if (registros != null)
+            {
+                int count = 1;
+                foreach (var item in registros)
+                {
+                    <tr>
+                        <td>@count</td>
+                        <td>@item.NombreRol</td>
+                        <td>@item.FechaCreacion.ToString("dd/MM/yyyy")</td>
+                        <td>@item.FechaActualizacion</td>
+                        <td>@item.UltimoLogin</td>
+                        <td>@item.Descripcion</td>
+                        <td>@item.Estado</td>
+                        <td>
+                            <a href='#' data-toggle="modal" data-target="#modal_ver_autorizacion">
+                                <i class='fas fa-eye'></i>
+                            </a><a href='#' data-toggle="modal" data-target="#modal_autualizar_autorizacion">
+                                <i class='fas fa-edit'></i>
+                            </a>
+                            <a href='#' data-toggle="modal" data-target="#modal_eliminar_autorizacion">
+                                <i class='fas fa-trash'></i>
+                            </a>
+                        </td>
+                    </tr>
+                    count++;
+                }
+            }
         </tbody>
     </table>
 </div>
-<!-- /.card-body -->
-<script src="~/js/ControllerJS/perfiles.js"></script>
+@await Html.PartialAsync("_ModalVerAutorizacion")

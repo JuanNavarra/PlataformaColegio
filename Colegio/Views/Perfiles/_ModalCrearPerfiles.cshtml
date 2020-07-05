@@ -7,11 +7,11 @@
         margin-right: 0;
     }
 </style>
-<div class="modal fade" id="modal-lg">
+<div class="modal fade" id="modal_crear_autorizacion">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Creación de módulos</h4>
+                <h4 class="modal-title">Creación de perfiles</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -48,15 +48,15 @@
                                             </div>
                                             <div class="col-sm-4">
                                                 <div class="form-group">
-                                                    <label>Nombre de autorizacón</label>
-                                                    <input type="text" class="form-control" id="modal_nombre_autorizacion" autocomplete="off">
+                                                    <label>Permisos CRUD</label>
+                                                    <select class="select2" id="modal_nombre_crud" multiple="multiple" data-placeholder="Selecciona varios" style="width: 100%;"></select>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-sm-6">
                                                 <div class="form-group">
-                                                    <label>Descripción de la autorización</label>
+                                                    <label>Descripción del perfil</label>
                                                     <textarea class="form-control" rows="3" id="modal_descripcion_autorizacion"></textarea>
                                                 </div>
                                             </div>

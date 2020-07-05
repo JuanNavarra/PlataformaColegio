@@ -1,7 +1,8 @@
 ﻿$(document).ready(function () {
     ejecutarDataTable("detalle_perfiles_table")
-    //cargarRoles()
+
     cargarModulos();
+    cargarPermisosCRUD()
     $('.select2').select2()
 
     $("#modal_nombre_modulo").on("select2:close", function (e) {
@@ -81,17 +82,18 @@
         $(this).css("display", "none");
     });
 
+
 })
 
 function cargarModulos() {
     $.ajax({
-        type: "POST",
+        type: "GET",
         url: "Perfiles/CargarModulos",
         data: {},
         dataType: "json",
         async: true,
         success: function (res) {
-            if (res.result = "ok") {
+            if (res.result == "ok") {
                 var ca = "";
                 $.each(res.data, function (index, item) {
                     ca = "<option value=" + item.moduloId + ">" + item.nombre + "</option>"
@@ -116,7 +118,7 @@ function cargarSubModulos() {
         async: true,
         success: function (res) {
             $('#modal_submodulos').empty();
-            if (res.result = "ok") {
+            if (res.result == "ok") {
                 var ca = "";
                 $.each(res.data, function (index, item) {
                     ca = "<option value=" + item.subModuloId + "-" + item.moduloId + ">" + item.nombre + " (" + item.descripcion + ")</option>"
@@ -132,6 +134,9 @@ function cargarSubModulos() {
 
 function guardarModulos() {
     var moduloArray = new Array();
+    var subModuloArray = new Array();
+    var permisoCRUDArray = new Array();
+
     var selectModulos = document.getElementById("modal_nombre_modulo");
     for (var i = 0; i < selectModulos.length; i++) {
 
@@ -143,7 +148,17 @@ function guardarModulos() {
         }
     }
 
-    var subModuloArray = new Array();
+    var selectCRUD = document.getElementById("modal_nombre_crud");
+    for (var i = 0; i < selectCRUD.length; i++) {
+
+        var item = {
+            PermisoId: $("#modal_nombre_crud").val()[i],
+        };
+        if (item.PermisoId != undefined) {
+            permisoCRUDArray.push(item);
+        }
+    }
+
     var selectSubModulo = document.getElementById("modal_submodulos2");
     for (var i = 0; i < selectSubModulo.length; i++) {
         var dato = $("#modal_submodulos2").val()[i].split('-')
@@ -161,22 +176,34 @@ function guardarModulos() {
         url: "Perfiles/GuardarAutorizaciones",
         data: {
             modulo: JSON.stringify(moduloArray), subModulo: JSON.stringify(subModuloArray), rol: $("#modal_nombre_perfil").val(),
-            autorizacion: $("#modal_nombre_autorizacion").val(), descripcion: $("#modal_descripcion_autorizacion").val()
+            crud: JSON.stringify(permisoCRUDArray), descripcion: $("#modal_descripcion_autorizacion").val()
         },
         dataType: "json",
         async: true,
         success: function (res) {
-            if (res.result) {
+            if (res.result.status) {
+                $("#modal_submodulos").html('');
+                $("#modal_submodulos1").html('');
+                $("#modal_nombre_perfil").val('');
+                $("#modal_nombre_modulo").trigger('change').val("");
+                $("#modal_nombre_crud").trigger('change').val("");
+                $("#modal_descripcion_autorizacion").val('');
+                $("#customCheckbox1").prop('checked', false);
+                $("#customCheckbox1").prop("disabled", true);
+                $("#modal_siguiente_detalle").css("display", "none");
+                $("#modal_guardar_cambios").removeAttr("style");
+                $("#modal_crear_autorizacion").hide();
+
                 $(document).Toasts('create', {
                     class: 'bg-success',
-                    title: res.title,
-                    body: res.message
+                    title: res.result.title,
+                    body: res.result.message
                 })
             } else {
                 $(document).Toasts('create', {
                     class: 'bg-danger',
-                    title: res.title,
-                    body: res.message
+                    title: res.result.title,
+                    body: res.result.message
                 })
             }
         },
@@ -189,17 +216,39 @@ function guardarModulos() {
 //aun no se usa
 function cargarRoles() {
     $.ajax({
-        type: "POST",
+        type: "GET",
         url: "Perfiles/CargarRoles",
         data: {},
         dataType: "json",
         async: true,
         success: function (res) {
-            if (res.result = "ok") {
+            if (res.result == "ok") {
                 var ca = "";
                 $.each(res.roles, function (index, item) {
                     ca = "<option value=" + item.rolId + ">" + item.nombreRol + "</option>"
                     $("#modal_nombre_perfil_existente").append(ca);
+                });
+            }
+        },
+        error: function (error) {
+            console.log("No se ha podido obtener la información");
+        }
+    })
+}
+
+function cargarPermisosCRUD() {
+    $.ajax({
+        type: "GET",
+        url: "Perfiles/CargarPermisosCRUD",
+        data: {},
+        dataType: "json",
+        async: true,
+        success: function (res) {
+            if (res.result == "ok") {
+                var ca = "";
+                $.each(res.data, function (index, item) {
+                    ca = "<option value=" + item.permisoId + ">" + item.nombre + " (" + item.descripcion + ")</option>"
+                    $("#modal_nombre_crud").append(ca);
                 });
             }
         },
