@@ -17,10 +17,14 @@ namespace Colegio.Data.Configuarations
                 .WithMany()
                 .HasForeignKey(f => f.ModuloId)
                 .IsRequired();
+            builder.HasOne<Col_Roles>()
+                .WithMany()
+                .HasForeignKey(f => f.RolId)
+                .IsRequired();
             builder.HasOne<Col_SubModulos>()
                 .WithMany()
                 .HasForeignKey(f => f.SubModuloId)
-                .IsRequired();
+                .IsRequired(false);
 
             builder.ToTable("Col_SubModuloModulo");
         }

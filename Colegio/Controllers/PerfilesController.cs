@@ -153,5 +153,30 @@ namespace Colegio.Controllers
             }
             return Redirect("~/Login/Authentication");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> MostrarDetallePerfil(int rolId)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var perfil = await perfilesService.MostrarDetallePerfil(rolId);
+                return Json(new { result = "ok", data = perfil });
+            }
+            return Redirect("~/Login/Authentication");
+        }
+
+        [HttpPost]
+        public  async Task<IActionResult> EliminarPerfiles(int rolId, bool op)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var result = await perfilesService.EliminarPerfiles(rolId, op);
+                return Json(result);
+            }
+            else
+            {
+                return Redirect("~/Login/Authentication");
+            }
+        }
     }
 }

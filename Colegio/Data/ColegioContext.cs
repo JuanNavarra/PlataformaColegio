@@ -22,6 +22,7 @@ namespace Colegio.Data
         public DbSet<Col_PermisosCrud> Col_PermisosCrud { get; set; }
         public DbSet<Col_PermisoRol> Col_PermisoRol { get; set; }
         public DbSet<Col_RolModulos> Col_RolModulos { get; set; }
+        public DbSet<Col_Estudiantes> Col_Estudiantes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -35,6 +36,7 @@ namespace Colegio.Data
             modelBuilder.ApplyConfiguration(new Col_PermisosCrudConfiguration());
             modelBuilder.ApplyConfiguration(new Col_PermisoRolConfiguration());
             modelBuilder.ApplyConfiguration(new Col_RolModulosConfiguration());
+            modelBuilder.ApplyConfiguration(new Col_EstudiantesConfiguration());
         }
     }
 }

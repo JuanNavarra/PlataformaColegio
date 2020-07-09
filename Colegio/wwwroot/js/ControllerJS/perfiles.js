@@ -192,23 +192,14 @@ function guardarModulos() {
                 $("#customCheckbox1").prop("disabled", true);
                 $("#modal_siguiente_detalle").css("display", "none");
                 $("#modal_guardar_cambios").removeAttr("style");
-                $("#modal_crear_autorizacion").hide();
-
-                $(document).Toasts('create', {
-                    class: 'bg-success',
-                    title: res.result.title,
-                    body: res.result.message
-                })
+                $("#modal_crear_autorizacion").toggle();
+                toastr.success(res.result.title + ": " + res.result.message);
             } else {
-                $(document).Toasts('create', {
-                    class: 'bg-danger',
-                    title: res.result.title,
-                    body: res.result.message
-                })
+                toastr.error(res.result.title + ": " + res.result.message);
             }
         },
         error: function (error) {
-            console.log("No se ha podido obtener la información");
+            toastr.error(res.result.title + ": " + res.result.message);
         }
     })
 }
@@ -256,4 +247,112 @@ function cargarPermisosCRUD() {
             console.log("No se ha podido obtener la información");
         }
     })
+}
+
+function modalVerAutorizacion(rolId) {
+    $.ajax({
+        type: "GET",
+        url: "Perfiles/MostrarDetallePerfil",
+        data: {
+            rolId: rolId
+        },
+        datatype: "json",
+        async: true,
+        success: function (res) {
+            if (res.result == "ok") {
+                $('#tbody_ver_detalle_autorizacion').empty();
+                $("#listado_modulos").empty();
+                $("#tbody_ver_personas_perfil").empty();
+
+                $('#modal_ver_autorizacion').modal('show');
+                var ca = "<tr>"
+                ca += "<td>" + res.data.roles.nombreRol + "</td>"
+                ca += "<td>" + res.data.roles.fechaCreacion + "</td>"
+                ca += "<td>"
+                ca += res.data.roles.fechaActualizacion == null ? "Sin registros" : res.data.roles.fechaActualizacion
+                ca += "</td>"
+                ca += "<td>"
+                ca += res.data.roles.ultimoLogin == null ? "Sin registros" : res.data.roles.ultimoLogin
+                ca += "</td>"
+                ca += "<td>" + res.data.roles.estado + "</td>"
+                ca += "</tr>"
+                $('#tbody_ver_detalle_autorizacion').append(ca);
+                $('#ver_detalle_descripcion').html(res.data.roles.descripcion);
+
+                ca = ""
+                $.each(res.data.modulos, function (index, item) {
+                    ca = "<div class='col-4'>"
+                    ca += "<ul class='list-group'>"
+                    ca += "<li class='list-group-item active'>" + item.nombreModulo + "</li>"
+                    if (res.data.modulos[index].relaciones.length > 0) {
+                        $.each(res.data.modulos[index].relaciones, function (index, item2) {
+                            ca += "<li class='list-group-item'>" + item2.nombreSubModulo + "</li>"
+                        });
+                    }
+                    ca += "</ul>"
+                    ca += "</div>"
+                    $("#listado_modulos").append(ca);
+                });
+
+                ca = "";
+                $.each(res.data.usuarios, function (index, item) {
+                    var ca = "<tr>"
+                    ca += "<td>" + res.data.usuarios[index].nombreUsuario + "</td>"
+                    ca += "<td>" + res.data.usuarios[index].nombrePersona + "</td>"
+                    ca += "<td>" + res.data.usuarios[index].fechaCreacion + "</td>"
+                    ca += "<td>"
+                    ca += res.data.usuarios[index].fechaActualizacion == null ? "Sin registros" : res.data.usuarios[index].fechaActualizacion
+                    ca += "</td>"
+                    ca += "<td>"
+                    ca += res.data.usuarios[index].ultimoLogin == null ? "Sin registros" : res.data.usuarios[index].ultimoLogin
+                    ca += "</td>"
+                    ca += "<td>" + res.data.usuarios[index].estado + "</td>"
+                    ca += "</tr>"
+                    $('#tbody_ver_personas_perfil').append(ca);
+                })
+                console.log(res.data.usuarios)
+            }
+        },
+        error: function (error) {
+            console.log("no se ha podido obtener la información");
+        }
+    })
+}
+
+function modalEliminarAuorizacion(rolId) {
+    swal({
+        title: "¿Desea eliminar éste perfil?",
+        buttons: [true, "Continuar"]
+    }).then((value) => {
+        if (value) {
+            swal({
+                title: "Inactivar un perfil o eliminarlo para siempre",
+                text: "Si hay usuarios con este rol, actualice el rol de de los usuarios," +
+                    " de lo contrario los usuarios serán eliminados",
+                buttons: ["Inactivar", "Eliminar"]
+            }).then((value) => {
+                var op = value == true ? true : false
+                $.ajax({
+                    type: "POST",
+                    url: "Perfiles/EliminarPerfiles",
+                    data: {
+                        rolId: rolId, op: op
+                    },
+                    dataType: "json",
+                    async: true,
+                    success: function (res) {
+                        if (res.status) {
+                            toastr.success(res.title + ": " + res.message);
+                        } else {
+                            toastr.error(res.title + ": " + res.message);
+                        }
+                    },
+                    error: function (error) {
+                        toastr.error("Contacte con el adminstrador");
+                    }
+                })
+            })
+        }
+    })
+
 }

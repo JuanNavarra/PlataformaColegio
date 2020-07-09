@@ -34,14 +34,56 @@ namespace Colegio.Services
 
         public async Task<List<Col_Modulos>> CargarModulos()
         {
-            var modulos = await context.Col_Modulos
-                .Where(w => w.Estado.Equals("A"))
-                .Select(s => new Col_Modulos
+            try
+            {
+                var modulos = await context.Col_Modulos
+                    .Where(w => w.Estado.Equals("A"))
+                    .Select(s => new Col_Modulos
+                    {
+                        ModuloId = s.ModuloId,
+                        Nombre = s.Nombre
+                    }).ToListAsync();
+                return modulos;
+            }
+            #region catch
+            catch (DbEntityValidationException e)
+            {
+                string err = "";
+                foreach (var eve in e.EntityValidationErrors)
                 {
-                    ModuloId = s.ModuloId,
-                    Nombre = s.Nombre
-                }).ToListAsync();
-            return modulos;
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        err += ve.ErrorMessage;
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+                return null;
+            }
+
+            catch (Exception e)
+            {
+                string err = "";
+                if (e.InnerException != null)
+                {
+                    if (e.InnerException.Message != null)
+                    {
+                        err = (e.InnerException.Message);
+                        if (e.InnerException.InnerException != null)
+                        {
+                            err += e.InnerException.InnerException.Message;
+                        }
+                    }
+                }
+                else
+                {
+                    err = (e.Message);
+                }
+                return null;
+            }
+            #endregion
         }
 
         public async Task<List<Col_SubModulos>> CargarSubModulos(int[] modulos)
@@ -63,111 +105,18 @@ namespace Colegio.Services
 
         public async Task<List<Col_PermisosCrud>> CargarPermisosCRUD()
         {
-            var crud = await context.Col_PermisosCrud
-                .Where(w => w.Estado.Equals("A"))
-                .Select(s => new Col_PermisosCrud
-                {
-                    Descripcion = s.Descripcion,
-                    Nombre = s.Nombre,
-                    PermisoId = s.PermisoId
-                })
-                .ToListAsync();
-            return crud;
-        }
-
-        public async Task<ApiCallResult> GuardarAutorizaciones(List<Col_Modulos> modulo, List<Col_SubModulos> subModulo, string rolNombre, List<Col_PermisosCrud> permisos, string descripcion)
-        {
             try
             {
-                bool status = false;
-                string title = "Error";
-                string message = "Ya existe un rol con este nombre";
-
-                var existeNombre = await context.Col_Roles.Where(w => w.NombreRol.Equals(rolNombre.ToUpper())).AnyAsync();
-                if (!existeNombre)
-                {
-                    Col_Roles rol = new Col_Roles();
-                    List<Col_RolModulos> rolModulos = new List<Col_RolModulos>();
-                    List<Col_PermisoRol> permisoRoles = new List<Col_PermisoRol>();
-                    List<Col_SubModuloModulo> subModuloModulos = new List<Col_SubModuloModulo>();
-
-                    status = true;
-                    title = "Proceso exitoso";
-                    message = "Los datos fueron guardados correctamente en la plataforma";
-
-                    int? maxIdRol = await context.Col_Roles.MaxAsync(m => (int?)m.RolId);
-                    int? rolId = maxIdRol == null ? 1 : maxIdRol + 1;
-                    rol.Estado = "A";
-                    rol.FechaActualizacion = null;
-                    rol.FechaCreacion = DateTime.Now;
-                    rol.NombreRol = rolNombre.ToUpper();
-                    rol.RolId = Convert.ToInt32(rolId);
-                    rol.Descripcion = descripcion;
-                    await context.AddAsync<Col_Roles>(rol);
-
-                    int? maxIdPermisoRol = await context.Col_PermisoRol.MaxAsync(m => (int?)m.Id);
-                    int? permisoRolId = maxIdPermisoRol == null ? 1 : maxIdPermisoRol + 1;
-                    foreach (var item in permisos)
+                var crud = await context.Col_PermisosCrud
+                    .Where(w => w.Estado.Equals("A"))
+                    .Select(s => new Col_PermisosCrud
                     {
-                        Col_PermisoRol permisoRol = new Col_PermisoRol();
-                        permisoRol.Id = Convert.ToInt32(permisoRolId);
-                        permisoRol.PermisoId = item.PermisoId;
-                        permisoRol.RolId = rol.RolId;
-                        permisoRoles.Add(permisoRol);
-                        permisoRolId++;
-                    }
-                    await context.AddRangeAsync(permisoRoles);
-
-                    int? maxRolModulo = await context.Col_RolModulos.MaxAsync(m => (int?)m.Id);
-                    int? rolModuloId = maxRolModulo == null ? 1 : maxRolModulo + 1;
-                    foreach (var item in modulo)
-                    {
-                        Col_RolModulos _rolModulo = new Col_RolModulos();
-                        _rolModulo.Id = Convert.ToInt32(rolModuloId);
-                        _rolModulo.RolId = rol.RolId;
-                        _rolModulo.ModuloId = item.ModuloId;
-                        rolModulos.Add(_rolModulo);
-                        rolModuloId++;
-                    }
-                    await context.AddRangeAsync(rolModulos);
-
-                    int? maxSubModuloModulo = await context.Col_SubModuloModulo.MaxAsync(m => (int?)m.Id);
-                    int? rolSubModuloModuloId = maxSubModuloModulo == null ? 1 : maxSubModuloModulo + 1;
-                    if (subModulo.Count() <= 0)
-                    {
-                        List<int> modulos = new List<int>();
-                        foreach (var item in modulo)
-                        {
-                            modulos.Add(item.ModuloId);
-                        }
-                        subModulo = await context.Col_SubModulos
-                            .Where(w => modulos.Contains(w.ModuloId) && w.Estado.Equals("A"))
-                            .Select(s => new Col_SubModulos
-                            {
-                                SubModuloId = s.SubModuloId,
-                                ModuloId = s.ModuloId
-                            }).ToListAsync();
-                    }
-                    foreach (var item in subModulo)
-                    {
-                        Col_SubModuloModulo _subModulo = new Col_SubModuloModulo();
-                        _subModulo.Id = Convert.ToInt32(rolSubModuloModuloId);
-                        _subModulo.ModuloId = item.ModuloId;
-                        _subModulo.SubModuloId = item.SubModuloId;
-                        subModuloModulos.Add(_subModulo);
-                        rolSubModuloModuloId++;
-                    }
-                    await context.AddRangeAsync(subModuloModulos);
-
-                    await context.SaveChangesAsync();
-                }
-
-                return new ApiCallResult
-                {
-                    Status = status,
-                    Title = title,
-                    Message = message
-                };
+                        Descripcion = s.Descripcion,
+                        Nombre = s.Nombre,
+                        PermisoId = s.PermisoId
+                    })
+                    .ToListAsync();
+                return crud;
             }
             #region catch
             catch (DbEntityValidationException e)
@@ -184,7 +133,7 @@ namespace Colegio.Services
                             ve.PropertyName, ve.ErrorMessage);
                     }
                 }
-                return new ApiCallResult { Status = false, Title = "Error al guardar", Message = "Favor contacte éste con el administrador" };
+                return null;
             }
 
             catch (Exception e)
@@ -205,9 +154,10 @@ namespace Colegio.Services
                 {
                     err = (e.Message);
                 }
-                return new ApiCallResult { Status = false, Title = "Error al guardar", Message = "Favor contacte éste con el administrador" };
+                return null;
             }
             #endregion
+
         }
 
         public async Task<List<Col_Roles>> MostrarAutorizaciones()
@@ -272,6 +222,452 @@ namespace Colegio.Services
                     err = (e.Message);
                 }
                 return null;
+            }
+            #endregion
+        }
+
+        private async Task<Col_Roles> VerDetalleRol(int idRol)
+        {
+            try
+            {
+                var query = await context.Col_Roles
+                    .Where(w => w.RolId.Equals(idRol))
+                    .Select(s => new Col_Roles
+                    {
+                        NombreRol = s.NombreRol,
+                        FechaActualizacion = s.FechaActualizacion,
+                        FechaCreacion = s.FechaCreacion,
+                        Estado = s.Estado == "A" ? "ACTIVO" : "INACTIVO",
+                        Descripcion = s.Descripcion ?? "",
+                        UltimoLogin = context.Col_Usuarios
+                                    .Where(w => w.Estado.Equals("A") && w.RolId.Equals(s.RolId))
+                                    .OrderByDescending(o => o.UltimoLogin)
+                                    .Select(s => s.UltimoLogin).FirstOrDefault()
+                    }).FirstOrDefaultAsync();
+                return query;
+            }
+            #region catch
+            catch (DbEntityValidationException e)
+            {
+                string err = "";
+                foreach (var eve in e.EntityValidationErrors)
+                {
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        err += ve.ErrorMessage;
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+                return null;
+            }
+
+            catch (Exception e)
+            {
+                string err = "";
+                if (e.InnerException != null)
+                {
+                    if (e.InnerException.Message != null)
+                    {
+                        err = (e.InnerException.Message);
+                        if (e.InnerException.InnerException != null)
+                        {
+                            err += e.InnerException.InnerException.Message;
+                        }
+                    }
+                }
+                else
+                {
+                    err = (e.Message);
+                }
+                return null;
+            }
+            #endregion
+        }
+
+        private async Task<List<ModulosToSubModulos>> VerDetalleModulos(int idRol)
+        {
+            try
+            {
+                List<ModulosToSubModulos> relaciones = new List<ModulosToSubModulos>();
+
+                var query = await (from t0 in context.Col_Roles
+                                   join t1 in context.Col_RolModulos on t0.RolId equals t1.RolId
+                                   join t2 in context.Col_Modulos on t1.ModuloId equals t2.ModuloId
+                                   join t3 in context.Col_SubModuloModulo on new { t2.ModuloId, t0.RolId } equals new { t3.ModuloId, t3.RolId }
+                                   join t4 in context.Col_SubModulos on t3.SubModuloId equals t4.SubModuloId into ModSub
+                                   from t5 in ModSub.DefaultIfEmpty()
+                                   where t0.RolId.Equals(idRol)
+                                   select new ModulosToSubModulos
+                                   {
+                                       NombreRol = t0.NombreRol,
+                                       NombreModulo = t2.Nombre,
+                                       NombreSubModulo = t5.Nombre,
+                                       ModuloId = t2.ModuloId
+                                   }).ToListAsync();
+
+                foreach (var item in query)
+                {
+                    ModulosToSubModulos relacion = new ModulosToSubModulos();
+                    if (!relaciones.Where(w => w.NombreModulo == item.NombreModulo).Any())
+                    {
+                        List<ModulosToSubModulos> _relaciones = new List<ModulosToSubModulos>();
+                        relacion.NombreModulo = item.NombreModulo;
+                        relacion.ModuloId = item.ModuloId;
+                        relacion.NombreRol = item.NombreRol;
+                        foreach (var temp in query.Where(w => w.NombreModulo == item.NombreModulo && w.NombreSubModulo != null).ToList())
+                        {
+                            ModulosToSubModulos _relacion = new ModulosToSubModulos();
+                            _relacion.NombreSubModulo = temp.NombreSubModulo;
+                            _relaciones.Add(_relacion);
+                        }
+                        relacion.Relaciones = _relaciones;
+                        relaciones.Add(relacion);
+                    }
+                }
+
+                return relaciones;
+            }
+            #region catch
+            catch (DbEntityValidationException e)
+            {
+                string err = "";
+                foreach (var eve in e.EntityValidationErrors)
+                {
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        err += ve.ErrorMessage;
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+                return null;
+            }
+
+            catch (Exception e)
+            {
+                string err = "";
+                if (e.InnerException != null)
+                {
+                    if (e.InnerException.Message != null)
+                    {
+                        err = (e.InnerException.Message);
+                        if (e.InnerException.InnerException != null)
+                        {
+                            err += e.InnerException.InnerException.Message;
+                        }
+                    }
+                }
+                else
+                {
+                    err = (e.Message);
+                }
+                return null;
+            }
+            #endregion  
+        }
+
+        private async Task<List<UsuariosPerfiles>> VerListadoUsuariosPerfil(int rolId)
+        {
+            try
+            {
+                var query = await (from t0 in context.Col_Roles
+                                   join t1 in context.Col_Usuarios on t0.RolId equals t1.RolId
+                                   join t2 in context.Col_Estudiantes on t1.Id equals t2.UsuarioId
+                                   where t0.RolId.Equals(rolId) && t0.Estado.Equals("A") && t1.Estado.Equals("A")
+                                   && t2.Estado.Equals("A")
+                                   select new UsuariosPerfiles
+                                   {
+                                       Estado = t1.Estado,
+                                       NombreUsuario = t1.Usuario,
+                                       NombrePersona = t2.Nombres + " " + t2.PrimerApellido + " " + t2.SegundoApellido,
+                                       FechaCreacion = t1.FechaCreacion,
+                                       FechaActualizacion = t1.FechaActualizacion,
+                                       UltimoLogin = t1.UltimoLogin
+                                   }).ToListAsync();
+                return query;
+            }
+            #region catch
+            catch (DbEntityValidationException e)
+            {
+                string err = "";
+                foreach (var eve in e.EntityValidationErrors)
+                {
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        err += ve.ErrorMessage;
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+                return null;
+            }
+
+            catch (Exception e)
+            {
+                string err = "";
+                if (e.InnerException != null)
+                {
+                    if (e.InnerException.Message != null)
+                    {
+                        err = (e.InnerException.Message);
+                        if (e.InnerException.InnerException != null)
+                        {
+                            err += e.InnerException.InnerException.Message;
+                        }
+                    }
+                }
+                else
+                {
+                    err = (e.Message);
+                }
+                return null;
+            }
+            #endregion  
+        }
+
+        public async Task<PerfilesViewModel> MostrarDetallePerfil(int rolId)
+        {
+            PerfilesViewModel perfiles = new PerfilesViewModel();
+
+            perfiles.Roles = await VerDetalleRol(rolId);
+            perfiles.Modulos = await VerDetalleModulos(rolId);
+            perfiles.Usuarios = await VerListadoUsuariosPerfil(rolId);
+            return perfiles;
+        }
+
+        public async Task<ApiCallResult> EliminarPerfiles(int rolId, bool op)
+        {
+            try
+            {
+                bool status = false;
+                string title = "Error";
+                string message = "Ya existe un rol con este nombre";
+
+                var query = await context.Col_Roles
+                    .Join(context.Col_Usuarios,
+                        r => r.RolId,
+                        u => u.RolId,
+                        (r, u) => new { Col_Roles = r, Col_Usuarios = u })
+                    .Where(w => w.Col_Roles.RolId.Equals(rolId)).CountAsync();
+                var usuario = await context.Col_Usuarios.Where(w => w.RolId.Equals(rolId)).ToListAsync();
+                var rol = await context.Col_Roles.Where(w => w.RolId.Equals(rolId)).FirstOrDefaultAsync();
+                if (op)
+                {
+                    var subModulo = await context.Col_SubModuloModulo.Where(w => w.RolId.Equals(rolId)).ToListAsync();
+                    var permiso = await context.Col_PermisoRol.Where(w => w.RolId.Equals(rolId)).ToListAsync();
+                    var modulo = await context.Col_RolModulos.Where(w => w.RolId.Equals(rolId)).ToListAsync();
+                    if (query > 0)
+                    {
+                        context.Col_Usuarios.RemoveRange(usuario);
+                    }
+                    if (subModulo.Count() > 0)
+                    {
+                        context.Col_SubModuloModulo.RemoveRange(subModulo);
+                    }
+                    context.Col_PermisoRol.RemoveRange(permiso);
+                    context.Col_RolModulos.RemoveRange(modulo);
+                    context.Col_Roles.Remove(rol);
+                }
+                else
+                {
+                    if (query > 0)
+                    {
+                        foreach (var item in usuario)
+                        {
+                            item.FechaActualizacion = DateTime.Now;
+                            item.Estado = "I";
+                            context.Col_Usuarios.Update(item);
+                        }
+                    }
+                    rol.Estado = "I";
+                    rol.FechaActualizacion = DateTime.Now;
+                    context.Col_Roles.Update(rol);
+                }
+
+                await context.SaveChangesAsync();
+                status = true;
+                title = "Éxito";
+                message = "El perfil se ha eliminado exitosamente";
+
+                return new ApiCallResult { Status = status, Title = title, Message = message };
+            }
+            #region catch
+            catch (DbEntityValidationException e)
+            {
+                string err = "";
+                foreach (var eve in e.EntityValidationErrors)
+                {
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        err += ve.ErrorMessage;
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+                return new ApiCallResult { Status = false, Title = "Error al eliminar", Message = "Favor contacte éste con el administrador" };
+            }
+
+            catch (Exception e)
+            {
+                string err = "";
+                if (e.InnerException != null)
+                {
+                    if (e.InnerException.Message != null)
+                    {
+                        err = (e.InnerException.Message);
+                        if (e.InnerException.InnerException != null)
+                        {
+                            err += e.InnerException.InnerException.Message;
+                        }
+                    }
+                }
+                else
+                {
+                    err = (e.Message);
+                }
+                return new ApiCallResult { Status = false, Title = "Error al eliminar", Message = "Favor contacte éste con el administrador" };
+            }
+            #endregion  
+        }
+
+        public async Task<ApiCallResult> GuardarAutorizaciones(List<Col_Modulos> modulo, List<Col_SubModulos> subModulo, string rolNombre, List<Col_PermisosCrud> permisos, string descripcion)
+        {
+            try
+            {
+                bool status = false;
+                string title = "Error";
+                string message = "Ya existe un rol con este nombre";
+
+                var existeNombre = await context.Col_Roles.Where(w => w.NombreRol.Equals(rolNombre.ToUpper())).AnyAsync();
+                if (!existeNombre)
+                {
+                    Col_Roles rol = new Col_Roles();
+                    List<Col_RolModulos> rolModulos = new List<Col_RolModulos>();
+                    List<Col_PermisoRol> permisoRoles = new List<Col_PermisoRol>();
+                    List<Col_SubModuloModulo> subModuloModulos = new List<Col_SubModuloModulo>();
+
+                    status = true;
+                    title = "Proceso exitoso";
+                    message = "Los datos fueron guardados correctamente en la plataforma";
+
+                    int? maxId = await context.Col_Roles.MaxAsync(m => (int?)m.RolId);
+                    int? id = maxId == null ? 1 : maxId + 1;
+                    rol.Estado = "A";
+                    rol.FechaActualizacion = null;
+                    rol.FechaCreacion = DateTime.Now;
+                    rol.NombreRol = rolNombre.ToUpper();
+                    rol.RolId = Convert.ToInt32(id);
+                    rol.Descripcion = descripcion;
+                    await context.AddAsync<Col_Roles>(rol);
+
+                    maxId = await context.Col_PermisoRol.MaxAsync(m => (int?)m.Id);
+                    id = maxId == null ? 1 : maxId + 1;
+                    foreach (var item in permisos)
+                    {
+                        Col_PermisoRol permisoRol = new Col_PermisoRol();
+                        permisoRol.Id = Convert.ToInt32(id);
+                        permisoRol.PermisoId = item.PermisoId;
+                        permisoRol.RolId = rol.RolId;
+                        permisoRoles.Add(permisoRol);
+                        id++;
+                    }
+                    await context.AddRangeAsync(permisoRoles);
+
+                    maxId = await context.Col_RolModulos.MaxAsync(m => (int?)m.Id);
+                    id = maxId == null ? 1 : maxId + 1;
+                    foreach (var item in modulo)
+                    {
+                        Col_RolModulos _rolModulo = new Col_RolModulos();
+                        _rolModulo.Id = Convert.ToInt32(id);
+                        _rolModulo.RolId = rol.RolId;
+                        _rolModulo.ModuloId = item.ModuloId;
+                        rolModulos.Add(_rolModulo);
+                        id++;
+                    }
+                    await context.AddRangeAsync(rolModulos);
+
+                    maxId = await context.Col_SubModuloModulo.MaxAsync(m => (int?)m.Id);
+                    id = maxId == null ? 1 : maxId + 1;
+                    var queryModulo = modulo.Where(w => !subModulo.Where(s => s.ModuloId == w.ModuloId).Any()).ToList();
+                    foreach (var item in queryModulo)
+                    {
+                        Col_SubModuloModulo _subModulo = new Col_SubModuloModulo();
+                        _subModulo.Id = Convert.ToInt32(id);
+                        _subModulo.ModuloId = item.ModuloId;
+                        _subModulo.SubModuloId = null;
+                        _subModulo.RolId = rol.RolId;
+                        subModuloModulos.Add(_subModulo);
+                        id++;
+                    }
+
+                    foreach (var item in subModulo)
+                    {
+                        Col_SubModuloModulo _subModulo = new Col_SubModuloModulo();
+                        _subModulo.Id = Convert.ToInt32(id);
+                        _subModulo.ModuloId = item.ModuloId;
+                        _subModulo.SubModuloId = item.SubModuloId;
+                        _subModulo.RolId = rol.RolId;
+                        subModuloModulos.Add(_subModulo);
+                        id++;
+                    }
+                    await context.AddRangeAsync(subModuloModulos);
+
+                    await context.SaveChangesAsync();
+                }
+
+                return new ApiCallResult
+                {
+                    Status = status,
+                    Title = title,
+                    Message = message
+                };
+            }
+            #region catch
+            catch (DbEntityValidationException e)
+            {
+                string err = "";
+                foreach (var eve in e.EntityValidationErrors)
+                {
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        err += ve.ErrorMessage;
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+                return new ApiCallResult { Status = false, Title = "Error al guardar", Message = "Favor contacte éste con el administrador" };
+            }
+
+            catch (Exception e)
+            {
+                string err = "";
+                if (e.InnerException != null)
+                {
+                    if (e.InnerException.Message != null)
+                    {
+                        err = (e.InnerException.Message);
+                        if (e.InnerException.InnerException != null)
+                        {
+                            err += e.InnerException.InnerException.Message;
+                        }
+                    }
+                }
+                else
+                {
+                    err = (e.Message);
+                }
+                return new ApiCallResult { Status = false, Title = "Error al guardar", Message = "Favor contacte éste con el administrador" };
             }
             #endregion
         }

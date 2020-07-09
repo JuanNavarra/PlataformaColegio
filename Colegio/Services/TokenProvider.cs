@@ -33,7 +33,9 @@ namespace Colegio.Services
         {
             try
             {
-                var user = contexto.Col_Usuarios.Where(w => w.Usuario.Equals(usuario)).FirstOrDefault();
+                var user = contexto.Col_Usuarios
+                    .Where(w => w.Usuario.Equals(usuario) && w.Estado.Equals("A"))
+                    .FirstOrDefault();
                 if (user == null)
                     return null;
                 if (contrasena == user.Contrasena)
@@ -56,7 +58,10 @@ namespace Colegio.Services
                     );
                     string token = new JwtSecurityTokenHandler().WriteToken(JWToken);
                     var claimsIdentity = new ClaimsIdentity(GetUserClaims(user), token);
-
+                    var _usuario = contexto.Col_Usuarios.Where(w => w.Id.Equals(user.Id)).FirstOrDefault();
+                    _usuario.UltimoLogin = DateTime.Now;
+                    contexto.Col_Usuarios.Update(_usuario);
+                    contexto.SaveChanges();
                     return claimsIdentity;
                 }
                 else

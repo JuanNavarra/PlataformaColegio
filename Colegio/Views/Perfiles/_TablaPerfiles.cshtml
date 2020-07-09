@@ -31,12 +31,12 @@
                         <td>@item.Descripcion</td>
                         <td>@item.Estado</td>
                         <td>
-                            <a href='#' data-toggle="modal" data-target="#modal_ver_autorizacion">
+                            <a href='#' onclick="modalVerAutorizacion(@item.RolId)">
                                 <i class='fas fa-eye'></i>
-                            </a><a href='#' data-toggle="modal" data-target="#modal_autualizar_autorizacion">
+                            </a><a href='#'>
                                 <i class='fas fa-edit'></i>
                             </a>
-                            <a href='#' data-toggle="modal" data-target="#modal_eliminar_autorizacion">
+                            <a href='#' onclick="modalEliminarAuorizacion(@item.RolId)">
                                 <i class='fas fa-trash'></i>
                             </a>
                         </td>

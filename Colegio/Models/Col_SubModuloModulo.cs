@@ -9,6 +9,7 @@ namespace Colegio.Models
     {
         public int Id { get; set; }
         public int ModuloId { get; set; }
-        public int SubModuloId { get; set; }
+        public int? SubModuloId { get; set; }
+        public int RolId { get; set; }
     }
 }

@@ -15,5 +15,7 @@ namespace Colegio.Services.Interfaces
         public Task<List<Col_SubModulos>> CargarSubModulos(int[] modulos);
         public Task<List<Col_PermisosCrud>> CargarPermisosCRUD();
         public Task<List<Col_Roles>> MostrarAutorizaciones();
+        public Task<PerfilesViewModel> MostrarDetallePerfil(int rolId);
+        public Task<ApiCallResult> EliminarPerfiles(int rolId, bool op);
     }
 }
