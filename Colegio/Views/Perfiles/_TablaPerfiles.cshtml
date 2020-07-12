@@ -22,7 +22,7 @@
                 int count = 1;
                 foreach (var item in registros)
                 {
-                    <tr>
+                    <tr id="auth_@item.RolId">
                         <td>@count</td>
                         <td>@item.NombreRol</td>
                         <td>@item.FechaCreacion.ToString("dd/MM/yyyy")</td>

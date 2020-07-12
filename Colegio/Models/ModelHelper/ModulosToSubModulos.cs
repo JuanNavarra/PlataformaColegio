@@ -12,5 +12,8 @@ namespace Colegio.Models.ModelHelper
         public string NombreSubModulo { get; set; }
         public int ModuloId { get; set; }
         public List<ModulosToSubModulos> Relaciones { get; set; }
+        public List<string> Permisos { get; set; }
+        public string PermisoModulo { get; set; }
+        public string PermisoSubModulo { get; set; }
     }
 }

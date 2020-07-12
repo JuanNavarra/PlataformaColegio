@@ -19,19 +19,6 @@ namespace Colegio.Services
             this.context = context;
         }
 
-        public async Task<List<Col_Roles>> CargarRol()
-        {
-            var roles = await context.Col_Roles
-                .Where(w => w.Estado.Equals("A"))
-                .Select(s => new Col_Roles
-                {
-                    RolId = s.RolId,
-                    NombreRol = s.NombreRol
-                })
-                .ToListAsync();
-            return roles;
-        }
-
         public async Task<List<Col_Modulos>> CargarModulos()
         {
             try
@@ -103,69 +90,11 @@ namespace Colegio.Services
             return subModulos;
         }
 
-        public async Task<List<Col_PermisosCrud>> CargarPermisosCRUD()
-        {
-            try
-            {
-                var crud = await context.Col_PermisosCrud
-                    .Where(w => w.Estado.Equals("A"))
-                    .Select(s => new Col_PermisosCrud
-                    {
-                        Descripcion = s.Descripcion,
-                        Nombre = s.Nombre,
-                        PermisoId = s.PermisoId
-                    })
-                    .ToListAsync();
-                return crud;
-            }
-            #region catch
-            catch (DbEntityValidationException e)
-            {
-                string err = "";
-                foreach (var eve in e.EntityValidationErrors)
-                {
-                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
-                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
-                    {
-                        err += ve.ErrorMessage;
-                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
-                            ve.PropertyName, ve.ErrorMessage);
-                    }
-                }
-                return null;
-            }
-
-            catch (Exception e)
-            {
-                string err = "";
-                if (e.InnerException != null)
-                {
-                    if (e.InnerException.Message != null)
-                    {
-                        err = (e.InnerException.Message);
-                        if (e.InnerException.InnerException != null)
-                        {
-                            err += e.InnerException.InnerException.Message;
-                        }
-                    }
-                }
-                else
-                {
-                    err = (e.Message);
-                }
-                return null;
-            }
-            #endregion
-
-        }
-
         public async Task<List<Col_Roles>> MostrarAutorizaciones()
         {
             try
             {
                 var query = await context.Col_Roles
-                    .Where(w => w.Estado.Equals("A"))
                     .Select(s => new Col_Roles
                     {
                         NombreRol = s.NombreRol,
@@ -305,7 +234,9 @@ namespace Colegio.Services
                                        NombreRol = t0.NombreRol,
                                        NombreModulo = t2.Nombre,
                                        NombreSubModulo = t5.Nombre,
-                                       ModuloId = t2.ModuloId
+                                       ModuloId = t2.ModuloId,
+                                       PermisoSubModulo = t3.PermisosCrud,
+                                       PermisoModulo = t1.PermisosCrud
                                    }).ToListAsync();
 
                 foreach (var item in query)
@@ -314,20 +245,36 @@ namespace Colegio.Services
                     if (!relaciones.Where(w => w.NombreModulo == item.NombreModulo).Any())
                     {
                         List<ModulosToSubModulos> _relaciones = new List<ModulosToSubModulos>();
+                        List<string> _permisos = new List<string>();
                         relacion.NombreModulo = item.NombreModulo;
                         relacion.ModuloId = item.ModuloId;
                         relacion.NombreRol = item.NombreRol;
-                        foreach (var temp in query.Where(w => w.NombreModulo == item.NombreModulo && w.NombreSubModulo != null).ToList())
+                        if (item.PermisoModulo != null)
                         {
-                            ModulosToSubModulos _relacion = new ModulosToSubModulos();
-                            _relacion.NombreSubModulo = temp.NombreSubModulo;
-                            _relaciones.Add(_relacion);
+                            string reemplazarModulo = item.PermisoModulo.Replace('\n', ' ');
+                            List<string> permisosModulo = reemplazarModulo.Split(',').ToList();
+                            foreach (var temp in permisosModulo)
+                            {
+                                _permisos.Add(temp);
+                            }
                         }
+                        else
+                        {
+                            foreach (var temp in query.Where(w => w.NombreModulo == item.NombreModulo && w.NombreSubModulo != null).ToList())
+                            {
+                                ModulosToSubModulos _relacion = new ModulosToSubModulos();
+                                string reemplazarSubModulo = temp.PermisoSubModulo.Replace('\n', ' ');
+                                List<string> permisosSubModulo = reemplazarSubModulo.Split(',').ToList();
+                                _relacion.NombreSubModulo = temp.NombreSubModulo;
+                                _relacion.Permisos = permisosSubModulo;
+                                _relaciones.Add(_relacion);
+                            }
+                        }
+                        relacion.Permisos = _permisos;
                         relacion.Relaciones = _relaciones;
                         relaciones.Add(relacion);
                     }
                 }
-
                 return relaciones;
             }
             #region catch
@@ -461,7 +408,6 @@ namespace Colegio.Services
                 if (op)
                 {
                     var subModulo = await context.Col_SubModuloModulo.Where(w => w.RolId.Equals(rolId)).ToListAsync();
-                    var permiso = await context.Col_PermisoRol.Where(w => w.RolId.Equals(rolId)).ToListAsync();
                     var modulo = await context.Col_RolModulos.Where(w => w.RolId.Equals(rolId)).ToListAsync();
                     if (query > 0)
                     {
@@ -471,7 +417,6 @@ namespace Colegio.Services
                     {
                         context.Col_SubModuloModulo.RemoveRange(subModulo);
                     }
-                    context.Col_PermisoRol.RemoveRange(permiso);
                     context.Col_RolModulos.RemoveRange(modulo);
                     context.Col_Roles.Remove(rol);
                 }
@@ -539,7 +484,7 @@ namespace Colegio.Services
             #endregion  
         }
 
-        public async Task<ApiCallResult> GuardarAutorizaciones(List<Col_Modulos> modulo, List<Col_SubModulos> subModulo, string rolNombre, List<Col_PermisosCrud> permisos, string descripcion)
+        public async Task<ApiCallResult> GuardarAutorizaciones(List<Col_RolModulos> modulo, List<Col_SubModuloModulo> subModulo, string rolNombre, string descripcion)
         {
             try
             {
@@ -552,7 +497,6 @@ namespace Colegio.Services
                 {
                     Col_Roles rol = new Col_Roles();
                     List<Col_RolModulos> rolModulos = new List<Col_RolModulos>();
-                    List<Col_PermisoRol> permisoRoles = new List<Col_PermisoRol>();
                     List<Col_SubModuloModulo> subModuloModulos = new List<Col_SubModuloModulo>();
 
                     status = true;
@@ -569,19 +513,6 @@ namespace Colegio.Services
                     rol.Descripcion = descripcion;
                     await context.AddAsync<Col_Roles>(rol);
 
-                    maxId = await context.Col_PermisoRol.MaxAsync(m => (int?)m.Id);
-                    id = maxId == null ? 1 : maxId + 1;
-                    foreach (var item in permisos)
-                    {
-                        Col_PermisoRol permisoRol = new Col_PermisoRol();
-                        permisoRol.Id = Convert.ToInt32(id);
-                        permisoRol.PermisoId = item.PermisoId;
-                        permisoRol.RolId = rol.RolId;
-                        permisoRoles.Add(permisoRol);
-                        id++;
-                    }
-                    await context.AddRangeAsync(permisoRoles);
-
                     maxId = await context.Col_RolModulos.MaxAsync(m => (int?)m.Id);
                     id = maxId == null ? 1 : maxId + 1;
                     foreach (var item in modulo)
@@ -590,6 +521,7 @@ namespace Colegio.Services
                         _rolModulo.Id = Convert.ToInt32(id);
                         _rolModulo.RolId = rol.RolId;
                         _rolModulo.ModuloId = item.ModuloId;
+                        _rolModulo.PermisosCrud = item.PermisosCrud?.Trim();
                         rolModulos.Add(_rolModulo);
                         id++;
                     }
@@ -605,6 +537,7 @@ namespace Colegio.Services
                         _subModulo.ModuloId = item.ModuloId;
                         _subModulo.SubModuloId = null;
                         _subModulo.RolId = rol.RolId;
+                        _subModulo.PermisosCrud = item.PermisosCrud.Trim();
                         subModuloModulos.Add(_subModulo);
                         id++;
                     }
@@ -616,6 +549,7 @@ namespace Colegio.Services
                         _subModulo.ModuloId = item.ModuloId;
                         _subModulo.SubModuloId = item.SubModuloId;
                         _subModulo.RolId = rol.RolId;
+                        _subModulo.PermisosCrud = item.PermisosCrud.Trim();
                         subModuloModulos.Add(_subModulo);
                         id++;
                     }

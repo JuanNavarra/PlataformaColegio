@@ -19,8 +19,6 @@ namespace Colegio.Data
         public DbSet<Col_Modulos> Col_Modulos { get; set; }
         public DbSet<Col_SubModulos> Col_SubModulos { get; set; }
         public DbSet<Col_SubModuloModulo> Col_SubModuloModulo { get; set; }
-        public DbSet<Col_PermisosCrud> Col_PermisosCrud { get; set; }
-        public DbSet<Col_PermisoRol> Col_PermisoRol { get; set; }
         public DbSet<Col_RolModulos> Col_RolModulos { get; set; }
         public DbSet<Col_Estudiantes> Col_Estudiantes { get; set; }
 
@@ -33,8 +31,6 @@ namespace Colegio.Data
             modelBuilder.ApplyConfiguration(new Col_ModulosConfiguration());
             modelBuilder.ApplyConfiguration(new Col_SubModulosConfiguration());
             modelBuilder.ApplyConfiguration(new Col_SubModuloModuloConfiguration());
-            modelBuilder.ApplyConfiguration(new Col_PermisosCrudConfiguration());
-            modelBuilder.ApplyConfiguration(new Col_PermisoRolConfiguration());
             modelBuilder.ApplyConfiguration(new Col_RolModulosConfiguration());
             modelBuilder.ApplyConfiguration(new Col_EstudiantesConfiguration());
         }

@@ -5,6 +5,8 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity.Validation;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Colegio.Controllers
@@ -12,9 +14,18 @@ namespace Colegio.Controllers
     public class PerfilesController : Controller
     {
         private readonly IPerfilesService perfilesService;
+
         public PerfilesController(IPerfilesService perfilesService)
         {
             this.perfilesService = perfilesService;
+        }
+
+        private List<Claim> GenerarPermisos()
+        {
+            var permisos = User.Claims
+                .Where(w => w.Type.Equals("PermisoSubModulo") && w.Value.Contains("Maestro Administrativo"))
+                .ToList();
+            return permisos;
         }
 
         [HttpGet]
@@ -22,15 +33,18 @@ namespace Colegio.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                var registros = await perfilesService.MostrarAutorizaciones();
-                ViewBag.Registros = registros;
-                return View();
+                if (GenerarPermisos().Where(w => w.Value.Contains("Perfiles")).Any())
+                {
+                    var registros = await perfilesService.MostrarAutorizaciones();
+                    ViewBag.Registros = registros;
+                    return View();
+                }
             }
             return Redirect("~/Login/Authentication");
         }
 
         [HttpPost]
-        public async Task<IActionResult> GuardarAutorizaciones(string modulo, string subModulo, string rol, string crud, string descripcion)
+        public async Task<IActionResult> GuardarAutorizaciones(string modulo, string subModulo, string rol, string descripcion)
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -38,34 +52,28 @@ namespace Colegio.Controllers
                 {
                     dynamic moduloJson = JsonConvert.DeserializeObject(modulo);
                     dynamic subModuloJson = JsonConvert.DeserializeObject(subModulo);
-                    dynamic crudJson = JsonConvert.DeserializeObject(crud);
-                    List<Col_Modulos> modulos = new List<Col_Modulos>();
-                    List<Col_SubModulos> subModulos = new List<Col_SubModulos>();
-                    List<Col_PermisosCrud> permisos = new List<Col_PermisosCrud>();
+                    List<Col_RolModulos> modulos = new List<Col_RolModulos>();
+                    List<Col_SubModuloModulo> subModulos = new List<Col_SubModuloModulo>();
                     foreach (var item in moduloJson)
                     {
-                        Col_Modulos _modulo = new Col_Modulos();
+                        Col_RolModulos _modulo = new Col_RolModulos();
                         _modulo.ModuloId = item.ModuloId;
+                        _modulo.PermisosCrud = item.PermisosCrud;
                         modulos.Add(_modulo);
-                    }
-                    foreach (var item in crudJson)
-                    {
-                        Col_PermisosCrud _permiso = new Col_PermisosCrud();
-                        _permiso.PermisoId = item.PermisoId;
-                        permisos.Add(_permiso);
                     }
                     if (subModuloJson.Count > 0)
                     {
                         foreach (var item in subModuloJson)
                         {
-                            Col_SubModulos _subModulos = new Col_SubModulos();
+                            Col_SubModuloModulo _subModulos = new Col_SubModuloModulo();
                             _subModulos.SubModuloId = item.SubModuloId;
                             _subModulos.ModuloId = item.ModuloId;
+                            _subModulos.PermisosCrud = item.PermisosCrud;
                             subModulos.Add(_subModulos);
                         }
                     }
 
-                    var result = await perfilesService.GuardarAutorizaciones(modulos, subModulos, rol, permisos, descripcion);
+                    var result = await perfilesService.GuardarAutorizaciones(modulos, subModulos, rol, descripcion);
                     return Json(new { result });
                 }
                 #region catch
@@ -115,13 +123,6 @@ namespace Colegio.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> CargarRoles()
-        {
-            var roles = await perfilesService.CargarRol();
-            return Json(new { result = "ok", roles });
-        }
-
-        [HttpGet]
         public async Task<IActionResult> CargarModulos()
         {
             if (User.Identity.IsAuthenticated)
@@ -144,17 +145,6 @@ namespace Colegio.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> CargarPermisosCRUD()
-        {
-            if (User.Identity.IsAuthenticated)
-            {
-                var crud = await perfilesService.CargarPermisosCRUD();
-                return Json(new { result = "ok", data = crud });
-            }
-            return Redirect("~/Login/Authentication");
-        }
-
-        [HttpGet]
         public async Task<IActionResult> MostrarDetallePerfil(int rolId)
         {
             if (User.Identity.IsAuthenticated)
@@ -166,7 +156,7 @@ namespace Colegio.Controllers
         }
 
         [HttpPost]
-        public  async Task<IActionResult> EliminarPerfiles(int rolId, bool op)
+        public async Task<IActionResult> EliminarPerfiles(int rolId, bool op)
         {
             if (User.Identity.IsAuthenticated)
             {

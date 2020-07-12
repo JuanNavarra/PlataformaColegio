@@ -13,5 +13,11 @@ namespace Colegio.Models.ModelHelper
         public DateTime? FechaActualizacion { get; set; }
         public DateTime? UltimoLogin { get; set; }
         public string Estado { get; set; }
+        public int Id { get; set; }
+        public string PermisosSubModulo { get; set; }
+        public string PermisosModulo { get; set; }
+        public string SubModulos { get; set; }
+        public string Modulos { get; set; }
+        public string NombreRol { get; set; }
     }
 }

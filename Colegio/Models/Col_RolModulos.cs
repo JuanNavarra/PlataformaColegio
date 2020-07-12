@@ -10,5 +10,6 @@ namespace Colegio.Models
         public int Id { get; set; }
         public int RolId { get; set; }
         public int ModuloId { get; set; }
+        public string PermisosCrud { get; set; }
     }
 }

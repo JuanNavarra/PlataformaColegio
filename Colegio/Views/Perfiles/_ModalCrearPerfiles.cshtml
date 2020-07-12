@@ -25,8 +25,11 @@
                                     <li class="nav-item">
                                         <a class="nav-link active" id="custom-tabs-one-home-tab" role="tab" aria-controls="custom-tabs-one-home" aria-selected="true">Generales</a>
                                     </li>
-                                    <li class="nav-item">
+                                    <li class="nav-item" id="profile_tab" style="display:none;">
                                         <a class="nav-link" id="custom-tabs-one-profile-tab" role="tab" aria-controls="custom-tabs-one-profile" aria-selected="false">Detallado</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="custom-tabs-one-permisos-tab" role="tab" aria-controls="custom-tabs-one-permisos" aria-selected="false">Permisos CRUD</a>
                                     </li>
                                 </ul>
                             </div>
@@ -36,31 +39,25 @@
                                         <div class="row">
                                             <div class="col-sm-4" id="row_crear_roles">
                                                 <div class="form-group">
-                                                    <label>Nombre del perfil</label>
-                                                    <input type="text" class="form-control validar1" id="modal_nombre_perfil" autocomplete="off">
+                                                    <label>* Nombre del perfil</label>
+                                                    <input type="text" class="form-control" id="modal_nombre_perfil" autocomplete="off">
                                                 </div>
                                             </div>
-                                            <div class="col-sm-4">
+                                            <div class="col-sm-8">
                                                 <div class="form-group">
-                                                    <label>Nombre del módulo</label>
+                                                    <label>* Nombre del módulo</label>
                                                     <select class="select2" id="modal_nombre_modulo" multiple="multiple" data-placeholder="Selecciona varios" style="width: 100%;"></select>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <div class="form-group">
-                                                    <label>Permisos CRUD</label>
-                                                    <select class="select2" id="modal_nombre_crud" multiple="multiple" data-placeholder="Selecciona varios" style="width: 100%;"></select>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-sm-6">
+                                            <div class="col-sm-8">
                                                 <div class="form-group">
-                                                    <label>Descripción del perfil</label>
+                                                    <label>* Descripción del perfil</label>
                                                     <textarea class="form-control" rows="3" id="modal_descripcion_autorizacion"></textarea>
                                                 </div>
                                             </div>
-                                            <div class="col-sm-6">
+                                            <div class="col-sm-4">
                                                 <div class="custom-control custom-checkbox">
                                                     <input disabled class="custom-control-input" type="checkbox" id="customCheckbox1" value="option1">
                                                     <label for="customCheckbox1" class="custom-control-label">Restringir por submodulos</label>
@@ -97,6 +94,28 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="tab-pane fade" id="custom-tabs-one-permisos" role="tabpanel" aria-labelledby="custom-tabs-one-permisos-tab">
+                                        <div class="card card-default">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="card-body p-0">
+                                                            <table class="table table-striped">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th style="width: 10px">#</th>
+                                                                        <th>Módulo</th>
+                                                                        <th>Permisos</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody id="tbody_permisos"></tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -109,8 +128,8 @@
                 </div>
                 <div class="derecha-boton">
                     <button type="button" class="btn btn-danger" id="modal_atras_detalle" style="display:none">Atras</button>
-                    <button type="button" class="btn btn-primary" id="modal_guardar_cambios" onclick="guardarModulos()">Guardar cambios</button>
-                    <button type="button" class="btn btn-primary" id="modal_siguiente_detalle" style="display:none">Siguiente</button>
+                    <button type="button" class="btn btn-primary" id="modal_guardar_cambios" onclick="guardarModulos()" style="display:none;">Guardar cambios</button>
+                    <button type="button" class="btn btn-primary" id="modal_siguiente_detalle">Siguiente</button>
                 </div>
             </div>
         </div>

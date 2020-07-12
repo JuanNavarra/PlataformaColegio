@@ -1,5 +1,6 @@
 ﻿using Colegio.Data;
 using Colegio.Models;
+using Colegio.Models.ModelHelper;
 using Colegio.Services.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -40,6 +41,23 @@ namespace Colegio.Services
                     return null;
                 if (contrasena == user.Contrasena)
                 {
+                    var query = (from t0 in contexto.Col_Roles
+                                 join t6 in contexto.Col_Usuarios on t0.RolId equals t6.RolId
+                                 join t1 in contexto.Col_RolModulos on t0.RolId equals t1.RolId
+                                 join t2 in contexto.Col_Modulos on t1.ModuloId equals t2.ModuloId
+                                 join t3 in contexto.Col_SubModuloModulo on new { t2.ModuloId, t0.RolId } equals new { t3.ModuloId, t3.RolId }
+                                 join t4 in contexto.Col_SubModulos on t3.SubModuloId equals t4.SubModuloId into ModSub
+                                 from t5 in ModSub.DefaultIfEmpty()
+                                 where t6.Id.Equals(user.Id)
+                                 select new UsuariosPerfiles
+                                 {
+                                     NombreUsuario = t6.Usuario,
+                                     PermisosModulo = t1.PermisosCrud.Replace("\n", ""),
+                                     PermisosSubModulo = t3.PermisosCrud.Replace("\n", ""),
+                                     Modulos = t2.Nombre,
+                                     SubModulos = t5.Nombre,
+                                 }).ToList();
+
                     //Authentication successful, Issue Token with user credentials 
                     //Provide the security key which is given in 
                     //Startup.cs ConfigureServices() method 
@@ -49,7 +67,7 @@ namespace Colegio.Services
                     var JWToken = new JwtSecurityToken(
                         issuer: "http://localhost:45092/",
                         audience: "http://localhost:45092/",
-                        claims: GetUserClaims(user),
+                        claims: GetUserClaims(query),
                         notBefore: new DateTimeOffset(DateTime.Now).DateTime,
                         expires: new DateTimeOffset(DateTime.Now.AddDays(1)).DateTime,
                         //Using HS256 Algorithm to encrypt Token  
@@ -57,7 +75,7 @@ namespace Colegio.Services
                         (new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                     );
                     string token = new JwtSecurityTokenHandler().WriteToken(JWToken);
-                    var claimsIdentity = new ClaimsIdentity(GetUserClaims(user), token);
+                    var claimsIdentity = new ClaimsIdentity(GetUserClaims(query), token);
                     var _usuario = contexto.Col_Usuarios.Where(w => w.Id.Equals(user.Id)).FirstOrDefault();
                     _usuario.UltimoLogin = DateTime.Now;
                     contexto.Col_Usuarios.Update(_usuario);
@@ -116,14 +134,15 @@ namespace Colegio.Services
         /// </summary>
         /// <param name="user">Objeto de tipo Col_Usuarios</param>
         /// <returns></returns>
-        private IEnumerable<Claim> GetUserClaims(Col_Usuarios user)
+        private List<Claim> GetUserClaims(List<UsuariosPerfiles> user)
         {
-            IEnumerable<Claim> claims = new Claim[]
+            List<Claim> claims = new List<Claim>();
+            foreach (var item in user)
             {
-                new Claim(ClaimTypes.Name, user.Usuario),
-                new Claim("Usuario", user.Usuario),
-                new Claim("Id", user.Id.ToString())
-            };
+                claims.Add(new Claim("Usuario", item.NombreUsuario));
+                claims.Add(new Claim("PermisoModulo", $"{item.Modulos}-{item.PermisosModulo ?? "0"}"));
+                claims.Add(new Claim("PermisoSubModulo", $"{item.Modulos}-{item.SubModulos ?? "0"}-{item.PermisosSubModulo}"));
+            }
             return claims;
         }
 

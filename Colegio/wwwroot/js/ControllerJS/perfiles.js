@@ -2,23 +2,25 @@
     ejecutarDataTable("detalle_perfiles_table")
 
     cargarModulos();
-    cargarPermisosCRUD()
     $('.select2').select2()
 
     $("#modal_nombre_modulo").on("select2:close", function (e) {
         if ($(this).val() == "") {
             $("#customCheckbox1").prop("disabled", true);
-            $("#modal_siguiente_detalle").css("display", "none");
-            $("#modal_guardar_cambios").removeAttr("style");
             if ($("#customCheckbox1").is(':checked')) {
                 $("#customCheckbox1").prop('checked', false)
             }
         }
+        cargarSubModulos();
     });
 
     $('#modal_nombre_modulo').on('select2:select', function (e) {
         if ($(this).val() != "") {
+            cargarSubModulos();
             $("#customCheckbox1").prop("disabled", false);
+            if ($("#customCheckbox1").is(':checked')) {
+                $("#profile_tab").removeAttr("style");
+            }
         }
     });
 
@@ -26,13 +28,87 @@
         if ($(this).is(':checked')) {
             $("#modal_guardar_cambios").css("display", "none");
             $("#modal_siguiente_detalle").removeAttr("style");
-            cargarSubModulos();
+            $("#profile_tab").removeAttr("style");
         } else {
-            $("#modal_siguiente_detalle").css("display", "none");
-            $("#modal_guardar_cambios").removeAttr("style");
+            $("#profile_tab").css("display", "none");
             $("#modal_submodulos").val("");
+            $("#modal_submodulos2").html("")
         }
     })
+
+    $("#modal_siguiente_detalle").on("click", function (e) {
+        e.preventDefault();
+        if ($("#custom-tabs-one-home-tab").hasClass("active")) {
+            if ($("#modal_nombre_perfil").val() != "" && $("#modal_nombre_modulo").val() != "" && $("#modal_descripcion_autorizacion").val() != "") {
+                if ($("#customCheckbox1").is(":checked")) {
+                    $("#custom-tabs-one-profile-tab").addClass("active");
+                    $("#custom-tabs-one-profile").addClass("active").addClass("show");
+                    $("#modal_guardar_cambios").css("display", "none");
+                } else {
+                    $("#custom-tabs-one-permisos-tab").addClass("active");
+                    $("#custom-tabs-one-permisos").addClass("active").addClass("show");
+                    $("#modal_guardar_cambios").removeAttr("style");
+                    cargarPermisosCRUD();
+                    $(this).css("display", "none");
+                }
+                $("#custom-tabs-one-home-tab").removeClass("active");
+                $("#custom-tabs-one-home").removeClass("show").removeClass("active");
+                $("#modal_atras_detalle").removeAttr("style");
+                cargarSubModulos();
+            } else {
+                toastr.warning("¡Falta llenar los campos obligatorios!");
+            }
+        }
+        else if ($("#custom-tabs-one-profile-tab").hasClass("active")) {
+            if ($("#modal_submodulos2").val() != "") {
+                $("#custom-tabs-one-permisos-tab").addClass("active");
+                $("#custom-tabs-one-permisos").addClass("active").addClass("show");
+                $("#custom-tabs-one-profile-tab").removeClass("active");
+                $("#custom-tabs-one-profile").removeClass("show").removeClass("active");
+                $("#modal_guardar_cambios").removeAttr("style");
+                $(this).css("display", "none");
+                cargarPermisosCRUD();
+                $("#modal_atras_detalle").removeAttr("style");
+                cargarSubModulos();
+            } else {
+                toastr.warning("¡Al menos tiene que tener un submodulo seleccionado!");
+            }
+        }
+        else {
+            $(this).css("display", "none");
+            $("#modal_atras_detalle").removeAttr("style");
+            cargarSubModulos();
+        }
+    })
+
+    $("#modal_atras_detalle").on("click", function (e) {
+        e.preventDefault();
+        if ($("#custom-tabs-one-permisos-tab").hasClass("active")) {
+            if (!$("#customCheckbox1").is(":checked")) {
+                $("#custom-tabs-one-home-tab").addClass("active").addClass("show");
+                $("#custom-tabs-one-home").addClass("show").addClass("active");
+                $("#custom-tabs-one-permisos-tab").removeClass("active").removeClass("show");
+                $("#custom-tabs-one-permisos").removeClass("active").removeClass("show");
+                $(this).css("display", "none");
+            } else {
+                $("#custom-tabs-one-profile-tab").addClass("active").addClass("show");
+                $("#custom-tabs-one-profile").addClass("show").addClass("active");
+                $("#custom-tabs-one-permisos-tab").removeClass("active").removeClass("show");
+                $("#custom-tabs-one-permisos").removeClass("active").removeClass("show");
+            }
+        }
+        else if ($("#custom-tabs-one-profile-tab").hasClass("active")) {
+            $("#custom-tabs-one-home-tab").addClass("active").addClass("show");
+            $("#custom-tabs-one-home").addClass("show").addClass("active");
+            $("#custom-tabs-one-profile-tab").removeClass("active").removeClass("show");
+            $("#custom-tabs-one-profile").removeClass("active").removeClass("show");
+            $(this).css("display", "none");
+        }
+        $("#modal_guardar_cambios").css("display", "none");
+        $("#modal_siguiente_detalle").removeAttr("style");
+        $("#modal_submodulos2").html("")
+        cargarSubModulos();
+    });
 
     $('#btnRight').click(function (e) {
         $('select').moveToListAndDelete('#modal_submodulos', '#modal_submodulos2');
@@ -57,29 +133,6 @@
         $('select').moveAllToListAndDelete('#modal_submodulos2', '#modal_submodulos');
         $("#modal_submodulos option").prop("selected", "true");
         e.preventDefault();
-    });
-
-    $("#modal_siguiente_detalle").on("click", function (e) {
-        e.preventDefault();
-        $("#custom-tabs-one-profile-tab").addClass("active");
-        $("#custom-tabs-one-profile").addClass("active").addClass("show");
-        $("#custom-tabs-one-home-tab").removeClass("active");
-        $("#custom-tabs-one-home").removeClass("show").removeClass("active");
-        $("#modal_atras_detalle").removeAttr("style");
-        $("#modal_guardar_cambios").removeAttr("style");
-        $(this).css("display", "none");
-        cargarSubModulos();
-    })
-
-    $("#modal_atras_detalle").on("click", function (e) {
-        e.preventDefault();
-        $("#custom-tabs-one-profile-tab").removeClass("active").removeClass("show");
-        $("#custom-tabs-one-profile").removeClass("active").removeClass("show");
-        $("#custom-tabs-one-home-tab").addClass("active").addClass("show");
-        $("#custom-tabs-one-home").addClass("show").addClass("active");
-        $("#modal_siguiente_detalle").removeAttr("style");
-        $("#modal_guardar_cambios").css("display", "none");
-        $(this).css("display", "none");
     });
 
 
@@ -121,7 +174,7 @@ function cargarSubModulos() {
             if (res.result == "ok") {
                 var ca = "";
                 $.each(res.data, function (index, item) {
-                    ca = "<option value=" + item.subModuloId + "-" + item.moduloId + ">" + item.nombre + " (" + item.descripcion + ")</option>"
+                    ca = "<option value=" + item.subModuloId + "-" + item.moduloId + ">" + item.nombre + " (" + item.descripcion + ")  </option>"
                     $("#modal_submodulos").append(ca);
                 });
             }
@@ -135,39 +188,49 @@ function cargarSubModulos() {
 function guardarModulos() {
     var moduloArray = new Array();
     var subModuloArray = new Array();
-    var permisoCRUDArray = new Array();
 
     var selectModulos = document.getElementById("modal_nombre_modulo");
     for (var i = 0; i < selectModulos.length; i++) {
-
-        var item = {
-            ModuloId: $("#modal_nombre_modulo").val()[i],
-        };
-        if (item.ModuloId != undefined) {
-            moduloArray.push(item);
+        var modulo = $("#null-" + $("#modal_nombre_modulo").val()[i]).children().eq(2);
+        if (modulo.length > 0) {
+            var repl = modulo[0].childNodes[1].innerText;
+            var arrayMod = repl.replace("×", "").replace("×", ",").replace("×", ",").replace("×", ",");
+            var item = {
+                ModuloId: $("#modal_nombre_modulo").val()[i],
+                PermisosCrud: arrayMod
+            };
+            if (item.ModuloId != undefined) {
+                moduloArray.push(item);
+            }
         }
-    }
-
-    var selectCRUD = document.getElementById("modal_nombre_crud");
-    for (var i = 0; i < selectCRUD.length; i++) {
-
-        var item = {
-            PermisoId: $("#modal_nombre_crud").val()[i],
-        };
-        if (item.PermisoId != undefined) {
-            permisoCRUDArray.push(item);
+        else {
+            var item = {
+                ModuloId: $("#modal_nombre_modulo").val()[i],
+                PermisosCrud: null
+            };
+            if (item.ModuloId != undefined) {
+                moduloArray.push(item);
+            }
         }
     }
 
     var selectSubModulo = document.getElementById("modal_submodulos2");
-    for (var i = 0; i < selectSubModulo.length; i++) {
-        var dato = $("#modal_submodulos2").val()[i].split('-')
-        var item = {
-            SubModuloId: dato[0],
-            ModuloId: dato[1]
-        };
-        if (item.SubModuloId != undefined) {
-            subModuloArray.push(item);
+    if (selectSubModulo.length > 0) {
+        for (var i = 0; i < selectSubModulo.length; i++) {
+            var dato = $("#modal_submodulos2").val()[i].split('-')
+            var submodulo = $("#" + dato[0] + "-" + dato[1]).children().eq(2);
+            if (submodulo.length > 0) {
+                var repl = submodulo[0].childNodes[1].innerText;
+                var arrayMod = repl.replace("×", "").replace("×", ",").replace("×", ",").replace("×", ",");
+                var item = {
+                    SubModuloId: dato[0],
+                    ModuloId: dato[1],
+                    PermisosCrud: arrayMod
+                };
+                if (item.SubModuloId != undefined) {
+                    subModuloArray.push(item);
+                }
+            }
         }
     }
 
@@ -175,8 +238,8 @@ function guardarModulos() {
         type: "POST",
         url: "Perfiles/GuardarAutorizaciones",
         data: {
-            modulo: JSON.stringify(moduloArray), subModulo: JSON.stringify(subModuloArray), rol: $("#modal_nombre_perfil").val(),
-            crud: JSON.stringify(permisoCRUDArray), descripcion: $("#modal_descripcion_autorizacion").val()
+            modulo: JSON.stringify(moduloArray), subModulo: JSON.stringify(subModuloArray),
+            rol: $("#modal_nombre_perfil").val(), descripcion: $("#modal_descripcion_autorizacion").val()
         },
         dataType: "json",
         async: true,
@@ -192,7 +255,7 @@ function guardarModulos() {
                 $("#customCheckbox1").prop("disabled", true);
                 $("#modal_siguiente_detalle").css("display", "none");
                 $("#modal_guardar_cambios").removeAttr("style");
-                $("#modal_crear_autorizacion").toggle();
+                $("#modal_crear_autorizacion").modal('toggle');
                 toastr.success(res.result.title + ": " + res.result.message);
             } else {
                 toastr.error(res.result.title + ": " + res.result.message);
@@ -200,51 +263,6 @@ function guardarModulos() {
         },
         error: function (error) {
             toastr.error(res.result.title + ": " + res.result.message);
-        }
-    })
-}
-
-//aun no se usa
-function cargarRoles() {
-    $.ajax({
-        type: "GET",
-        url: "Perfiles/CargarRoles",
-        data: {},
-        dataType: "json",
-        async: true,
-        success: function (res) {
-            if (res.result == "ok") {
-                var ca = "";
-                $.each(res.roles, function (index, item) {
-                    ca = "<option value=" + item.rolId + ">" + item.nombreRol + "</option>"
-                    $("#modal_nombre_perfil_existente").append(ca);
-                });
-            }
-        },
-        error: function (error) {
-            console.log("No se ha podido obtener la información");
-        }
-    })
-}
-
-function cargarPermisosCRUD() {
-    $.ajax({
-        type: "GET",
-        url: "Perfiles/CargarPermisosCRUD",
-        data: {},
-        dataType: "json",
-        async: true,
-        success: function (res) {
-            if (res.result == "ok") {
-                var ca = "";
-                $.each(res.data, function (index, item) {
-                    ca = "<option value=" + item.permisoId + ">" + item.nombre + " (" + item.descripcion + ")</option>"
-                    $("#modal_nombre_crud").append(ca);
-                });
-            }
-        },
-        error: function (error) {
-            console.log("No se ha podido obtener la información");
         }
     })
 }
@@ -263,8 +281,8 @@ function modalVerAutorizacion(rolId) {
                 $('#tbody_ver_detalle_autorizacion').empty();
                 $("#listado_modulos").empty();
                 $("#tbody_ver_personas_perfil").empty();
-
                 $('#modal_ver_autorizacion').modal('show');
+
                 var ca = "<tr>"
                 ca += "<td>" + res.data.roles.nombreRol + "</td>"
                 ca += "<td>" + res.data.roles.fechaCreacion + "</td>"
@@ -283,11 +301,45 @@ function modalVerAutorizacion(rolId) {
                 $.each(res.data.modulos, function (index, item) {
                     ca = "<div class='col-4'>"
                     ca += "<ul class='list-group'>"
-                    ca += "<li class='list-group-item active'>" + item.nombreModulo + "</li>"
                     if (res.data.modulos[index].relaciones.length > 0) {
-                        $.each(res.data.modulos[index].relaciones, function (index, item2) {
-                            ca += "<li class='list-group-item'>" + item2.nombreSubModulo + "</li>"
+                        ca += "<li class='list-group-item active' style='margin-bottom:11%;'>" + item.nombreModulo + "</li>"
+                        $.each(res.data.modulos[index].relaciones, function (index2, item2) {
+                            ca += "<li class='list-group-item'>"
+                            ca += item2.nombreSubModulo
+                            $.each(item2.permisos, function (index3, item3) {
+                                if (item3.includes("Crear")) {
+                                    ca += "<span class='badge badge-success' style='margin-left: 6px;height: 13px;width: 14px;'>  </span>"
+                                }
+                                else if (item3.includes("Eliminar")) {
+                                    ca += "<span class='badge badge-danger' style='margin-left: 6px;height: 13px;width: 14px;'>  </span>"
+                                }
+                                else if (item3.includes("Actualizar")) {
+                                    ca += "<span class='badge badge-warning' style='margin-left: 6px;height: 13px;width: 14px;'>  </span>"
+                                }
+                                else {
+                                    ca += "<span class='badge badge-info' style='margin-left: 6px;height: 13px;width: 14px;background-color: coral !important;'>  </span>"
+                                }
+                            })
+                            ca += "</li>"
                         });
+                    } else {
+                        ca += "<li class='list-group-item active' style='margin-bottom:11%;'>"
+                        ca += item.nombreModulo
+                        $.each(res.data.modulos[index].permisos, function (index2, item2) {
+                            if (item2.includes("Crear")) {
+                                ca += "<span class='badge badge-success' style='margin-left: 6px;height: 13px;width: 14px;'>  </span>"
+                            }
+                            else if (item2.includes("Eliminar")) {
+                                ca += "<span class='badge badge-danger' style='margin-left: 6px;height: 13px;width: 14px;'>  </span>"
+                            }
+                            else if (item2.includes("Actualizar")) {
+                                ca += "<span class='badge badge-warning' style='margin-left: 6px;height: 13px;width: 14px;'>  </span>"
+                            }
+                            else {
+                                ca += "<span class='badge badge-info' style='margin-left: 6px;height: 13px;width: 14px;background-color: coral !important;'>  </span>"
+                            }
+                        })
+                        ca += "</li>"
                     }
                     ca += "</ul>"
                     ca += "</div>"
@@ -310,7 +362,6 @@ function modalVerAutorizacion(rolId) {
                     ca += "</tr>"
                     $('#tbody_ver_personas_perfil').append(ca);
                 })
-                console.log(res.data.usuarios)
             }
         },
         error: function (error) {
@@ -342,6 +393,9 @@ function modalEliminarAuorizacion(rolId) {
                     async: true,
                     success: function (res) {
                         if (res.status) {
+                            if (op) {
+                                $("#auth_" + rolId).hide();
+                            }
                             toastr.success(res.title + ": " + res.message);
                         } else {
                             toastr.error(res.title + ": " + res.message);
@@ -355,4 +409,67 @@ function modalEliminarAuorizacion(rolId) {
         }
     })
 
+}
+
+function cargarPermisosCRUD() {
+    $("#tbody_permisos").empty();
+    var subModuloArray = new Array();
+    var selectSubModulo = document.getElementById("modal_submodulos2");
+    for (var i = 0; i < selectSubModulo.length; i++) {
+        var dato = $("#modal_submodulos2").val()[i].split('-')
+        var texto = $("#modal_submodulos2").text().trim().split('  ')
+        var item = {
+            SubModuloId: dato[0],
+            ModuloId: dato[1],
+            Texto: texto[i]
+        };
+        if (item.SubModuloId != undefined) {
+            subModuloArray.push(item);
+        }
+    }
+    var modulos = $('#modal_nombre_modulo option:selected')
+    if (subModuloArray.length > 0) {
+        for (var i in modulos) {
+            var moduloNombre = modulos[i].innerHTML;
+            var moduloId = modulos[i].value;
+            if (subModuloArray.find(f => f.ModuloId != moduloId)) {
+                var item = {
+                    SubModuloId: null,
+                    ModuloId: moduloId,
+                    Texto: moduloNombre,
+                };
+                if (item.ModuloId != undefined) {
+                    subModuloArray.push(item);
+                }
+            }
+        }
+    } else {
+        for (var i in modulos) {
+            var moduloNombre = modulos[i].innerHTML;
+            var moduloId = modulos[i].value;
+            var item = {
+                SubModuloId: null,
+                ModuloId: moduloId,
+                Texto: moduloNombre,
+            };
+            if (item.ModuloId != undefined) {
+                subModuloArray.push(item);
+            }
+        }
+    }
+
+    var ca = "";
+    $.each(subModuloArray, function (index, item) {
+        ca = "<tr id ='" + item.SubModuloId + "-" + item.ModuloId + "'>"
+        ca += "<td>" + (index + 1) + "</td>"
+        ca += "<td>" + (item.Texto) + "</td>"
+        ca += "<td>"
+        ca += "<select class='select2' multiple='multiple' name=tags[] style='width:100%;'>"
+        ca += "<option value='R'>Leer</option><option value='C'>Crear</option><option value='U'>Actualizar</option><option value='D'>Eliminar</option>"
+        ca += "</select>"
+        ca += "</td>"
+        ca += "</tr>"
+        $("#tbody_permisos").append(ca);
+    })
+    $('.select2').select2()
 }
