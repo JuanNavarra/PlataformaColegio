@@ -16,5 +16,6 @@ namespace Colegio.Models
         public string Descripcion { get; set; }
         [NotMapped]
         public DateTime? UltimoLogin { get; set; }
+        public bool? Restringir { get; set; }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Colegio.Data;
-using Colegio.Models;
 using Colegio.Models.ModelHelper;
 using Colegio.Services.Interfaces;
 using Microsoft.IdentityModel.Tokens;

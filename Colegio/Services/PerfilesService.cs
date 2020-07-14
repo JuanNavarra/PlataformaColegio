@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity.Validation;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace Colegio.Services
@@ -21,56 +22,15 @@ namespace Colegio.Services
 
         public async Task<List<Col_Modulos>> CargarModulos()
         {
-            try
-            {
-                var modulos = await context.Col_Modulos
-                    .Where(w => w.Estado.Equals("A"))
-                    .Select(s => new Col_Modulos
-                    {
-                        ModuloId = s.ModuloId,
-                        Nombre = s.Nombre
-                    }).ToListAsync();
-                return modulos;
-            }
-            #region catch
-            catch (DbEntityValidationException e)
-            {
-                string err = "";
-                foreach (var eve in e.EntityValidationErrors)
-                {
-                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
-                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
-                    {
-                        err += ve.ErrorMessage;
-                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
-                            ve.PropertyName, ve.ErrorMessage);
-                    }
-                }
-                return null;
-            }
 
-            catch (Exception e)
-            {
-                string err = "";
-                if (e.InnerException != null)
+            var modulos = await context.Col_Modulos
+                .Where(w => w.Estado.Equals("A"))
+                .Select(s => new Col_Modulos
                 {
-                    if (e.InnerException.Message != null)
-                    {
-                        err = (e.InnerException.Message);
-                        if (e.InnerException.InnerException != null)
-                        {
-                            err += e.InnerException.InnerException.Message;
-                        }
-                    }
-                }
-                else
-                {
-                    err = (e.Message);
-                }
-                return null;
-            }
-            #endregion
+                    ModuloId = s.ModuloId,
+                    Nombre = s.Nombre
+                }).ToListAsync();
+            return modulos;
         }
 
         public async Task<List<Col_SubModulos>> CargarSubModulos(int[] modulos)
@@ -238,6 +198,21 @@ namespace Colegio.Services
                                        PermisoSubModulo = t3.PermisosCrud,
                                        PermisoModulo = t1.PermisosCrud
                                    }).ToListAsync();
+
+                if (query.Count() == 0)
+                {
+                    query = await (from t0 in context.Col_Roles
+                                   join t1 in context.Col_RolModulos on t0.RolId equals t1.RolId
+                                   join t2 in context.Col_Modulos on t1.ModuloId equals t2.ModuloId
+                                   where t0.RolId.Equals(idRol)
+                                   select new ModulosToSubModulos
+                                   {
+                                       NombreRol = t0.NombreRol,
+                                       NombreModulo = t2.Nombre,
+                                       ModuloId = t2.ModuloId,
+                                       PermisoModulo = t1.PermisosCrud
+                                   }).ToListAsync();
+                }
 
                 foreach (var item in query)
                 {
@@ -484,7 +459,7 @@ namespace Colegio.Services
             #endregion  
         }
 
-        public async Task<ApiCallResult> GuardarAutorizaciones(List<Col_RolModulos> modulo, List<Col_SubModuloModulo> subModulo, string rolNombre, string descripcion)
+        public async Task<ApiCallResult> GuardarAutorizaciones(List<Col_RolModulos> modulo, List<Col_SubModuloModulo> subModulo, string rolNombre, string descripcion, bool restringir)
         {
             try
             {
@@ -511,6 +486,7 @@ namespace Colegio.Services
                     rol.NombreRol = rolNombre.ToUpper();
                     rol.RolId = Convert.ToInt32(id);
                     rol.Descripcion = descripcion;
+                    rol.Restringir = restringir;
                     await context.AddAsync<Col_Roles>(rol);
 
                     maxId = await context.Col_RolModulos.MaxAsync(m => (int?)m.Id);
@@ -602,6 +578,104 @@ namespace Colegio.Services
                     err = (e.Message);
                 }
                 return new ApiCallResult { Status = false, Title = "Error al guardar", Message = "Favor contacte éste con el administrador" };
+            }
+            #endregion
+        }
+
+        public async Task<ModulosSelect> CargaDatosActualizar(int rolId)
+        {
+            try
+            {
+                ModulosSelect select = new ModulosSelect();
+
+                #region Primer Tab
+                var query = await (from t0 in context.Col_Roles
+                                   join t1 in context.Col_RolModulos on t0.RolId equals t1.RolId
+                                   join t2 in context.Col_Modulos on t1.ModuloId equals t2.ModuloId
+                                   select new ModulosSelect { ModuloId = t2.ModuloId, Nombre = t2.Nombre, RolId = t0.RolId }).ToListAsync();
+
+                select.Rol = await context.Col_Roles.Where(w => w.RolId.Equals(rolId)).FirstOrDefaultAsync();
+                select.Modulos = query.Where(w => w.RolId.Equals(rolId)).ToList();
+
+                List<ModulosSelect> subModulos = new List<ModulosSelect>();
+                foreach (var grupo in query.GroupBy(g => g.ModuloId))
+                {
+                    ModulosSelect subModulo = new ModulosSelect();
+                    subModulo.ModuloId = grupo.Select(s => s.ModuloId).FirstOrDefault();
+                    subModulo.RolId = grupo.Select(s => Convert.ToInt32(s.Rol)).FirstOrDefault();
+                    subModulo.Nombre = grupo.Select(s => s.Nombre).FirstOrDefault();
+                    subModulos.Add(subModulo);
+                }
+                select.AllModulos = subModulos.Where(w => !select.Modulos.Where(s => s.ModuloId == w.ModuloId).Any()).ToList();
+                #endregion
+
+                select.Seleccionados = await (from t0 in context.Col_Roles
+                                              join t1 in context.Col_SubModuloModulo on t0.RolId equals t1.RolId
+                                              join t2 in context.Col_SubModulos on t1.SubModuloId equals t2.SubModuloId
+                                              join t3 in context.Col_Modulos on t2.ModuloId equals t3.ModuloId
+                                              where t0.RolId.Equals(rolId)
+                                              select new ModulosSelect
+                                              {
+                                                  Nombre = t2.Nombre,
+                                                  SubModuloId = t2.SubModuloId,
+                                                  ModuloId = t2.ModuloId,
+                                                  Descripcion = t3.Nombre
+                                              }).ToListAsync();
+
+                select.AllSubModulos = await (from t0 in context.Col_Roles
+                                              join t1 in context.Col_RolModulos on t0.RolId equals t1.RolId
+                                              join t2 in context.Col_Modulos on t1.ModuloId equals t2.ModuloId
+                                              join t3 in context.Col_SubModulos on t2.ModuloId equals t3.ModuloId
+                                              where t0.RolId.Equals(rolId)
+                                              select new ModulosSelect
+                                              {
+                                                  Nombre = t3.Nombre,
+                                                  SubModuloId = t3.SubModuloId,
+                                                  ModuloId = t2.ModuloId,
+                                                  Descripcion = t2.Nombre
+                                              }).ToListAsync();
+
+                select.NoSeleccionados = select.AllSubModulos.Where(w => !select.Seleccionados.Where(m => m.SubModuloId == w.SubModuloId).Any()).ToList();
+
+                return select;
+            }
+            #region catch
+            catch (DbEntityValidationException e)
+            {
+                string err = "";
+                foreach (var eve in e.EntityValidationErrors)
+                {
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        err += ve.ErrorMessage;
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+                return null;
+            }
+
+            catch (Exception e)
+            {
+                string err = "";
+                if (e.InnerException != null)
+                {
+                    if (e.InnerException.Message != null)
+                    {
+                        err = (e.InnerException.Message);
+                        if (e.InnerException.InnerException != null)
+                        {
+                            err += e.InnerException.InnerException.Message;
+                        }
+                    }
+                }
+                else
+                {
+                    err = (e.Message);
+                }
+                return null;
             }
             #endregion
         }

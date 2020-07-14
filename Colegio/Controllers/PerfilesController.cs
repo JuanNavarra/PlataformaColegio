@@ -1,4 +1,5 @@
 ﻿using Colegio.Models;
+using Colegio.Models.ModelHelper;
 using Colegio.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -44,7 +45,7 @@ namespace Colegio.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GuardarAutorizaciones(string modulo, string subModulo, string rol, string descripcion)
+        public async Task<IActionResult> GuardarCambios(string modulo, string subModulo, string rol, string descripcion, bool verbo, bool restringir)
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -72,8 +73,8 @@ namespace Colegio.Controllers
                             subModulos.Add(_subModulos);
                         }
                     }
-
-                    var result = await perfilesService.GuardarAutorizaciones(modulos, subModulos, rol, descripcion);
+                    ApiCallResult result = new ApiCallResult();
+                    result = verbo ? await perfilesService.GuardarAutorizaciones(modulos, subModulos, rol, descripcion, restringir) : null;
                     return Json(new { result });
                 }
                 #region catch
@@ -162,6 +163,20 @@ namespace Colegio.Controllers
             {
                 var result = await perfilesService.EliminarPerfiles(rolId, op);
                 return Json(result);
+            }
+            else
+            {
+                return Redirect("~/Login/Authentication");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CargarDatosActualizar(int rolId)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var data = await perfilesService.CargaDatosActualizar(rolId);
+                return Json(new { result = "ok", data });
             }
             else
             {
