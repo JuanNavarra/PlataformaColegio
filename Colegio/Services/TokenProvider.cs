@@ -57,6 +57,21 @@ namespace Colegio.Services
                                      SubModulos = t5.Nombre,
                                  }).ToList();
 
+                    if (query.Count() == 0)
+                    {
+                        query = (from t0 in contexto.Col_Roles
+                                 join t3 in contexto.Col_Usuarios on t0.RolId equals t3.RolId
+                                 join t1 in contexto.Col_RolModulos on t0.RolId equals t1.RolId
+                                 join t2 in contexto.Col_Modulos on t1.ModuloId equals t2.ModuloId
+                                 where t3.Id.Equals(user.Id)
+                                 select new UsuariosPerfiles
+                                 {
+                                     NombreUsuario = t3.Usuario,
+                                     PermisosModulo = t1.PermisosCrud.Replace("\n", ""),
+                                     Modulos = t2.Nombre
+                                 }).ToList();
+                    }
+
                     //Authentication successful, Issue Token with user credentials 
                     //Provide the security key which is given in 
                     //Startup.cs ConfigureServices() method 
@@ -136,11 +151,11 @@ namespace Colegio.Services
         private List<Claim> GetUserClaims(List<UsuariosPerfiles> user)
         {
             List<Claim> claims = new List<Claim>();
+            claims.Add(new Claim("Usuario", user.Select(s => s.NombreUsuario).FirstOrDefault()));
             foreach (var item in user)
             {
-                claims.Add(new Claim("Usuario", item.NombreUsuario));
                 claims.Add(new Claim("PermisoModulo", $"{item.Modulos}-{item.PermisosModulo ?? "0"}"));
-                claims.Add(new Claim("PermisoSubModulo", $"{item.Modulos}-{item.SubModulos ?? "0"}-{item.PermisosSubModulo}"));
+                claims.Add(new Claim("PermisoSubModulo", $"{item.Modulos}-{item.PermisosSubModulo ?? "0"}-{item.SubModulos ?? "0"}"));
             }
             return claims;
         }

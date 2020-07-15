@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity.Validation;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Colegio.Controllers
@@ -21,11 +20,19 @@ namespace Colegio.Controllers
             this.perfilesService = perfilesService;
         }
 
-        private List<Claim> GenerarPermisos()
+        private bool GenerarPermisos(string subModulo)
         {
             var permisos = User.Claims
-                .Where(w => w.Type.Equals("PermisoSubModulo") && w.Value.Contains("Maestro Administrativo"))
-                .ToList();
+                .Where(w => w.Type.Equals("PermisoSubModulo") && w.Value.StartsWith("Maestro Administrativo")
+                && w.Value.Contains(subModulo)).Any();
+            return permisos;
+        }
+
+        private bool GenerarPermisosGlobales()
+        {
+            var permisos = User.Claims
+                .Where(w => w.Type.Equals("PermisoModulo") && w.Value.Contains("Maestro Administrativo"))
+                .Any();
             return permisos;
         }
 
@@ -34,18 +41,19 @@ namespace Colegio.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                if (GenerarPermisos().Where(w => w.Value.Contains("Perfiles")).Any())
+                if (GenerarPermisos("Perfiles") || (!GenerarPermisos("Perfiles") && GenerarPermisosGlobales()))
                 {
                     var registros = await perfilesService.MostrarAutorizaciones();
                     ViewBag.Registros = registros;
                     return View();
                 }
+                return RedirectToAction("Index", "Home");
             }
-            return Redirect("~/Login/Authentication");
+            return RedirectToAction("Index", "Login");
         }
 
         [HttpPost]
-        public async Task<IActionResult> GuardarCambios(string modulo, string subModulo, string rol, string descripcion, bool verbo, bool restringir)
+        public async Task<IActionResult> GuardarCambios(string modulo, string subModulo, string rol, string descripcion, int idRol)
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -73,8 +81,9 @@ namespace Colegio.Controllers
                             subModulos.Add(_subModulos);
                         }
                     }
-                    ApiCallResult result = new ApiCallResult();
-                    result = verbo ? await perfilesService.GuardarAutorizaciones(modulos, subModulos, rol, descripcion, restringir) : null;
+
+                    ApiCallResult result = idRol == 0 ? await perfilesService.GuardarAutorizaciones(modulos, subModulos, rol, descripcion) :
+                        await perfilesService.ActualizarAutorizaciones(modulos, subModulos, rol, descripcion, idRol);
                     return Json(new { result });
                 }
                 #region catch
@@ -119,7 +128,7 @@ namespace Colegio.Controllers
             }
             else
             {
-                return Redirect("~/Login/Authentication");
+                return RedirectToAction("Index", "Login");
             }
         }
 
@@ -131,7 +140,7 @@ namespace Colegio.Controllers
                 var modulos = await perfilesService.CargarModulos();
                 return Json(new { result = "ok", data = modulos });
             }
-            return Redirect("~/Login/Authentication");
+            return RedirectToAction("Index", "Login");
         }
 
         [HttpPost]
@@ -142,7 +151,7 @@ namespace Colegio.Controllers
                 var subModulos = await perfilesService.CargarSubModulos(modulos);
                 return Json(new { result = "ok", data = subModulos });
             }
-            return Redirect("~/Login/Authentication");
+            return RedirectToAction("Index", "Login");
         }
 
         [HttpGet]
@@ -153,7 +162,7 @@ namespace Colegio.Controllers
                 var perfil = await perfilesService.MostrarDetallePerfil(rolId);
                 return Json(new { result = "ok", data = perfil });
             }
-            return Redirect("~/Login/Authentication");
+            return RedirectToAction("Index", "Login");
         }
 
         [HttpPost]
@@ -166,7 +175,7 @@ namespace Colegio.Controllers
             }
             else
             {
-                return Redirect("~/Login/Authentication");
+                return RedirectToAction("Index", "Login");
             }
         }
 
@@ -180,7 +189,7 @@ namespace Colegio.Controllers
             }
             else
             {
-                return Redirect("~/Login/Authentication");
+                return RedirectToAction("Index", "Login");
             }
         }
     }

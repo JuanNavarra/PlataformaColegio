@@ -27,7 +27,7 @@ namespace Colegio.Controllers
             {
                 return View();
             }
-            return Redirect("~/Home/");
+            return RedirectToAction("Index", "Login");
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Colegio.Controllers
                     HttpContext.Session.SetString("JWToken", userToken.AuthenticationType);
                     return Redirect("~/Home/");
                 }
-                return Redirect("~/Login/Authentication");
+                return RedirectToAction("Index", "Login");
             }
             #region catch
             catch (DbEntityValidationException e)
@@ -102,7 +102,7 @@ namespace Colegio.Controllers
         public IActionResult Logoff()
         {
             HttpContext.Session.Clear();
-            return Redirect("~/Login/Authentication");
+            return RedirectToAction("Index", "Login");
         }
     }
 }

@@ -29,8 +29,13 @@
 
     $('#actualizar_no').on('switchChange.bootstrapSwitch', function () {
         if ($(this).is(':checked')) {
-            vaciarModal();
+            vaciarModal(false);
             cargarModulos();
+            $("#custom-tabs-one-home-tab").addClass("active").addClass("show");
+            $("#custom-tabs-one-home").addClass("show").addClass("active");
+            $("#custom-tabs-one-profile-tab").removeClass("active").removeClass("show");
+            $("#profile_tab").css("display", "none");
+            $("#custom-tabs-one-profile").removeClass("active").removeClass("show");
         } else {
             cargarModalActualizar();
         }
@@ -56,15 +61,35 @@
                     $("#custom-tabs-one-profile-tab").addClass("active");
                     $("#custom-tabs-one-profile").addClass("active").addClass("show");
                     $("#modal_guardar_cambios").css("display", "none");
-                    $("#modal_submodulos2").prop("disabled", false);
-                    if (!$('#actualizar_no').is(':checked')) {
-                        cargarModalActualizar()
+                    if (!$('#actualizar_no').is(':checked') && $("#id_rol_actualizar").val() != "") {
+                        cargarModalActualizar();
+                        $("#btnAllRight").css("display", "none");
+                        $("#btnRight").css("display", "none");
+                        $("#btnLeft").css("display", "none");
+                        $("#btnAllLeft").css("display", "none");
+                    } else {
+                        cargarSubModulos();
+                        $("#btnAllRight").removeAttr("style");
+                        $("#btnRight").removeAttr("style");
+                        $("#btnLeft").removeAttr("style");
+                        $("#btnAllLeft").removeAttr("style");
                     }
                 } else {
                     $("#custom-tabs-one-permisos-tab").addClass("active");
                     $("#custom-tabs-one-permisos").addClass("active").addClass("show");
                     $("#modal_guardar_cambios").removeAttr("style");
-                    cargarPermisosCRUD();
+                    if ($("#id_rol_actualizar").val() != "") {
+                        if ($('#actualizar_no').is(':checked')) {
+                            cargarPermisosCRUD();
+                        }
+                        else {
+                            cargarModalActualizar();
+                            $("#modal_guardar_cambios").css("display", "none");
+                        }
+                    } else {
+                        cargarPermisosCRUD();
+                        $("#modal_guardar_cambios").removeAttr("style");
+                    }
                     $(this).css("display", "none");
                 }
                 $("#custom-tabs-one-home-tab").removeClass("active");
@@ -86,9 +111,9 @@
                     $("#custom-tabs-one-profile").removeClass("show").removeClass("active");
                     $("#modal_guardar_cambios").removeAttr("style");
                     $(this).css("display", "none");
-                    cargarPermisosCRUD();
                     $("#modal_atras_detalle").removeAttr("style");
-                    if ($('#actualizar_no').is(':checked')) {
+                    if ($('#actualizar_no').is(':checked') || $("#id_rol_actualizar").val() == "") {
+                        cargarPermisosCRUD();
                         cargarSubModulos();
                     }
                 } else {
@@ -107,20 +132,69 @@
     $("#modal_atras_detalle").on("click", function (e) {
         e.preventDefault();
         if ($("#custom-tabs-one-permisos-tab").hasClass("active")) {
-            if (!$("#customCheckbox1").is(":checked")) {
-                $("#custom-tabs-one-home-tab").addClass("active").addClass("show");
-                $("#custom-tabs-one-home").addClass("show").addClass("active");
-                $("#custom-tabs-one-permisos-tab").removeClass("active").removeClass("show");
-                $("#custom-tabs-one-permisos").removeClass("active").removeClass("show");
-                $(this).css("display", "none");
-            } else {
+            if ($("#customCheckbox1").is(":checked")) {
                 $("#custom-tabs-one-profile-tab").addClass("active").addClass("show");
                 $("#custom-tabs-one-profile").addClass("show").addClass("active");
                 $("#custom-tabs-one-permisos-tab").removeClass("active").removeClass("show");
                 $("#custom-tabs-one-permisos").removeClass("active").removeClass("show");
-                if (!$('#actualizar_no').is(':checked')) {
-                    cargarModalActualizar();
+                $("#modal_guardar_cambios").css("display", "none");
+                $(this).removeAttr("style");
+                $("#modal_siguiente_detalle").removeAttr("style");
+                if ($("#id_rol_actualizar").val() != "") {
+                    if (!$('#actualizar_no').is(':checked')) {
+                        cargarModalActualizar();
+                        $("#btnAllRight").css("display", "none");
+                        $("#btnRight").css("display", "none");
+                        $("#btnLeft").css("display", "none");
+                        $("#btnAllLeft").css("display", "none");
+                    }
+                    else {
+                        cargarSubModulos();
+                        $("#modal_atras_detalle").removeAttr("style");
+                        $("#btnAllRight").removeAttr("style");
+                        $("#btnRight").removeAttr("style");
+                        $("#btnLeft").removeAttr("style");
+                        $("#btnAllLeft").removeAttr("style");
+                        $("#modal_submodulos2").html('');
+                    }
+                } else {
+                    cargarSubModulos();
                     $("#modal_atras_detalle").removeAttr("style");
+                    $("#btnAllRight").removeAttr("style");
+                    $("#btnRight").removeAttr("style");
+                    $("#btnLeft").removeAttr("style");
+                    $("#btnAllLeft").removeAttr("style");
+                    $("#modal_submodulos2").html('');
+                }
+            } else {
+                $("#custom-tabs-one-home-tab").addClass("active").addClass("show");
+                $("#custom-tabs-one-home").addClass("show").addClass("active");
+                $("#custom-tabs-one-permisos-tab").removeClass("active").removeClass("show");
+                $("#custom-tabs-one-permisos").removeClass("active").removeClass("show");
+                $("#modal_guardar_cambios").css("display", "none");
+                $(this).css("display", "none");
+                $("#modal_siguiente_detalle").removeAttr("style");
+                if ($("#id_rol_actualizar").val() != "") {
+                    if (!$('#actualizar_no').is(':checked')) {
+                        cargarModalActualizar();
+                    } else {
+                        cargarModulos();
+                        $(this).css("display", "none");
+                        $("#modal_nombre_perfil").val('');
+                        $("#modal_descripcion_autorizacion").val('');
+                        $("#profile_tab").css("display", "none");
+                        $("#customCheckbox1").prop("disabled", true);
+                        $("#customCheckbox1").prop('checked', false);
+                    }
+                }
+                else {
+                    cargarModulos();
+                    $(this).css("display", "none");
+                    $("#modal_nombre_perfil").val('');
+                    $("#modal_descripcion_autorizacion").val('');
+                    $("#profile_tab").css("display", "none");
+                    $("#customCheckbox1").prop("disabled", true);
+                    $("#customCheckbox1").prop('checked', false);
                 }
             }
         }
@@ -129,13 +203,31 @@
             $("#custom-tabs-one-home").addClass("show").addClass("active");
             $("#custom-tabs-one-profile-tab").removeClass("active").removeClass("show");
             $("#custom-tabs-one-profile").removeClass("active").removeClass("show");
-            $(this).css("display", "none");
-        }
-        $("#modal_guardar_cambios").css("display", "none");
-        $("#modal_siguiente_detalle").removeAttr("style");
-        $("#modal_submodulos2").html("")
-        if ($('#actualizar_no').is(':checked')) {
-            cargarSubModulos();
+            $("#modal_guardar_cambios").css("display", "none");
+            $("#modal_siguiente_detalle").removeAttr("style");
+            if ($("#id_rol_actualizar").val() != "") {
+                if (!$('#actualizar_no').is(':checked')) {
+                    cargarModalActualizar();
+                } else {
+                    cargarModulos();
+                    $(this).css("display", "none");
+                    $("#modal_nombre_perfil").val('');
+                    $("#modal_descripcion_autorizacion").val('');
+                    $("#profile_tab").css("display", "none");
+                    $("#customCheckbox1").prop("disabled", true);
+                    $("#customCheckbox1").prop('checked', false);
+                    $("#modal_submodulos2").html('');
+                }
+            } else {
+                cargarModulos();
+                $(this).css("display", "none");
+                $("#modal_nombre_perfil").val('');
+                $("#modal_descripcion_autorizacion").val('');
+                $("#profile_tab").css("display", "none");
+                $("#customCheckbox1").prop("disabled", true);
+                $("#customCheckbox1").prop('checked', false);
+                $("#modal_submodulos2").html('');
+            }
         }
 
     });
@@ -166,40 +258,11 @@
     });
 
     $("#btn_crear_autorizacion").on("click", function () {
-        $("#titulo_accion_perfil").html("Creación de perfiles");
-        $("#custom-tabs-one-home-tab").addClass("active");
-        $("#custom-tabs-one-home").addClass("active").addClass("show");
-        $("#row_actualizar_no").css("display", "none");
-        $("#custom-tabs-one-profile-tab").removeClass("active").removeClass("show");
-        $("#custom-tabs-one-profile").removeClass("active").removeClass("show");
-        $("#custom-tabs-one-permisos-tab").removeClass("active").removeClass("show");
-        $("#custom-tabs-one-permisos").removeClass("show").removeClass("active");
-        $("#profile_tab").css("display", "none");
-        $("#modal_guardar_cambios").css("display", "none");
-        $("#modal_siguiente_detalle").removeAttr("style");
-        $("#modal_atras_detalle").css("display", "none");
-        vaciarModal();
-        cargarModulos();
+        limpiarModal(false, "");
     });
 
     $(".btn_titulo_actualizar").on("click", function () {
-        $("#titulo_accion_perfil").html("Actualizar perfil: " + $(this).parent().parent().children().eq(1).text());
-        $("#id_rol_actualizar").val($(this).parent().parent().attr("id").replace("auth_", ""));
-        cargarModalActualizar();
-        $("#row_actualizar_no").removeAttr("style");
-        $("#actualizar_no").bootstrapSwitch('state', false);
-        $("#custom-tabs-one-home-tab").addClass("active");
-        $("#custom-tabs-one-home").addClass("active").addClass("show");
-        $("#custom-tabs-one-profile-tab").removeClass("active");
-        $("#custom-tabs-one-profile").removeClass("show").removeClass("active");
-        $("#custom-tabs-one-permisos-tab").removeClass("active");
-        $("#custom-tabs-one-permisos").removeClass("show").removeClass("active");
-        $("#profile_tab").css("display", "none");
-        $("#modal_guardar_cambios").css("display", "none");
-        $("#modal_siguiente_detalle").removeAttr("style");
-        $("#modal_atras_detalle").css("display", "none");
-        $("#customCheckbox1").prop('checked', false);
-        $("#customCheckbox1").prop("disabled", false);
+        limpiarModal(true, this);
     });
 
     $("input[data-bootstrap-switch]").each(function () {
@@ -207,6 +270,35 @@
     });
 
 });
+
+function limpiarModal(verbo, event) {
+    if (verbo) {
+        $("#titulo_accion_perfil").html("Actualizar perfil: " + $(event).parent().parent().children().eq(1).text());
+        $("#id_rol_actualizar").val($(event).parent().parent().attr("id").replace("auth_", ""));
+        $("#row_actualizar_no").removeAttr("style");
+        $("#actualizar_no").bootstrapSwitch('state', false);
+        cargarModalActualizar();
+    } else {
+        $("#titulo_accion_perfil").html("Creación de perfiles");
+        vaciarModal(false);
+        cargarModulos();
+        $("#customCheckbox1").prop('checked', false);
+        $("#row_actualizar_no").css("display", "none");
+        $("#id_rol_actualizar").val("");
+    }
+    $("#profile_tab").css("display", "none");
+    $("#custom-tabs-one-home-tab").addClass("active");
+    $("#custom-tabs-one-home").addClass("active").addClass("show");
+    $("#custom-tabs-one-profile-tab").removeClass("active"); 1
+    $("#custom-tabs-one-profile").removeClass("show").removeClass("active");
+    $("#custom-tabs-one-permisos-tab").removeClass("active");
+    $("#custom-tabs-one-permisos").removeClass("show").removeClass("active");
+    $("#modal_guardar_cambios").css("display", "none");
+    $("#modal_siguiente_detalle").removeAttr("style");
+    $("#modal_atras_detalle").css("display", "none");
+    $("#customCheckbox1").prop("disabled", true);
+    $("#tbody_permisos").html("")
+}
 
 function cargarModulos() {
     $.ajax({
@@ -258,7 +350,6 @@ function cargarSubModulos() {
 
 function guardarCambios() {
 
-    var verbo = $("#id_rol_actualizar").val() == "" ? true : false;
     var moduloArray = new Array();
     var subModuloArray = new Array();
 
@@ -313,13 +404,14 @@ function guardarCambios() {
         data: {
             modulo: JSON.stringify(moduloArray), subModulo: JSON.stringify(subModuloArray),
             rol: $("#modal_nombre_perfil").val(), descripcion: $("#modal_descripcion_autorizacion").val(),
-            verbo: verbo, restringir: $("#customCheckbox1").is(':checked') ? true : false
+            idRol: $("#id_rol_actualizar").val()
         },
         dataType: "json",
         async: true,
         success: function (res) {
             if (res.result.status) {
-                vaciarModal();
+                vaciarModal(false);
+                $('#modal_crear_autorizacion').modal('toggle');
                 toastr.success(res.result.title + ": " + res.result.message);
             } else {
                 toastr.error(res.result.title + ": " + res.result.message);
@@ -331,14 +423,14 @@ function guardarCambios() {
     })
 }
 
-function vaciarModal() {
-    $("#modal_submodulos").html('').prop("disabled", false);
-    $("#modal_submodulos1").html('').prop("disabled", false);
-    $("#modal_nombre_perfil").val('').prop("disabled", false);
+function vaciarModal(opcion) {
+    $("#modal_submodulos").html('').prop("disabled", opcion);
+    $("#modal_submodulos2").html('').prop("disabled", opcion);
+    $("#modal_nombre_perfil").val('').prop("disabled", opcion);
+    $("#modal_descripcion_autorizacion").val('').prop("disabled", opcion);
     $('#modal_nombre_modulo').find('option:selected').remove().end();
-    $("#modal_nombre_modulo").val("").prop("disabled", false);
-    $("#modal_descripcion_autorizacion").val('').prop("disabled", false);
-    $("#customCheckbox1").prop('checked', false);
+    $("#modal_nombre_modulo").val("").prop("disabled", opcion);
+    $("#customCheckbox1").prop('checked', opcion);
     $("#customCheckbox1").prop("disabled", true);
 }
 
@@ -446,41 +538,60 @@ function modalVerAutorizacion(rolId) {
 }
 
 function modalEliminarAuorizacion(rolId) {
-    swal({
-        title: "¿Desea eliminar éste perfil?",
-        buttons: [true, "Continuar"]
-    }).then((value) => {
-        if (value) {
-            swal({
-                title: "Inactivar un perfil o eliminarlo para siempre",
-                text: "Si hay usuarios con este rol, actualice el rol de de los usuarios," +
-                    " de lo contrario los usuarios serán eliminados",
-                buttons: ["Inactivar", "Eliminar"]
-            }).then((value) => {
-                var op = value ? value : false
-                $.ajax({
-                    type: "POST",
-                    url: "Perfiles/EliminarPerfiles",
-                    data: {
-                        rolId: rolId, op: op
-                    },
-                    dataType: "json",
-                    async: true,
-                    success: function (res) {
-                        if (res.status) {
-                            if (op) {
-                                $("#auth_" + rolId).hide();
-                            }
-                            toastr.success(res.title + ": " + res.message);
-                        } else {
-                            toastr.error(res.title + ": " + res.message);
-                        }
-                    },
-                    error: function (error) {
-                        toastr.error("Contacte con el adminstrador");
-                    }
+    var estado = $("#auth_" + rolId).children().eq(6).text();
+    if (estado == "ACTIVO") {
+        swal({
+            title: "¿Desea eliminar éste perfil?",
+            buttons: [true, "Continuar"]
+        }).then((value) => {
+            if (value) {
+                swal({
+                    title: "Inactivar un perfil o eliminarlo para siempre",
+                    text: "Si hay usuarios con este rol, actualice el rol de de los usuarios," +
+                        " de lo contrario los usuarios serán eliminados",
+                    buttons: ["Inactivar", "Eliminar"]
+                }).then((value) => {
+                    var op = value ? value : false
+                    eliminarAuorizacion(rolId, op);
                 })
-            })
+            }
+        })
+    } else {
+        swal({
+            title: "Eliminar el perfil",
+            text: "Si hay usuarios con este rol, actualice el rol de de los usuarios," +
+                " de lo contrario los usuarios serán eliminados",
+            buttons: [true, "Eliminar"]
+        }).then((value) => {
+            if (value) {
+                eliminarAuorizacion(rolId, true);
+            }
+        })
+    }
+}
+
+
+function eliminarAuorizacion(rolId, op) {
+    $.ajax({
+        type: "POST",
+        url: "Perfiles/EliminarPerfiles",
+        data: {
+            rolId: rolId, op: op
+        },
+        dataType: "json",
+        async: true,
+        success: function (res) {
+            if (res.status) {
+                if (op) {
+                    $("#auth_" + rolId).hide();
+                }
+                toastr.success(res.title + ": " + res.message);
+            } else {
+                toastr.error(res.title + ": " + res.message);
+            }
+        },
+        error: function (error) {
+            toastr.error("Contacte con el adminstrador");
         }
     })
 }
@@ -562,6 +673,7 @@ function cargarModalActualizar() {
                 $("#modal_submodulos2").empty();
                 $("#modal_nombre_modulo").empty();
                 $("#modal_submodulos").empty();
+                $("#tbody_permisos").empty();
                 $("#modal_nombre_perfil").val(res.data.rol.nombreRol).prop("disabled", true);
                 $("#modal_descripcion_autorizacion").val(res.data.rol.descripcion).prop("disabled", true);
                 $("#customCheckbox1").prop('checked', false).prop("disabled", true);
@@ -572,10 +684,6 @@ function cargarModalActualizar() {
 
                 $.each(res.data.modulos, function (index, item) {
                     ca = "<option selected value=" + item.moduloId + ">" + item.nombre + "</option>"
-                    $("#modal_nombre_modulo").append(ca);
-                });
-                $.each(res.data.allModulos, function (index, item) {
-                    ca = "<option value=" + item.moduloId + ">" + item.nombre + "</option>"
                     $("#modal_nombre_modulo").append(ca);
                 });
                 $.each(res.data.seleccionados, function (index, item) {
@@ -591,6 +699,43 @@ function cargarModalActualizar() {
                 $("#modal_submodulos").prop("disabled", true);
                 $("#modal_submodulos2").prop("disabled", true);
                 $("#modal_submodulos2 option").prop("selected", "true");
+
+                var cont = 1
+                $.each(res.data.permisos, function (index, item) {
+                    if (item.relaciones.length > 0) {
+                        $.each(item.relaciones, function (index2, item2) {
+                            ca = "<tr id ='" + item2.subModuloId + "-" + item2.moduloId + "'>"
+                            ca += "<td>" + cont + "</td>"
+                            ca += "<td>" + (item2.nombreSubModulo) + " (" + item.nombreModulo + ")</td>"
+                            ca += "<td>"
+                            ca += "<select disabled class='select2' multiple='multiple' name=tags[] style='width:100%;'>"
+                            $.each(item2.permisos, function (index3, item3) {
+                                ca += "<option selected value='" + item3 + "'>" + item3 + "</option>"
+                            })
+                            ca += "</select>"
+                            ca += "<td>"
+                            ca += "</tr>"
+                            $("#tbody_permisos").append(ca);
+                            cont++;
+                        })
+                    } else {
+                        ca = "<tr id ='" + item.subModuloId + "-" + item.moduloId + "'>"
+                        ca += "<td>" + cont + "</td>"
+                        ca += "<td>" + (item.nombreModulo) + "</td>"
+                        ca += "<td>"
+                        ca += "<select disabled class='select2' multiple='multiple' name=tags[] style='width:100%;'>"
+                        $.each(item.permisos, function (index2, item2) {
+                            ca += "<option selected value='" + item2 + "'>" + item2 + "</option>"
+                        })
+                        ca += "</select>"
+                        ca += "<td>"
+                        ca += "</tr>"
+                        $("#tbody_permisos").append(ca);
+                    }
+                    cont++;
+                })
+                $('.select2').select2()
+
             }
         },
         error: function (error) {

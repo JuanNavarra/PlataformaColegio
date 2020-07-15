@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Usuario = User.Claims.ToList()[1].Value.ToString();
+    ViewBag.Usuario = User.Claims.ToList()[0].Value.ToString();
     var PermisoModuloAdministrativo = User.Claims
         .Where(w => w.Type.Equals("PermisoModulo") && w.Value.Contains("Maestro Administrativo"))
         .ToList();
@@ -136,7 +136,8 @@
                 @if (PermisoModuloAdministrativo.Any())
                 {
                     var PermisoSubAdministrativo = User.Claims
-                        .Where(w => w.Type.Equals("PermisoSubModulo") && w.Value.Contains("Maestro Administrativo"))
+                        .Where(w => w.Type.Equals("PermisoSubModulo") && w.Value.StartsWith("Maestro Administrativo")
+                        && !w.Value.EndsWith("-0"))
                         .ToList();
                     <li class="nav-item has-treeview menu-open">
                         <a href="#" class="nav-link active">
@@ -147,7 +148,7 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                            @if (PermisoSubAdministrativo.Where(w => w.Value.Contains("Perfiles")).Any())
+                            @if (PermisoSubAdministrativo.Where(w => w.Value.Contains("Perfiles")).Any() || (PermisoSubAdministrativo.Count() == 0 && PermisoModuloAdministrativo.Any()))
                             {
                                 <li class="nav-item">
                                     <a href="@Url.Action("Index","Perfiles")" class="nav-link">
@@ -156,7 +157,7 @@
                                     </a>
                                 </li>
                             }
-                            @if (PermisoSubAdministrativo.Where(w => w.Value.Contains("Horarios")).Any())
+                            @if (PermisoSubAdministrativo.Where(w => w.Value.Contains("Horarios")).Any() || (PermisoSubAdministrativo.Count() == 0 && PermisoModuloAdministrativo.Any()))
                             {
                                 <li class="nav-item">
                                     <a href="#" class="nav-link">
@@ -165,7 +166,7 @@
                                     </a>
                                 </li>
                             }
-                            @if (PermisoSubAdministrativo.Where(w => w.Value.Contains("Estudiantes")).Any())
+                            @if (PermisoSubAdministrativo.Where(w => w.Value.Contains("Estudiantes")).Any() || (PermisoSubAdministrativo.Count() == 0 && PermisoModuloAdministrativo.Any()))
                             {
                                 <li class="nav-item">
                                     <a href="#" class="nav-link">
@@ -174,7 +175,7 @@
                                     </a>
                                 </li>
                             }
-                            @if (PermisoSubAdministrativo.Where(w => w.Value.Contains("Materias")).Any())
+                            @if (PermisoSubAdministrativo.Where(w => w.Value.Contains("Materias")).Any() || (PermisoSubAdministrativo.Count() == 0 && PermisoModuloAdministrativo.Any()))
                             {
                                 <li class="nav-item">
                                     <a href="#" class="nav-link">

@@ -15,8 +15,8 @@ namespace Colegio.Models.ModelHelper
         public List<ModulosSelect> Modulos { get; set; }
         public List<ModulosSelect> Seleccionados { get; set; }
         public List<ModulosSelect> NoSeleccionados { get; set; }
-        public List<ModulosSelect> AllSubModulos { get; set; }
         public List<ModulosSelect> AllModulos { get; set; }
         public string Descripcion { get; set; }
+        public List<ModulosToSubModulos> Permisos { get; set; }
     }
 }

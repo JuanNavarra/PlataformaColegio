@@ -34,12 +34,15 @@
                             <a href='#' onclick="modalVerAutorizacion(@item.RolId)">
                                 <i class='fas fa-eye'></i>
                             </a>
-                            <a href='#' class="btn_titulo_actualizar" data-toggle="modal" data-target="#modal_crear_autorizacion">
-                                <i class='fas fa-edit'></i>
-                            </a>
                             <a href='#' onclick="modalEliminarAuorizacion(@item.RolId)">
                                 <i class='fas fa-trash'></i>
                             </a>
+                            @if (item.Estado.Equals("ACTIVO"))
+                            {
+                                <a href='#' class="btn_titulo_actualizar" data-toggle="modal" data-target="#modal_crear_autorizacion">
+                                    <i class='fas fa-edit'></i>
+                                </a>
+                            }
                         </td>
                     </tr>
                     count++;
