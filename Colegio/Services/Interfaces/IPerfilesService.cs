@@ -17,5 +17,6 @@ namespace Colegio.Services.Interfaces
         public Task<ApiCallResult> EliminarPerfiles(int rolId, bool op);
         public Task<ModulosSelect> CargaDatosActualizar(int rolId);
         public Task<ApiCallResult> ActualizarAutorizaciones(List<Col_RolModulos> modulo, List<Col_SubModuloModulo> subModulo, string rol, string descripcion, int idRol);
+        public Task<ApiCallResult> ActivarPerfil(int rolId);
     }
 }

@@ -2,13 +2,13 @@
 @model Colegio.Models.Col_Usuarios
 @{
     ViewBag.Title = "Login";
+    ViewBag.Error = "Ususario o contraseña incorrectos";
 }
 
 <div class="login-box" style="left: 31%;position: relative;top:24px;">
     <div class="login-logo">
         <a href="#"><b>Aula</b>Virtual.</a>
     </div>
-    <!-- /.login-logo -->
     <div class="card">
         <div class="card-body login-card-body">
             <p class="login-box-msg">Inicio de sesión Plataforma</p>
@@ -17,7 +17,7 @@
             {
                 @Html.AntiForgeryToken()
                 <div class="input-group mb-3">
-                    @Html.TextBoxFor(m => m.Usuario, new { @class = "form-control txtbox", placeholder = "Usuario" })
+                    @Html.TextBoxFor(m => m.Usuario, new { @class = "form-control txtbox", placeholder = "Usuario", required = "required" })
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <span class="fas fa-envelope"></span>
@@ -25,7 +25,7 @@
                     </div>
                 </div>
                 <div class="input-group mb-3">
-                    @Html.PasswordFor(m => m.Contrasena, new { @class = "form-control txtbox", placeholder = "Contraseña" })
+                    @Html.PasswordFor(m => m.Contrasena, new { @class = "form-control txtbox", placeholder = "Contraseña", required = "required" })
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <span class="fas fa-lock"></span>
@@ -33,14 +33,29 @@
                     </div>
                 </div>
                 <div class="row">
-                    <!-- /.col -->
-                    <div class="col-4">
+                    <div class="col-12">
                         <button type="submit" class="btn btn-primary btn-block">Ingresar</button>
                     </div>
-                    <!-- /.col -->
                 </div>
             }
         </div>
-        <!-- /.login-card-body -->
+        @if (!ViewBag.Bool)
+        {
+            <div class="card-footer text-muted">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="alert"
+                             style="
+                                    background: #f8d7da !important;
+                                    color:#721c24 !important;
+                                    border-color: #f5c6cb !important;
+                                    text-align:center"
+                             role="alert">
+                            @ViewBag.Error
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 </div>

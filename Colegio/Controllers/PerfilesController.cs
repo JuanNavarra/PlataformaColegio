@@ -20,20 +20,16 @@ namespace Colegio.Controllers
             this.perfilesService = perfilesService;
         }
 
-        private bool GenerarPermisos(string subModulo)
+        private PermisosCRUD Permisos(string modulo)
         {
+            PermisosCRUD permiso = new PermisosCRUD();
             var permisos = User.Claims
-                .Where(w => w.Type.Equals("PermisoSubModulo") && w.Value.StartsWith("Maestro Administrativo")
-                && w.Value.Contains(subModulo)).Any();
-            return permisos;
-        }
-
-        private bool GenerarPermisosGlobales()
-        {
-            var permisos = User.Claims
-                .Where(w => w.Type.Equals("PermisoModulo") && w.Value.Contains("Maestro Administrativo"))
-                .Any();
-            return permisos;
+                        .Where(w => w.Type.Equals(modulo) && w.Value.StartsWith("Maestro Administrativo")
+                                && w.Value.Contains("Perfiles")).ToList();
+            permiso.PSMAPB = permisos.Any();
+            permiso.PMMAPB = permisos.Any();
+            permiso.PMMAPL = permisos;
+            return permiso;
         }
 
         [HttpGet]
@@ -41,10 +37,18 @@ namespace Colegio.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                if (GenerarPermisos("Perfiles") || (!GenerarPermisos("Perfiles") && GenerarPermisosGlobales()))
+                if (Permisos("PermisoSubModulo").PSMAPB || (!Permisos("PermisoSubModulo").PSMAPB && Permisos("PermisoModulo").PMMAPB))
                 {
                     var registros = await perfilesService.MostrarAutorizaciones();
                     ViewBag.Registros = registros;
+
+                    string modulo = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                    var permisos = Permisos(modulo).PMMAPL;
+                    ViewBag.Leer = permisos.Where(w => w.Value.Contains("Leer")).Any();
+                    ViewBag.Crear = permisos.Where(w => w.Value.Contains("Crear")).Any();
+                    ViewBag.Actualizar = permisos.Where(w => w.Value.Contains("Actualizar")).Any();
+                    ViewBag.Eliminar = permisos.Where(w => w.Value.Contains("Eliminar")).Any();
+
                     return View();
                 }
                 return RedirectToAction("Index", "Home");
@@ -57,7 +61,10 @@ namespace Colegio.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                try
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                var actualizar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Actualizar")).Any();
+                if ((crear && idRol == 0) || (actualizar && idRol != 0))
                 {
                     dynamic moduloJson = JsonConvert.DeserializeObject(modulo);
                     dynamic subModuloJson = JsonConvert.DeserializeObject(subModulo);
@@ -86,45 +93,10 @@ namespace Colegio.Controllers
                         await perfilesService.ActualizarAutorizaciones(modulos, subModulos, rol, descripcion, idRol);
                     return Json(new { result });
                 }
-                #region catch
-                catch (DbEntityValidationException e)
+                else
                 {
-                    string err = "";
-                    foreach (var eve in e.EntityValidationErrors)
-                    {
-                        Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
-                            eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                        foreach (var ve in eve.ValidationErrors)
-                        {
-                            err += ve.ErrorMessage;
-                            Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
-                                ve.PropertyName, ve.ErrorMessage);
-                        }
-                    }
-                    return null;
+                    return NotFound();
                 }
-
-                catch (Exception e)
-                {
-                    string err = "";
-                    if (e.InnerException != null)
-                    {
-                        if (e.InnerException.Message != null)
-                        {
-                            err = (e.InnerException.Message);
-                            if (e.InnerException.InnerException != null)
-                            {
-                                err += e.InnerException.InnerException.Message;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        err = (e.Message);
-                    }
-                    return null;
-                }
-                #endregion
             }
             else
             {
@@ -159,8 +131,17 @@ namespace Colegio.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                var perfil = await perfilesService.MostrarDetallePerfil(rolId);
-                return Json(new { result = "ok", data = perfil });
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                var leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
+                if (leer)
+                {
+                    var perfil = await perfilesService.MostrarDetallePerfil(rolId);
+                    return Json(new { result = "ok", data = perfil });
+                }
+                else
+                {
+                    return NotFound();
+                }
             }
             return RedirectToAction("Index", "Login");
         }
@@ -170,8 +151,17 @@ namespace Colegio.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                var result = await perfilesService.EliminarPerfiles(rolId, op);
-                return Json(result);
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                var eliminar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Eliminar")).Any();
+                if (eliminar)
+                {
+                    var result = await perfilesService.EliminarPerfiles(rolId, op);
+                    return Json(result);
+                }
+                else
+                {
+                    return NotFound();
+                }
             }
             else
             {
@@ -184,8 +174,40 @@ namespace Colegio.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                var data = await perfilesService.CargaDatosActualizar(rolId);
-                return Json(new { result = "ok", data });
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                var actualizar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Actualizar")).Any();
+                if (actualizar)
+                {
+                    var data = await perfilesService.CargaDatosActualizar(rolId);
+                    return Json(new { result = "ok", data });
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> ActivarPerfil(int rolId)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                var actualizar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Actualizar")).Any();
+                if (actualizar)
+                {
+                    var result = await perfilesService.ActivarPerfil(rolId);
+                    return Json(result);
+                }
+                else
+                {
+                    return NotFound();
+                }
             }
             else
             {

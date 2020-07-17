@@ -62,7 +62,7 @@ namespace Colegio.Services
                         FechaActualizacion = s.FechaActualizacion,
                         FechaCreacion = s.FechaCreacion,
                         Estado = s.Estado == "A" ? "ACTIVO" : "INACTIVO",
-                        Descripcion = s.Descripcion.Length > 45 ? $"{s.Descripcion.Substring(0,45)}..." : s.Descripcion,
+                        Descripcion = s.Descripcion.Length > 45 ? $"{s.Descripcion.Substring(0, 45)}..." : s.Descripcion,
                         UltimoLogin = context.Col_Usuarios
                                 .Where(w => w.Estado.Equals("A") && w.RolId.Equals(s.RolId))
                                 .OrderByDescending(o => o.UltimoLogin)
@@ -417,7 +417,7 @@ namespace Colegio.Services
                     context.Col_Roles.Update(rol);
                     status = true;
                     title = "Éxito";
-                    message = "El perfil se ha inhabilitado exitosamente";
+                    message = $"El perfil {rol.NombreRol} se ha inhabilitado exitosamente";
                 }
 
                 await context.SaveChangesAsync();
@@ -824,6 +824,23 @@ namespace Colegio.Services
                 return new ApiCallResult { Status = false, Title = "Error al guardar", Message = "Favor contacte éste con el administrador" };
             }
             #endregion
+        }
+
+        public async Task<ApiCallResult> ActivarPerfil(int rolId)
+        {
+            var rol = await context.Col_Roles.Where(w => w.RolId.Equals(rolId)).FirstOrDefaultAsync();
+            rol.Estado = "A";
+            rol.FechaActualizacion = DateTime.Now;
+            context.Col_Roles.Update(rol);
+
+            await context.SaveChangesAsync();
+
+            return new ApiCallResult
+            {
+                Status = true,
+                Title = "Exitos",
+                Message = $"El Perfil {rol.NombreRol} se habitlitó exitosamente"
+            };
         }
     }
 }

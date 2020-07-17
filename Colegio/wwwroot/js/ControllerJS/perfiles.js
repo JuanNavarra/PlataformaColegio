@@ -115,6 +115,8 @@
                     if ($('#actualizar_no').is(':checked') || $("#id_rol_actualizar").val() == "") {
                         cargarPermisosCRUD();
                         cargarSubModulos();
+                    } else {
+                        $("#modal_guardar_cambios").css("display", "none");
                     }
                 } else {
                     toastr.warning("¡Al menos tiene que tener un submodulo seleccionado!");
@@ -208,6 +210,7 @@
             if ($("#id_rol_actualizar").val() != "") {
                 if (!$('#actualizar_no').is(':checked')) {
                     cargarModalActualizar();
+                    $(this).css("display", "none");
                 } else {
                     cargarModulos();
                     $(this).css("display", "none");
@@ -452,12 +455,12 @@ function modalVerAutorizacion(rolId) {
 
                 var ca = "<tr>"
                 ca += "<td>" + res.data.roles.nombreRol + "</td>"
-                ca += "<td>" + res.data.roles.fechaCreacion + "</td>"
+                ca += "<td>" + convertirFechaEspecifica(res.data.roles.fechaCreacion) + "</td>"
                 ca += "<td>"
-                ca += res.data.roles.fechaActualizacion == null ? "Sin registros" : res.data.roles.fechaActualizacion
+                ca += res.data.roles.fechaActualizacion == null ? "Sin registros" : convertirFechaEspecifica(res.data.roles.fechaActualizacion)
                 ca += "</td>"
                 ca += "<td>"
-                ca += res.data.roles.ultimoLogin == null ? "Sin registros" : res.data.roles.ultimoLogin
+                ca += res.data.roles.ultimoLogin == null ? "Sin registros" : convertirFechaEspecifica(res.data.roles.ultimoLogin)
                 ca += "</td>"
                 ca += "<td>" + res.data.roles.estado + "</td>"
                 ca += "</tr>"
@@ -469,9 +472,9 @@ function modalVerAutorizacion(rolId) {
                     ca = "<div class='col-4'>"
                     ca += "<ul class='list-group'>"
                     if (res.data.modulos[index].relaciones.length > 0) {
-                        ca += "<li class='list-group-item active' style='margin-bottom:11%;'>" + item.nombreModulo + "</li>"
+                        ca += "<li class='list-group-item active'>" + item.nombreModulo + "</li>"
                         $.each(res.data.modulos[index].relaciones, function (index2, item2) {
-                            ca += "<li class='list-group-item'>"
+                            ca += "<li class='list-group-item' style='margin-bottom:11%;'>"
                             ca += item2.nombreSubModulo
                             $.each(item2.permisos, function (index3, item3) {
                                 if (item3.includes("Crear")) {
@@ -538,22 +541,37 @@ function modalVerAutorizacion(rolId) {
 }
 
 function modalEliminarAuorizacion(rolId) {
+
     var estado = $("#auth_" + rolId).children().eq(6).text();
     if (estado == "ACTIVO") {
         swal({
             title: "¿Desea eliminar éste perfil?",
-            buttons: [true, "Continuar"]
+            buttons: ["Cancelar", "Continuar"],
+            icon: "warning",
         }).then((value) => {
             if (value) {
                 swal({
                     title: "Inactivar un perfil o eliminarlo para siempre",
                     text: "Si hay usuarios con este rol, actualice el rol de de los usuarios," +
                         " de lo contrario los usuarios serán eliminados",
-                    buttons: ["Inactivar", "Eliminar"]
+                    buttons: {
+                        cancel: "Cancelar",
+                        defeat: {
+                            text: "Inactivar",
+                            value: "defeat",
+                        },
+                        catch: {
+                            text: "Eliminar",
+                            value: "catch",
+                        },
+                    },
+                    icon: "warning",
                 }).then((value) => {
-                    var op = value ? value : false
-                    eliminarAuorizacion(rolId, op);
-                })
+                    if (value == "defeat" || value == "catch") {
+                        var op = value == "catch" ? true : false
+                        eliminarAuorizacion(rolId, op);
+                    }
+                });
             }
         })
     } else {
@@ -561,15 +579,15 @@ function modalEliminarAuorizacion(rolId) {
             title: "Eliminar el perfil",
             text: "Si hay usuarios con este rol, actualice el rol de de los usuarios," +
                 " de lo contrario los usuarios serán eliminados",
+            icon: "warning",
             buttons: [true, "Eliminar"]
         }).then((value) => {
             if (value) {
                 eliminarAuorizacion(rolId, true);
             }
-        })
+        });
     }
 }
-
 
 function eliminarAuorizacion(rolId, op) {
     $.ajax({
@@ -584,8 +602,12 @@ function eliminarAuorizacion(rolId, op) {
             if (res.status) {
                 if (op) {
                     $("#auth_" + rolId).hide();
+                } else {
+                    $("#auth_" + rolId).children().eq(7).append("<a href='#' onclick='activarPerfil(" + rolId + ")' id='icon_activar_" + rolId + "'><i class='far fa-hand-point-up' ></i></a >");
+                    $("#icon_actualizar_" + rolId).remove();
+                    $("#auth_" + rolId).children().eq(6).text("INACTIVO");
                 }
-                toastr.success(res.title + ": " + res.message);
+                toastr.warning(res.title + ": " + res.message);
             } else {
                 toastr.error(res.title + ": " + res.message);
             }
@@ -737,6 +759,27 @@ function cargarModalActualizar() {
                 $('.select2').select2()
 
             }
+        },
+        error: function (error) {
+            toastr.error("Contacte con el adminstrador");
+        }
+    })
+}
+
+function activarPerfil(rolId) {
+    $.ajax({
+        type: "PUT",
+        url: "Perfiles/ActivarPerfil",
+        data: {
+            rolId: rolId
+        },
+        dataType: "json",
+        async: true,
+        success: function (res) {
+            $("#auth_" + rolId).children().eq(7).append("<a href='#' class='btn_titulo_actualizar' data-toggle='modal' data-target='#modal_crear_autorizacion' id='icon_actualizar_" + rolId + "'><i class='fas fa-edit'></i></a>");
+            $("#icon_activar_" + rolId).remove();
+            $("#auth_" + rolId).children().eq(6).text("ACTIVO");
+            toastr.success(res.title + ": " + res.message);
         },
         error: function (error) {
             toastr.error("Contacte con el adminstrador");

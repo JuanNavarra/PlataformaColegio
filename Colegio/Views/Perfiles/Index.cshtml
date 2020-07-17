@@ -5,15 +5,24 @@
     <div class="card-header">
         <h3 class="card-title">Listado de perfiles con autorización</h3>
     </div>
-    <div class="row">
-        <div class="col-md-1 col-sm-2 col-12">
-            <div class="info-box">
-                <span class="info-box-icon bg-primary" id="btn_crear_autorizacion" data-toggle="modal" data-target="#modal_crear_autorizacion"><i class="fas fa-plus"></i></span>
+    @if (ViewBag.Crear)
+    {
+        <div class="row">
+            <div class="col-md-1 col-sm-2 col-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-primary" id="btn_crear_autorizacion" data-toggle="modal" data-target="#modal_crear_autorizacion"><i class="fas fa-plus"></i></span>
+                </div>
             </div>
         </div>
-    </div>
-    @await Html.PartialAsync("_TablaPerfiles")
-    @await Html.PartialAsync("_ModalCrearPerfiles")
+    }
+    @if (ViewBag.Leer)
+    {
+        @await Html.PartialAsync("_TablaPerfiles")
+    }
+    @if (ViewBag.Crear || ViewBag.Actualizar)
+    {
+        @await Html.PartialAsync("_ModalCrearPerfiles")
+    }
 </div>
 
 <script src="~/js/ControllerJS/perfiles.js"></script>

@@ -6,6 +6,7 @@ using Colegio.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using System.Data.Entity.Validation;
+using System.Threading.Tasks;
 
 namespace Colegio.Controllers
 {
@@ -13,6 +14,7 @@ namespace Colegio.Controllers
     public class LoginController : Controller
     {
         private readonly ITokenProvider tokenProvider;
+        private static bool sesion = true;
 
         public LoginController(ITokenProvider tokenProvider)
         {
@@ -25,9 +27,10 @@ namespace Colegio.Controllers
         {
             if (!User.Identity.IsAuthenticated)
             {
+                ViewBag.Bool = sesion;
                 return View();
             }
-            return RedirectToAction("Index", "Login");
+            return RedirectToAction("Index", "Home");
         }
 
         /// <summary>
@@ -38,17 +41,18 @@ namespace Colegio.Controllers
         /// retorna la pagina de autenticación
         /// </returns>
         [HttpPost]
-        public IActionResult LoginUser(Col_Usuarios user)
+        public async Task<IActionResult> LoginUser(Col_Usuarios user)
         {
             try
             {
-                var userToken = tokenProvider.LoginUser(user.Usuario.Trim(), user.Contrasena);
+                var userToken = await tokenProvider.LoginUser(user.Usuario.Trim(), user.Contrasena);
                 if (userToken != null)
                 {
                     //Save token in session object
                     HttpContext.Session.SetString("JWToken", userToken.AuthenticationType);
                     return Redirect("~/Home/");
                 }
+                sesion = false;
                 return RedirectToAction("Index", "Login");
             }
             #region catch
