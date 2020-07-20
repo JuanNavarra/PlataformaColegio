@@ -1,0 +1,80 @@
+﻿@{
+}
+    <div class="tab-pane" role="tabpanel" id="datos_afiliacion">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Tipo Entidad *</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-industry"></i></span>
+                        </div>
+                        <select class="form-control" id="tipo_entidad" name="tipo_entidad">
+                            <option value="0">Selecciona</option>
+                            <option value="arl">ARL</option>
+                            <option value="cc">Caja de Compensacion</option>
+                            <option value="eps">EPS</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Nombre Entidad *</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-industry"></i></span>
+                        </div>
+                        <input class="form-control" type="text" name="entidad" id="entidad">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label>Fecha de Afiliacion *</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                        </div>
+                        <input type="text" class="form-control" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask id="fecha_afiliacion" name="fecha_afiliacion">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10px">#</th>
+                                    <th>Tipo Entidad</th>
+                                    <th>Nombre Entidad</th>
+                                    <th>Fecha Afiliación</th>
+                                    <th style="width: 15%;">Quitar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1.</td>
+                                    <td>Confamiliar</td>
+                                    <td>GlobalSoft</td>
+                                    <td>01/02/2020</td>
+                                    <td style="text-align:center">
+                                        <a href='#'>
+                                            <i class='fas fa-trash'></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <ul class="list-inline pull-right">
+            <li><button type="button" class="default-btn prev-step btn-danger">Atrás</button></li>
+            <li><button type="button" class="default-btn next-step btn-primary">Terminar</button></li>
+        </ul>
+    </div>

@@ -1,0 +1,172 @@
+﻿@{
+}
+
+<div class="tab-pane" role="tabpanel" id="datos_laborales">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>Nombre del Cargo *</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
+                    </div>
+                    <select class="form-control" id="nombre_cargo" name="nombre_cargo">
+                        <option value="0">Selecciona</option>
+                        <option value="profesor">Profesor</option>
+                        <option value="psicologo">Psicologo</option>
+                        <option value="aseador">Aseador</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>Salario a Devengar *</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
+                    </div>
+                    <input class="form-control" type="text" name="salario" id="salario" pattern="^[0-9]+$">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>Tipo de Contrato *</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
+                    </div>
+                    <select class="form-control" id="tipo_contrado" name="tipo_contrado">
+                        <option value="0">Selecciona</option>
+                        <option value="in">Indefinido</option>
+                        <option value="ol">Obra Labor</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>Numero de Horas x Semana *</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-clock"></i></span>
+                    </div>
+                    <input class="form-control" type="text" name="horas" id="horas" pattern="^[0-9]+$">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">HORAS</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>Jornada Laboral *</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
+                    </div>
+                    <select class="form-control" id="jornada_laboral" name="jornada_laboral">
+                        <option value="0">Selecciona</option>
+                        <option value="p">Primera Jornada</option>
+                        <option value="s">Segunda Jornada</option>
+                        <option value="d">Doble Jornada</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>Fecha de Ingreso *</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                    </div>
+                    <input type="text" class="form-control" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask id="fecha_alta" name="fecha_alta">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>Fecha de Baja *</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                    </div>
+                    <input type="text" class="form-control" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask id="fecha_baja" name="fecha_baja">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>Correo Corporativo</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">@@</span>
+                    </div>
+                    <input class="form-control" type="email" name="correo_corporativo" id="correo_corporativo">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>Auxilio de Transporte</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-shuttle-van"></i></span>
+                    </div>
+                    <input class="form-control" type="email" name="auxilio_transporte" id="auxilio_transporte">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>Insumos de Trabajo</label>
+                <div class="input-group">
+                    <input type="text" class="form-control">
+                    <span class="input-group-append">
+                        <button type="button" class="btn btn-primary btn-flat">Escoger</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label>Listado de Insumos Escogidos </label>
+            <div class="card">
+                <div class="card-body p-0">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th style="width: 10px">#</th>
+                                <th>Insumo</th>
+                                <th style="width: 15%;">Quitar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1.</td>
+                                <td>Update software</td>
+                                <td style="text-align:center">
+                                    <a href='#'>
+                                        <i class='fas fa-trash'></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ul class="list-inline pull-right">
+        <li><button type="button" class="prev-step btn-danger">Atrás</button></li>
+        <li><button type="button" class="next-step btn-primary">Continuar</button></li>
+    </ul>
+</div>

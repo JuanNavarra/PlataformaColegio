@@ -1,0 +1,154 @@
+﻿@{
+}
+    <div class="tab-pane" role="tabpanel" id="datos_experiencia">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Empresa donde Laboró *</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-industry"></i></span>
+                        </div>
+                        <input class="form-control" type="text" name="empresa" id="empresa">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Cargo del empleado *</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
+                        </div>
+                        <input class="form-control" type="text" name="cargo_empleado" id="cargo_empleado">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label>Fecha de Inicio *</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                        </div>
+                        <input type="text" class="form-control" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask id="fecha_inicio" name="fecha_inicio">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label>Fecha de Fin *</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                        </div>
+                        <input type="text" class="form-control" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask id="fecha_fin" name="fecha_fin">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label>Tiempo Laborado</label>
+                    <div class="input-group">
+                        <input disabled style="background-color: #e9ecef !important;" class="form-control" type="text" name="tiempo_laborado" id="tiempo_laborado">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">MESES</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label>Breve Descripcion de Funciones *</label>
+                    <textarea class="form-control" rows="3" id="modal_descripcion_autorizacion"></textarea>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label>Logros Obtenidos *</label>
+                    <textarea class="form-control" rows="3" id="modal_descripcion_autorizacion"></textarea>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <ul class="list-inline pull-right">
+                    <li><button type="button" class="btn btn-primary" style="margin-top: 18%;">Agregar Experiencia</button></li>
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body p-0  table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10px">#</th>
+                                    <th>Cargo</th>
+                                    <th style="width: 10px">Tiempo</th>
+                                    <th>Empresa</th>
+                                    <th>Fecha inicio</th>
+                                    <th>Fecha fin</th>
+                                    <th>Funciones</th>
+                                    <th>Logros</th>
+                                    <th>Quitar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1.</td>
+                                    <td>Ingeniero de Software</td>
+                                    <td>12</td>
+                                    <td>GlobalSoft</td>
+                                    <td>01/02/2020</td>
+                                    <td>01/02/2020</td>
+                                    <td>Desarrollar software</td>
+                                    <td>Facturacion electronica</td>
+                                    <td style="text-align:center">
+                                        <a href='#'>
+                                            <i class='fas fa-trash'></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>1.</td>
+                                    <td>Ingeniero de Software</td>
+                                    <td>12</td>
+                                    <td>GlobalSoft</td>
+                                    <td>01/02/2020</td>
+                                    <td>01/02/2020</td>
+                                    <td>Desarrollar software</td>
+                                    <td>Facturacion electronica</td>
+                                    <td style="text-align:center">
+                                        <a href='#'>
+                                            <i class='fas fa-trash'></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="form-group">
+                        <label>Hoja de Vida *</label>
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="hoja_vida" name="hoja_vida">
+                                <label class="custom-file-label" for="exampleInputFile">Escoge Uno</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <ul class="list-inline pull-right">
+            <li><button type="button" class="default-btn prev-step btn-danger">Atrás</button></li>
+            <li><button type="button" class="default-btn next-step btn-primary">Continuar</button></li>
+        </ul>
+    </div>

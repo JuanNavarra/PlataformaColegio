@@ -140,8 +140,8 @@
                 @if (PMA.Any())
                 {
                     var PSMA = User.Claims
-                        .Where(w => w.Type.Equals("PermisoSubModulo") && w.Value.StartsWith("Maestro Administrativo")
-                        && !w.Value.EndsWith("-0"))
+                        .Where(w => w.Type.Equals("PermisoSubModulo") && w.Value.Contains("Maestro Administrativo")
+                        && !w.Value.EndsWith("0"))
                         .ToList();
                     bool PSMA_PMA = PSMA.Count() == 0 && PMA.Any();
                     <li class="nav-item has-treeview menu-open">
@@ -162,12 +162,12 @@
                                     </a>
                                 </li>
                             }
-                            @if (PSMA.Where(w => w.Value.Contains("Horarios")).Any() || PSMA_PMA)
+                            @if (PSMA.Where(w => w.Value.Contains("Contratacion")).Any() || PSMA_PMA)
                             {
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
+                                    <a href="@Url.Action("Index","Contratacion")" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Horarios</p>
+                                        <p>Contratación</p>
                                     </a>
                                 </li>
                             }

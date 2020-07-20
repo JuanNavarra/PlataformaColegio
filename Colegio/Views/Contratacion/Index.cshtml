@@ -1,0 +1,57 @@
+﻿@{
+}
+<link href="~/css/wizard.css" rel="stylesheet" />
+
+<div class="list-content">
+    <a href="#listone" data-toggle="collapse" aria-expanded="false" aria-controls="listone" style="background-color: #f2f4f6 !important;
+        color: black !important">Forumulario de contratación de empleados<i class="fa fa-chevron-down"></i></a>
+    <div class="collapse" id="listone">
+        <div class="list-box">
+            <section class="signup-step-container" style="margin-top: -123px;">
+                <div class="row d-flex justify-content-center">
+                    <div class="col-md-12">
+                        <div class="wizard">
+                            <div class="wizard-inner">
+                                <div class="connecting-line"></div>
+                                <ul class="nav nav-tabs" role="tablist">
+                                    <li role="presentation" class="active">
+                                        <a href="#datos_personales" data-toggle="tab" aria-controls="datos_personales" role="tab" aria-expanded="true"><span class="round-tab">1 </span> <i>Datos Personales</i></a>
+                                    </li>
+                                    <li role="presentation" class="disabled">
+                                        <a href="#datos_experiencia" data-toggle="tab" aria-controls="datos_experiencia" role="tab"><span class="round-tab">2</span> <i>Experiencia Laboral</i></a>
+                                    </li>
+                                    <li role="presentation" class="disabled">
+                                        <a href="#datos_laborales" data-toggle="tab" aria-controls="datos_laborales" role="tab" aria-expanded="false"><span class="round-tab">3</span> <i>Datos Laborales</i></a>
+                                    </li>
+                                    <li role="presentation" class="disabled">
+                                        <a href="#datos_afiliacion" data-toggle="tab" aria-controls="datos_afiliacion" role="tab"><span class="round-tab">4</span> <i>Datos de Afiliación</i></a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="container">
+                                <form role="form" class="login-box" style="width: 100% !important;">
+                                    <div class="col-md-12">
+                                        <div class="tab-content" id="main_form">
+                                            <br />
+                                            @await Html.PartialAsync("_FormularioPersonales")
+                                            @await Html.PartialAsync("_FormularioExperiencia")
+                                            @await Html.PartialAsync("_FormularioLaborales")
+                                            @await Html.PartialAsync("_FormularioAfiliacion")
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/ControllerJS/contratacion.js"></script>
+<script src="~/js/Wizard.js"></script>
+<script src="~/js/jquery.inputmask.bundle.min.js"></script>
+<script src="~/js/bs-custom-file-input.min.js"></script>

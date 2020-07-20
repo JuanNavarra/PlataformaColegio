@@ -24,9 +24,8 @@ namespace Colegio.Controllers
         {
             PermisosCRUD permiso = new PermisosCRUD();
             var permisos = User.Claims
-                        .Where(w => w.Type.Equals(modulo) && w.Value.StartsWith("Maestro Administrativo")
-                                && w.Value.Contains("Perfiles")).ToList();
-            permiso.PSMAPB = permisos.Any();
+                        .Where(w => w.Type.Equals(modulo) && w.Value.Contains("Maestro Administrativo")).ToList();
+            permiso.PSMAPB = permisos.Where(w => w.Value.Contains("Perfiles")).Any();
             permiso.PMMAPB = permisos.Any();
             permiso.PMMAPL = permisos;
             return permiso;
