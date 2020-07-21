@@ -13,11 +13,11 @@ namespace Colegio.Controllers
 {
     public class PerfilesController : Controller
     {
-        private readonly IPerfilesService perfilesService;
+        private readonly IPerfilesService service;
 
         public PerfilesController(IPerfilesService perfilesService)
         {
-            this.perfilesService = perfilesService;
+            this.service = perfilesService;
         }
 
         private PermisosCRUD Permisos(string modulo)
@@ -38,7 +38,7 @@ namespace Colegio.Controllers
             {
                 if (Permisos("PermisoSubModulo").PSMAPB || (!Permisos("PermisoSubModulo").PSMAPB && Permisos("PermisoModulo").PMMAPB))
                 {
-                    var registros = await perfilesService.MostrarAutorizaciones();
+                    var registros = await service.MostrarAutorizaciones();
                     ViewBag.Registros = registros;
 
                     string modulo = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
@@ -88,8 +88,8 @@ namespace Colegio.Controllers
                         }
                     }
 
-                    ApiCallResult result = idRol == 0 ? await perfilesService.GuardarAutorizaciones(modulos, subModulos, rol, descripcion) :
-                        await perfilesService.ActualizarAutorizaciones(modulos, subModulos, rol, descripcion, idRol);
+                    ApiCallResult result = idRol == 0 ? await service.GuardarAutorizaciones(modulos, subModulos, rol, descripcion) :
+                        await service.ActualizarAutorizaciones(modulos, subModulos, rol, descripcion, idRol);
                     return Json(new { result });
                 }
                 else
@@ -108,7 +108,7 @@ namespace Colegio.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                var modulos = await perfilesService.CargarModulos();
+                var modulos = await service.CargarModulos();
                 return Json(new { result = "ok", data = modulos });
             }
             return RedirectToAction("Index", "Login");
@@ -119,7 +119,7 @@ namespace Colegio.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                var subModulos = await perfilesService.CargarSubModulos(modulos);
+                var subModulos = await service.CargarSubModulos(modulos);
                 return Json(new { result = "ok", data = subModulos });
             }
             return RedirectToAction("Index", "Login");
@@ -134,7 +134,7 @@ namespace Colegio.Controllers
                 var leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
                 if (leer)
                 {
-                    var perfil = await perfilesService.MostrarDetallePerfil(rolId);
+                    var perfil = await service.MostrarDetallePerfil(rolId);
                     return Json(new { result = "ok", data = perfil });
                 }
                 else
@@ -154,7 +154,7 @@ namespace Colegio.Controllers
                 var eliminar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Eliminar")).Any();
                 if (eliminar)
                 {
-                    var result = await perfilesService.EliminarPerfiles(rolId, op);
+                    var result = await service.EliminarPerfiles(rolId, op);
                     return Json(result);
                 }
                 else
@@ -177,7 +177,7 @@ namespace Colegio.Controllers
                 var actualizar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Actualizar")).Any();
                 if (actualizar)
                 {
-                    var data = await perfilesService.CargaDatosActualizar(rolId);
+                    var data = await service.CargaDatosActualizar(rolId);
                     return Json(new { result = "ok", data });
                 }
                 else
@@ -200,7 +200,7 @@ namespace Colegio.Controllers
                 var actualizar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Actualizar")).Any();
                 if (actualizar)
                 {
-                    var result = await perfilesService.ActivarPerfil(rolId);
+                    var result = await service.ActivarPerfil(rolId);
                     return Json(result);
                 }
                 else

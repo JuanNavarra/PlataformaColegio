@@ -302,14 +302,14 @@ namespace Colegio.Services
             {
                 var query = await (from t0 in context.Col_Roles
                                    join t1 in context.Col_Usuarios on t0.RolId equals t1.RolId
-                                   join t2 in context.Col_Estudiantes on t1.Id equals t2.UsuarioId
+                                   join t2 in context.Col_Personas on t1.Id equals t2.UsuarioId
                                    where t0.RolId.Equals(rolId) && t0.Estado.Equals("A") && t1.Estado.Equals("A")
                                    && t2.Estado.Equals("A")
                                    select new UsuariosPerfiles
                                    {
                                        Estado = t1.Estado,
                                        NombreUsuario = t1.Usuario,
-                                       NombrePersona = t2.Nombres + " " + t2.PrimerApellido + " " + t2.SegundoApellido,
+                                       NombrePersona = t2.PrimerNombre + " " + t2.PrimerApellido + " " + t2.SegundoApellido,
                                        FechaCreacion = t1.FechaCreacion,
                                        FechaActualizacion = t1.FechaActualizacion,
                                        UltimoLogin = t1.UltimoLogin

@@ -33,6 +33,7 @@ namespace Colegio
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<ITokenProvider, TokenProvider>();
             services.AddScoped<IPerfilesService, PerfilesService>();
+            services.AddScoped<IContratacion, ContratacionService>();
             services.AddDistributedMemoryCache();
             services.AddSession(options => {
                 options.IdleTimeout = TimeSpan.FromMinutes(10);

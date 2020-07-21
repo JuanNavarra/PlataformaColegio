@@ -24,7 +24,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <div class="form-group">
                     <label>Fecha de Inicio *</label>
                     <div class="input-group">
@@ -35,7 +35,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <div class="form-group">
                     <label>Fecha de Fin *</label>
                     <div class="input-group">
@@ -46,34 +46,23 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-2">
-                <div class="form-group">
-                    <label>Tiempo Laborado</label>
-                    <div class="input-group">
-                        <input disabled style="background-color: #e9ecef !important;" class="form-control" type="text" name="tiempo_laborado" id="tiempo_laborado">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">MESES</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
         <div class="row">
             <div class="col-md-5">
                 <div class="form-group">
                     <label>Breve Descripcion de Funciones *</label>
-                    <textarea class="form-control experiencia" rows="3" id="modal_descripcion_autorizacion"></textarea>
+                    <textarea class="form-control experiencia" rows="3" id="descripcion_funciones"></textarea>
                 </div>
             </div>
             <div class="col-md-5">
                 <div class="form-group">
                     <label>Logros Obtenidos *</label>
-                    <textarea class="form-control" rows="3" id="modal_descripcion_autorizacion"></textarea>
+                    <textarea class="form-control experiencia" rows="3" id="logros_obtenidos"></textarea>
                 </div>
             </div>
             <div class="col-md-2">
                 <ul class="list-inline pull-right">
-                    <li><button type="button" class="btn btn-primary" style="margin-top: 18%;">Agregar Experiencia</button></li>
+                    <li><button type="button" class="btn btn-primary" style="margin-top: 18%;" onclick="agreagarExperiencia();">Agregar Experiencia</button></li>
                 </ul>
             </div>
         </div>
@@ -85,11 +74,11 @@
                             <thead>
                                 <tr>
                                     <th style="width: 10px">#</th>
-                                    <th>Cargo</th>
-                                    <th style="width: 10px">Tiempo</th>
                                     <th>Empresa</th>
+                                    <th>Cargo</th>
                                     <th>Fecha inicio</th>
                                     <th>Fecha fin</th>
+                                    <th style="width: 10px">Tiempo</th>
                                     <th>Funciones</th>
                                     <th>Logros</th>
                                     <th>Quitar</th>

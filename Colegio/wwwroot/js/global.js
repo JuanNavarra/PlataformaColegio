@@ -59,3 +59,14 @@ function validarCampos(clase) {
     }
     return validar;
 }
+
+function cantidadMeses(_fecha1, _fecha2) {
+    _fecha1 = _fecha1.split("/").reverse().join("/");
+    _fecha2 = _fecha2.split("/").reverse().join("/");
+    let fecha1 = new Date(_fecha1);
+    let fecha2 = new Date(_fecha2)
+
+    let resta = fecha2.getTime() - fecha1.getTime()
+    var meses = (Math.round(resta / (1000 * 60 * 60 * 24))) / 30
+    return meses.toFixed();
+}

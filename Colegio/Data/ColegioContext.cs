@@ -20,7 +20,12 @@ namespace Colegio.Data
         public DbSet<Col_SubModulos> Col_SubModulos { get; set; }
         public DbSet<Col_SubModuloModulo> Col_SubModuloModulo { get; set; }
         public DbSet<Col_RolModulos> Col_RolModulos { get; set; }
-        public DbSet<Col_Estudiantes> Col_Estudiantes { get; set; }
+        public DbSet<Col_Personas> Col_Personas { get; set; }
+        public DbSet<Col_Experiencia> Col_Experiencia { get; set; }
+        public DbSet<Col_InsumoLaboral> Col_InsumoLaboral { get; set; }
+        public DbSet<Col_Laborales> Col_Laborales { get; set; }
+        public DbSet<Col_Afiliacion> Col_Afiliacion { get; set; }
+        public DbSet<Col_InfoAcademica> Col_InfoAcademica { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -32,7 +37,12 @@ namespace Colegio.Data
             modelBuilder.ApplyConfiguration(new Col_SubModulosConfiguration());
             modelBuilder.ApplyConfiguration(new Col_SubModuloModuloConfiguration());
             modelBuilder.ApplyConfiguration(new Col_RolModulosConfiguration());
-            modelBuilder.ApplyConfiguration(new Col_EstudiantesConfiguration());
+            modelBuilder.ApplyConfiguration(new Col_PersonasConfiguration());
+            modelBuilder.ApplyConfiguration(new Col_ExperienciaConfiguration());
+            modelBuilder.ApplyConfiguration(new Col_InsumoLaboralConfiguration());
+            modelBuilder.ApplyConfiguration(new Col_LaboralesConfiguration());
+            modelBuilder.ApplyConfiguration(new Col_AfiliacionConfiguration());
+            modelBuilder.ApplyConfiguration(new Col_InfoAcademicaConfiguration());
         }
     }
 }
