@@ -14,17 +14,17 @@
                             <div class="wizard-inner">
                                 <div class="connecting-line"></div>
                                 <ul class="nav nav-tabs" role="tablist">
-                                    <li role="presentation" class="active">
-                                        <a href="#datos_personales" data-toggle="tab" aria-controls="datos_personales" role="tab" aria-expanded="true"><span class="round-tab">1 </span> <i>Datos Personales</i></a>
+                                    <li role="presentation" class="active" id="tab_datos_personales" style="pointer-events: none;">
+                                        <a href="#datos_personales" aria-controls="datos_personales" aria-expanded="true"><span class="round-tab">1</span><i>Datos Personales</i></a>
                                     </li>
-                                    <li role="presentation" class="disabled">
-                                        <a href="#datos_experiencia" data-toggle="tab" aria-controls="datos_experiencia" role="tab"><span class="round-tab">2</span> <i>Experiencia Laboral</i></a>
+                                    <li role="presentation" id="tab_datos_experiencia" style="pointer-events: none;">
+                                        <a href="#datos_experiencia" aria-controls="datos_experiencia"><span class="round-tab">2</span><i>Experiencia Laboral</i></a>
                                     </li>
-                                    <li role="presentation" class="disabled">
-                                        <a href="#datos_laborales" data-toggle="tab" aria-controls="datos_laborales" role="tab" aria-expanded="false"><span class="round-tab">3</span> <i>Datos Laborales</i></a>
+                                    <li role="presentation" id="tab_datos_laborales" style="pointer-events: none;">
+                                        <a href="#datos_laborales" aria-controls="datos_laborales" aria-expanded="false"><span class="round-tab">3</span><i>Datos Laborales</i></a>
                                     </li>
-                                    <li role="presentation" class="disabled">
-                                        <a href="#datos_afiliacion" data-toggle="tab" aria-controls="datos_afiliacion" role="tab"><span class="round-tab">4</span> <i>Datos de Afiliación</i></a>
+                                    <li role="presentation" id="tab_datos_afiliacion" style="pointer-events: none;">
+                                        <a href="#datos_afiliacion" aria-controls="datos_afiliacion"><span class="round-tab">4</span><i>Datos de Afiliación</i></a>
                                     </li>
                                 </ul>
                             </div>
@@ -39,6 +39,11 @@
                                             @await Html.PartialAsync("_FormularioLaborales")
                                             @await Html.PartialAsync("_FormularioAfiliacion")
                                             <div class="clearfix"></div>
+                                            <ul class="list-inline pull-right">
+                                                <li><button type="button" class="btn btn-danger" id="btn_atras_contrato" style="display:none;">Atrás</button></li>
+                                                <li><button type="button" class="btn btn-primary" id="btn_continuar_contrato">Continuar</button></li>
+                                                <li><button type="button" class="btn btn-primary" id="btn_terminar_contrato" style="display:none;">Terminar</button></li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </form>

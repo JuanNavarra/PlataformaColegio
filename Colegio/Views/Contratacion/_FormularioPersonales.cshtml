@@ -9,7 +9,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-passport"></i></span>
                     </div>
-                    <select class="form-control" id="tipo_documento" name="tipo_documento">
+                    <select class="form-control personal" id="tipo_documento" name="tipo_documento">
                         <option value="0">Selecciona</option>
                         <option value="cc">Cedula Ciudadania</option>
                         <option value="lm">Libreta Militar</option>
@@ -25,7 +25,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-passport"></i></span>
                     </div>
-                    <input class="form-control" type="text" name="tipo_documento" id="tipo_documento" pattern="^[0-9]+$">
+                    <input class="form-control personal" type="text" name="tipo_documento" id="tipo_documento" pattern="^[0-9]+$" autocomplete="off">
                 </div>
             </div>
         </div>
@@ -36,7 +36,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-user"></i></span>
                     </div>
-                    <input class="form-control" type="text" name="primer_nombre" id="primer_nombre" pattern="[a-zA-Z ]">
+                    <input class="form-control personal" type="text" name="primer_nombre" id="primer_nombre" pattern="[a-zA-Z]" autocomplete="off">
                 </div>
             </div>
         </div>
@@ -48,7 +48,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-user"></i></span>
                     </div>
-                    <input class="form-control" type="text" name="segundo_nombre" id="segundo_nombre" pattern="[a-zA-Z ]">
+                    <input class="form-control" type="text" name="segundo_nombre" id="segundo_nombre" pattern="[a-zA-Z]" autocomplete="off">
                 </div>
             </div>
         </div>
@@ -61,7 +61,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-user"></i></span>
                     </div>
-                    <input class="form-control" type="text" name="primer_apellido" id="primer_apellido" pattern="[a-zA-Z ]">
+                    <input class="form-control personal" type="text" name="primer_apellido" id="primer_apellido" pattern="[a-zA-Z]" autocomplete="off">
                 </div>
             </div>
         </div>
@@ -72,7 +72,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-user"></i></span>
                     </div>
-                    <input class="form-control" type="text" name="segundo_apellido" id="segundo_apellido" pattern="[a-zA-Z ]">
+                    <input class="form-control personal" type="text" name="segundo_apellido" id="segundo_apellido" pattern="[a-zA-Z]" autocomplete="off">
                 </div>
             </div>
         </div>
@@ -83,7 +83,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-phone"></i></span>
                     </div>
-                    <input type="text" class="form-control" data-inputmask='"mask": "999-999-9999"' data-mask name="celular" id="celular" pattern="^[0-9-]+$">
+                    <input type="text" class="form-control personal" data-inputmask='"mask": "999-999-9999"' data-mask name="celular" id="celular" pattern="^[0-9-]+$">
                 </div>
             </div>
         </div>
@@ -94,7 +94,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text">@@</span>
                     </div>
-                    <input class="form-control" type="email" name="correo_personal" id="correo_personal">
+                    <input class="form-control personal" type="email" name="correo_personal" id="correo_personal" autocomplete="off">
                 </div>
             </div>
         </div>
@@ -107,7 +107,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-street-view"></i></span>
                     </div>
-                    <input class="form-control" type="text" name="direccion" id="direccion">
+                    <input class="form-control personal" type="text" name="direccion" id="direccion" autocomplete="off">
                 </div>
             </div>
         </div>
@@ -118,7 +118,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-street-view"></i></span>
                     </div>
-                    <input class="form-control" type="text" name="barrio" id="barrio">
+                    <input class="form-control personal" type="text" name="barrio" id="barrio" autocomplete="off">
                 </div>
             </div>
         </div>
@@ -129,14 +129,14 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                     </div>
-                    <input type="text" class="form-control" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask id="fecha_nacimiento" name="fecha_nacimiento">
+                    <input type="text" class="form-control personal" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask id="fecha_nacimiento" name="fecha_nacimiento">
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="form-group">
                 <label>Estado Cívil *</label>
-                <select class="form-control" id="estado_civil">
+                <select class="form-control personal" id="estado_civil">
                     <option value="0">Seleccione</option>
                     <option value="ca">Casado</option>
                     <option value="so">Soletro</option>
@@ -159,33 +159,58 @@
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label>Nivel de Formación</label>
-                                <input type="text" class="form-control" name="formacion" id="formacion"/>
+                                <label>Nivel de Formación *</label>
+                                <input type="text" class="form-control" name="formacion" id="formacion" autocomplete="off" />
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label>Título</label>
-                                <input disabled type="text" class="form-control" name="titulo" id="titulo" />
+                                <label>Título Obtenido *</label>
+                                <input type="text" class="form-control" name="titulo" id="titulo" autocomplete="off" />
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label>Nombre de Institucón</label>
-                                <input disabled type="text" class="form-control" name="institucion" id="institucion" />
+                                <label>Nombre de Institucón *</label>
+                                <input type="text" class="form-control" name="institucion" id="institucion" autocomplete="off" />
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <label>Fecha Gradución</label>
+                        <div class="col-md-2">
+                            <label>Fecha Graduación *</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                                 </div>
-                                <input disabled type="text" class="form-control" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask id="fecha_graduacion" name="fecha_graduacion">
+                                <input type="text" class="form-control" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask id="fecha_graduacion" name="fecha_graduacion">
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="info-box" style="display: flex;min-height: 64px;padding: .5rem;width: 85%;margin-top: 16px;box-shadow: none;">
+                                <span class="info-box-icon bg-primary" id="btn_add_formacion"><i class="fas fa-plus"></i></span>
                             </div>
                         </div>
                     </div>
-
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body p-0 table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 10px">#</th>
+                                                <th>Nivel de Formación</th>
+                                                <th>Título Obtenido</th>
+                                                <th>Nombre de Institucón</th>
+                                                <th>Fecha Gradución</th>
+                                                <th style="width: 7%;">Quitar</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody_estudios_personales"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -206,7 +231,7 @@
                                 <div class="form-group">
                                     <div class="input-group">
                                         <div class="custom-file">
-                                            <input type="file" class="custom-file-input" id="anexo_documento_identidad" name="anexo_documento_identidad">
+                                            <input type="file" class="custom-file-input personal" id="anexo_documento_identidad" name="anexo_documento_identidad">
                                             <label class="custom-file-label">Documento de Identidad</label>
                                         </div>
                                     </div>
@@ -218,7 +243,4 @@
             </div>
         </div>
     </div>
-    <ul class="list-inline pull-right">
-        <li><button type="button" class="default-btn next-step btn-primary">Continuar</button></li>
-    </ul>
 </div>

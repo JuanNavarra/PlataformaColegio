@@ -45,3 +45,17 @@ function convertirFechaEspecifica(fecha) {
     var convercion = new Date(fecha);
     return convercion.toLocaleString();
 }
+
+function validarCampos(clase) {
+    var input = document.getElementsByClassName(clase);
+    var validar = true;
+    if (input.length > 0) {
+        for (var i = 0; i < input.length; i++) {
+            if (input[i].value == "" || input[i].value == "0") {
+                input[i].style.borderColor = "tomato";
+                validar = false;
+            }
+        }
+    }
+    return validar;
+}

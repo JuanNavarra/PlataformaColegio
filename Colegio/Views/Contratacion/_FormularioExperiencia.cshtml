@@ -9,7 +9,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-industry"></i></span>
                         </div>
-                        <input class="form-control" type="text" name="empresa" id="empresa">
+                        <input class="form-control experiencia" type="text" name="empresa" id="empresa" autocomplete="off">
                     </div>
                 </div>
             </div>
@@ -20,7 +20,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
                         </div>
-                        <input class="form-control" type="text" name="cargo_empleado" id="cargo_empleado">
+                        <input class="form-control experiencia" type="text" name="cargo_empleado" id="cargo_empleado" autocomplete="off">
                     </div>
                 </div>
             </div>
@@ -31,7 +31,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                         </div>
-                        <input type="text" class="form-control" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask id="fecha_inicio" name="fecha_inicio">
+                        <input type="text" class="form-control experiencia" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask id="fecha_inicio" name="fecha_inicio">
                     </div>
                 </div>
             </div>
@@ -42,7 +42,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                         </div>
-                        <input type="text" class="form-control" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask id="fecha_fin" name="fecha_fin">
+                        <input type="text" class="form-control experiencia" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask id="fecha_fin" name="fecha_fin">
                     </div>
                 </div>
             </div>
@@ -62,7 +62,7 @@
             <div class="col-md-5">
                 <div class="form-group">
                     <label>Breve Descripcion de Funciones *</label>
-                    <textarea class="form-control" rows="3" id="modal_descripcion_autorizacion"></textarea>
+                    <textarea class="form-control experiencia" rows="3" id="modal_descripcion_autorizacion"></textarea>
                 </div>
             </div>
             <div class="col-md-5">
@@ -95,38 +95,7 @@
                                     <th>Quitar</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1.</td>
-                                    <td>Ingeniero de Software</td>
-                                    <td>12</td>
-                                    <td>GlobalSoft</td>
-                                    <td>01/02/2020</td>
-                                    <td>01/02/2020</td>
-                                    <td>Desarrollar software</td>
-                                    <td>Facturacion electronica</td>
-                                    <td style="text-align:center">
-                                        <a href='#'>
-                                            <i class='fas fa-trash'></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>1.</td>
-                                    <td>Ingeniero de Software</td>
-                                    <td>12</td>
-                                    <td>GlobalSoft</td>
-                                    <td>01/02/2020</td>
-                                    <td>01/02/2020</td>
-                                    <td>Desarrollar software</td>
-                                    <td>Facturacion electronica</td>
-                                    <td style="text-align:center">
-                                        <a href='#'>
-                                            <i class='fas fa-trash'></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <tbody id="tbody_experiencia_laboral"></tbody>
                         </table>
                     </div>
                 </div>
@@ -140,15 +109,11 @@
                         <div class="input-group">
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="hoja_vida" name="hoja_vida">
-                                <label class="custom-file-label" for="exampleInputFile">Escoge Uno</label>
+                                <label class="custom-file-label experiencia" for="exampleInputFile">Escoge Uno</label>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <ul class="list-inline pull-right">
-            <li><button type="button" class="default-btn prev-step btn-danger">Atrás</button></li>
-            <li><button type="button" class="default-btn next-step btn-primary">Continuar</button></li>
-        </ul>
     </div>
