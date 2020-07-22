@@ -8,12 +8,15 @@
         if ($("#tab_datos_personales").hasClass("active")) {
             if (validarCampos("personal")) {
                 if ($("#tbody_estudios_personales tr").length > 0) {
-                    $("#tab_datos_personales").removeClass("active");
-                    $("#datos_personales").removeClass("active");
-                    $("#tab_datos_experiencia").addClass("active");
-                    $("#datos_experiencia").addClass("active");
-                    $("#btn_atras_contrato").removeAttr('style');
-                    guardarDatosPersonales();
+                    if ($("#id_experiencia").val() != "") {
+                        $("#tab_datos_personales").removeClass("active");
+                        $("#datos_personales").removeClass("active");
+                        $("#tab_datos_experiencia").addClass("active");
+                        $("#datos_experiencia").addClass("active");
+                        $("#btn_atras_contrato").removeAttr('style');
+                    } else {
+                        guardarDatosPersonales();
+                    }
                 } else {
                     toastr.warning("¡Llenar la tabla de información académica es obligatoria!");
                 }
@@ -70,7 +73,7 @@
 function agregarInfAca() {
     if (validarCampos("info-academica")) {
         var numero = $("#tbody_estudios_personales tr").length + 1;
-        var id = (numero + $("#formacion").val() + $("#institucion").val() + $("#fecha_graduacion").val());
+        var id = (numero + $("#formacion").val() + $("#institucion").val() + $("#titulo").val());
         ca = "<tr id=" + id + ">"
         ca += "<td>" + numero + "</td>"
         ca += "<td>" + $("#formacion").val() + "</td>"
@@ -160,9 +163,24 @@ function guardarDatosPersonales() {
         dataType: "json",
         async: true,
         success: function (res) {
+            if (res == -1) {
+                toastr.warning("Ya existe un empleado con este numero de documento");
+            }
+            else if (res == 0) {
+                toastr.error("Error al llenar los datos", "Contacte con el administrador");
+            }
+            else {
+                $("#id_experiencia").val(res);
+                $("#tab_datos_personales").removeClass("active");
+                $("#datos_personales").removeClass("active");
+                $("#tab_datos_experiencia").addClass("active");
+                $("#datos_experiencia").addClass("active");
+                $("#btn_atras_contrato").removeAttr('style');
+                toastr.success("¡Primer paso completado!", "Ingresa los datos de la experiencia laboral");
+            }
         },
         error: function (error) {
-            console.log("No se ha podido obtener la información");
+            toastr.error("No se ha podido obtener la información");
         }
     })
 }

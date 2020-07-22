@@ -19,7 +19,7 @@ namespace Colegio.Data.Configuarations
             builder.Property(p => p.SegundoApellido).HasMaxLength(50).IsRequired();
             builder.Property(p => p.Celular).HasMaxLength(10).IsRequired();
             builder.Property(p => p.EstadoCivil).HasMaxLength(2).IsRequired();
-            builder.Property(p => p.CorreoPesonal).HasMaxLength(100).IsRequired();
+            builder.Property(p => p.CorreoPersonal).HasMaxLength(100).IsRequired();
             builder.Property(p => p.Direccion).HasMaxLength(250).IsRequired();
             builder.Property(p => p.FechaNacimiento).IsRequired();
             builder.Property(p => p.FechaCreacion).IsRequired();
