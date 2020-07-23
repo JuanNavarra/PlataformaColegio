@@ -1,0 +1,31 @@
+﻿@{
+}
+<style>
+    .select2-selection {
+        height: 100% !important;
+    }
+</style>
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="asignar_rol_modal">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">¡Un paso mas!<br />Asignar un Rol</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <select id="escoger_rol" class="select2 asignar-rol">
+                            <option value="0">Seleccione</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="guardarAfiliacion()">Terminar</button>
+            </div>
+        </div>
+    </div>
+</div>

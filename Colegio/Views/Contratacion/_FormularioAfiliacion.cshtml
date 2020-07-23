@@ -2,14 +2,15 @@
 }
     <div class="tab-pane" role="tabpanel" id="datos_afiliacion">
         <div class="row">
-            <div class="col-md-4">
+            <input type="hidden" id="id_laboral_afiliacion" />
+            <div class="col-md-3">
                 <div class="form-group">
                     <label>Tipo Entidad *</label>
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-industry"></i></span>
                         </div>
-                        <select class="form-control" id="tipo_entidad" name="tipo_entidad">
+                        <select class="form-control afiliacion" id="tipo_entidad" name="tipo_entidad">
                             <option value="0">Selecciona</option>
                             <option value="arl">ARL</option>
                             <option value="cc">Caja de Compensacion</option>
@@ -25,20 +26,25 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-industry"></i></span>
                         </div>
-                        <input class="form-control" type="text" name="entidad" id="entidad" autocomplete="off">
+                        <input class="form-control afiliacion" type="text" name="entidad" id="entidad" autocomplete="off">
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="form-group">
                     <label>Fecha de Afiliacion *</label>
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                         </div>
-                        <input type="text" class="form-control" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask id="fecha_afiliacion" name="fecha_afiliacion">
+                        <input type="text" class="form-control afiliacion" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask id="fecha_afiliacion" name="fecha_afiliacion">
                     </div>
                 </div>
+            </div>
+            <div class="col-md-2">
+                <ul class="list-inline pull-right">
+                    <li><button type="button" class="btn btn-primary" style="margin-top: 18%;" onclick="agregarAfiliacion();">Agregar Concepto</button></li>
+                </ul>
             </div>
         </div>
         <div class="row">
@@ -55,19 +61,7 @@
                                     <th style="width: 7%;">Quitar</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1.</td>
-                                    <td>Confamiliar</td>
-                                    <td>GlobalSoft</td>
-                                    <td>01/02/2020</td>
-                                    <td style="text-align:center">
-                                        <a href='#'>
-                                            <i class='fas fa-trash'></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <tbody id="tbody_afiliacion"></tbody>
                         </table>
                     </div>
                 </div>

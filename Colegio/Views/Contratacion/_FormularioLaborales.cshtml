@@ -2,8 +2,8 @@
 }
 
 <div class="tab-pane" role="tabpanel" id="datos_laborales">
+    <input type="hidden" id="id_pesrona_experiencia" autocomplete="off" />
     <div class="row">
-        <input type="hidden" id="id_pesrona_experiencia" autocomplete="off" />
         <div class="col-md-3">
             <div class="form-group">
                 <label>Nombre del Cargo *</label>
@@ -131,9 +131,9 @@
             <div class="form-group">
                 <label>Insumos de Trabajo</label>
                 <div class="input-group">
-                    <input type="text" class="form-control" autocomplete="off" id="insumo_add">
+                    <input type="text" class="form-control insumos" autocomplete="off" id="insumo_add">
                     <span class="input-group-append">
-                        <button type="button" class="btn btn-primary btn-flat" id="btn_insumo_add">Escoger</button>
+                        <button type="button" class="btn btn-primary btn-flat" id="btn_insumo_add" onclick="agregarInsumo()">Escoger</button>
                     </span>
                 </div>
             </div>
@@ -150,16 +150,7 @@
                                 <th style="width: 15%;">Quitar</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>1.</td>
-                                <td>Update software</td>
-                                <td style="text-align:center">
-                                    <a href='#'>
-                                        <i class='fas fa-trash'></i>
-                                    </a>
-                                </td>
-                            </tr>
+                        <tbody id="tbody_insumolaboral_formurlario">
                         </tbody>
                     </table>
                 </div>
