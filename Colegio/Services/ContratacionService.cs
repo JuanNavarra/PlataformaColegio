@@ -103,5 +103,71 @@ namespace Colegio.Services
             }
             #endregion
         }
+
+        public async Task<bool> GuardarExperiencia(List<Col_Experiencia> experiencias, int personaId)
+        {
+            try
+            {
+                int? maxId = await context.Col_Experiencia.MaxAsync(m => (int?)m.ExperienciaId);
+                int? id = maxId == null ? 1 : maxId + 1;
+                List<Col_Experiencia> _experiencias = new List<Col_Experiencia>();
+                foreach (var item in experiencias)
+                {
+                    Col_Experiencia experiencia = new Col_Experiencia();
+                    experiencia.ExperienciaId = Convert.ToInt32(id);
+                    experiencia.PersonaId = personaId;
+                    experiencia.Cargo = item.Cargo;
+                    experiencia.Empresa = item.Empresa;
+                    experiencia.FechaFin = item.FechaFin;
+                    experiencia.FechaInicio = item.FechaInicio;
+                    experiencia.Funciones = item.Funciones;
+                    experiencia.Logros = item.Logros;
+                    _experiencias.Add(experiencia);
+                    id++;
+                }
+                await context.AddRangeAsync(_experiencias);
+                await context.SaveChangesAsync();
+                return true;
+            }
+            #region catch
+            catch (DbEntityValidationException e)
+            {
+                string err = "";
+                foreach (var eve in e.EntityValidationErrors)
+                {
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        err += ve.ErrorMessage;
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+                return false;
+            }
+
+            catch (Exception e)
+            {
+                string err = "";
+                if (e.InnerException != null)
+                {
+                    if (e.InnerException.Message != null)
+                    {
+                        err = (e.InnerException.Message);
+                        if (e.InnerException.InnerException != null)
+                        {
+                            err += e.InnerException.InnerException.Message;
+                        }
+                    }
+                }
+                else
+                {
+                    err = (e.Message);
+                }
+                return false;
+            }
+            #endregion
+        }
     }
 }

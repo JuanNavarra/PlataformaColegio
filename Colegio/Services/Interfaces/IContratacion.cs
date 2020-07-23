@@ -10,5 +10,6 @@ namespace Colegio.Services.Interfaces
     public interface IContratacion
     {
         public Task<int> GuardarPersonales(Col_Personas persona, List<Col_InfoAcademica> infoAcademicas);
+        public Task<bool> GuardarExperiencia(List<Col_Experiencia> experiencias, int personaId);
     }
 }

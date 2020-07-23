@@ -61,7 +61,6 @@ namespace Colegio.Controllers
                 {
                     string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
                     var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
-                    var actualizar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Actualizar")).Any();
                     if (crear)
                     {
                         dynamic personalJson = JsonConvert.DeserializeObject(personal);
@@ -93,6 +92,79 @@ namespace Colegio.Controllers
                         }
 
                         var result = await service.GuardarPersonales(persona, infoAcademicas);
+                        return Json(result);
+                    }
+                    return RedirectToAction("Index", "Home");
+                }
+                return RedirectToAction("Index", "Login");
+            }
+            #region catch
+            catch (DbEntityValidationException e)
+            {
+                string err = "";
+                foreach (var eve in e.EntityValidationErrors)
+                {
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        err += ve.ErrorMessage;
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+                return null;
+            }
+
+            catch (Exception e)
+            {
+                string err = "";
+                if (e.InnerException != null)
+                {
+                    if (e.InnerException.Message != null)
+                    {
+                        err = (e.InnerException.Message);
+                        if (e.InnerException.InnerException != null)
+                        {
+                            err += e.InnerException.InnerException.Message;
+                        }
+                    }
+                }
+                else
+                {
+                    err = (e.Message);
+                }
+                return null;
+            }
+            #endregion
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GuardarExperiencia(string experiencia, int personaId)
+        {
+            try
+            {
+                if (User.Identity.IsAuthenticated)
+                {
+                    string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                    var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                    if (crear)
+                    {
+                        dynamic experienciaJson = JsonConvert.DeserializeObject(experiencia);
+                        List<Col_Experiencia> experiencias = new List<Col_Experiencia>();
+
+                        foreach (var item in experienciaJson)
+                        {
+                            Col_Experiencia _experiencia = new Col_Experiencia();
+                            _experiencia.Cargo = item.Cargo;
+                            _experiencia.Empresa = item.Empresa;
+                            _experiencia.FechaFin = Convert.ToDateTime(item.FechaFin.ToString());
+                            _experiencia.FechaInicio = Convert.ToDateTime(item.FechaInicio.ToString());
+                            _experiencia.Logros = item.Logros;
+                            _experiencia.Funciones = item.Funciones;
+                            experiencias.Add(_experiencia);
+                        }
+                        var result = await service.GuardarExperiencia(experiencias, personaId);
                         return Json(result);
                     }
                     return RedirectToAction("Index", "Home");

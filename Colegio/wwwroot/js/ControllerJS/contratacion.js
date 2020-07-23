@@ -8,7 +8,7 @@
         if ($("#tab_datos_personales").hasClass("active")) {
             if (validarCampos("personal")) {
                 if ($("#tbody_estudios_personales tr").length > 0) {
-                    if ($("#id_experiencia").val() != "") {
+                    if ($("#id_persona").val() != "") {
                         $("#tab_datos_personales").removeClass("active");
                         $("#datos_personales").removeClass("active");
                         $("#tab_datos_experiencia").addClass("active");
@@ -25,10 +25,14 @@
             }
         } else if ($("#tab_datos_experiencia").hasClass("active")) {
             if ($("#tbody_experiencia_laboral tr").length > 0) {
-                $("#tab_datos_experiencia").removeClass("active");
-                $("#datos_experiencia").removeClass("active");
-                $("#datos_laborales").addClass("active");
-                $("#tab_datos_laborales").addClass("active");
+                if ($("#id_pesrona_experiencia").val() != "") {
+                    $("#tab_datos_experiencia").removeClass("active");
+                    $("#datos_experiencia").removeClass("active");
+                    $("#datos_laborales").addClass("active");
+                    $("#tab_datos_laborales").addClass("active");
+                } else {
+                    guardarExperiencia();
+                }
             } else {
                 toastr.warning("¡Llenar la tabla de experiencia laboral es obligatoria!");
             }
@@ -98,6 +102,11 @@ function agreagarExperiencia() {
         var numero = $("#tbody_experiencia_laboral tr").length + 1;
         var id = (numero + $("#empresa").val() + $("#cargo_empleado").val() + $("#tiempo_laborado").val());
         var meses = cantidadMeses($("#fecha_inicio").val(), $("#fecha_fin").val()) + " Meses";
+        var funciones = $("#descripcion_funciones").val().length > 20 ? $("#descripcion_funciones").val().substring(0, 20) + "..."
+            : $("#descripcion_funciones").val();
+        var logros = $("#logros_obtenidos").val().length > 20 ? $("#logros_obtenidos").val().substring(0, 20) + "..."
+            : $("#logros_obtenidos").val();
+
         ca = "<tr id=" + id + ">"
         ca += "<td>" + numero + "</td>"
         ca += "<td>" + $("#empresa").val() + "</td>"
@@ -105,8 +114,8 @@ function agreagarExperiencia() {
         ca += "<td>" + $("#fecha_inicio").val() + "</td>"
         ca += "<td>" + $("#fecha_fin").val() + "</td>"
         ca += "<td>" + meses + "</td>"
-        ca += "<td>" + $("#descripcion_funciones").val() + "</td>"
-        ca += "<td>" + $("#logros_obtenidos").val() + "</td>"
+        ca += "<td funciones=" + $("#descripcion_funciones").val() + ">" + funciones + "</td>"
+        ca += "<td logro=" + $("#logros_obtenidos").val() + ">" + logros + "</td>"
         ca += "<td style='text-align:center'><a href='#' onclick=\"eliminarFila('" + id + "');\"><i class='fas fa-trash'></i></a></td>"
         ca += "</tr>"
         $("#tbody_experiencia_laboral").append(ca);
@@ -138,7 +147,7 @@ function guardarDatosPersonales() {
 
     var academicaArr = new Array();
     var elemento = document.getElementById("tbody_estudios_personales");
-    for (var i = 0; i < elemento.attributes.length; i++) {
+    for (var i = 0; i < elemento.children.length; i++) {
         var nivel = elemento.children[i].cells[1].textContent;
         var titulo = elemento.children[i].cells[2].textContent;
         var nombreIns = elemento.children[i].cells[3].textContent;
@@ -149,9 +158,7 @@ function guardarDatosPersonales() {
             NombreIns: nombreIns,
             FechaGradua: fecha,
         };
-        if (item.NivelFormacion != undefined) {
-            academicaArr.push(item);
-        }
+        academicaArr.push(item);
     }
 
     $.ajax({
@@ -170,13 +177,61 @@ function guardarDatosPersonales() {
                 toastr.error("Error al llenar los datos", "Contacte con el administrador");
             }
             else {
-                $("#id_experiencia").val(res);
+                $("#id_persona").val(res);
                 $("#tab_datos_personales").removeClass("active");
                 $("#datos_personales").removeClass("active");
                 $("#tab_datos_experiencia").addClass("active");
                 $("#datos_experiencia").addClass("active");
                 $("#btn_atras_contrato").removeAttr('style');
                 toastr.success("¡Primer paso completado!", "Ingresa los datos de la experiencia laboral");
+            }
+        },
+        error: function (error) {
+            toastr.error("No se ha podido obtener la información");
+        }
+    })
+}
+
+function guardarExperiencia() {
+    var experienciaArr = new Array();
+    var elemento = document.getElementById("tbody_experiencia_laboral");
+    for (var i = 0; i < elemento.children.length; i++) {
+        var empresa = elemento.children[i].cells[1].textContent;
+        var cargo = elemento.children[i].cells[2].textContent;
+        var fechaInicio = elemento.children[i].cells[3].textContent;
+        var fechaFin = elemento.children[i].cells[4].textContent;
+        var funciones = elemento.children[i].cells[6].attributes[0].textContent;
+        var logros = elemento.children[i].cells[7].attributes[0].textContent;
+        var item = {
+            Empresa: empresa,
+            Cargo: cargo,
+            FechaInicio: fechaInicio,
+            FechaFin: fechaFin,
+            Funciones: funciones,
+            Logros: logros,
+        };
+        experienciaArr.push(item);
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "Contratacion/GuardarExperiencia",
+        data: {
+            experiencia: JSON.stringify(experienciaArr), personaId: $("#id_persona").val()
+        },
+        dataType: "json",
+        async: true,
+        success: function (res) {
+            if (!res) {
+                toastr.error("Error al llenar los datos", "Contacte con el administrador");
+            }
+            else {
+                $("#id_pesrona_experiencia").val($("#id_persona").val());
+                $("#tab_datos_experiencia").removeClass("active");
+                $("#datos_experiencia").removeClass("active");
+                $("#datos_laborales").addClass("active");
+                $("#tab_datos_laborales").addClass("active");
+                toastr.success("¡Segundo paso completado!", "Ingresa los datos laborales del empleado");
             }
         },
         error: function (error) {
