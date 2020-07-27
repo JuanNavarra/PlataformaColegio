@@ -13,7 +13,7 @@ namespace Colegio.Models
         public string TipoContrato { get; set; }
         public string Horas { get; set; }
         public string JornadaLaboral { get; set; }
-        public DateTime? FechaIngreso { get; set; }
+        public DateTime FechaIngreso { get; set; }
         public DateTime? FechaBaja { get; set; }
         public string AuxilioTransporte { get; set; }
         public int PersonaId { get; set; }

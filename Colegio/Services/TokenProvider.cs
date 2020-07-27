@@ -40,7 +40,7 @@ namespace Colegio.Services
                     .FirstOrDefaultAsync();
                 if (user == null)
                     return null;
-                if (contrasena == user.Contrasena)
+                if (SHA256(contrasena) == user.Contrasena)
                 {
                     var query = await (from t0 in contexto.Col_Roles
                                  join t6 in contexto.Col_Usuarios on t0.RolId equals t6.RolId
@@ -166,13 +166,13 @@ namespace Colegio.Services
         /// </summary>
         /// <param name="str">Parametro tipo string que se desea encriptar</param>
         /// <returns>Cadena encriptada</returns>
-        public static string SHA256(string contraseña)
+        public static string SHA256(string pass)
         {
             SHA256 sha256 = SHA256Managed.Create();
             ASCIIEncoding encoding = new ASCIIEncoding();
             byte[] stream = null;
             StringBuilder sb = new StringBuilder();
-            stream = sha256.ComputeHash(encoding.GetBytes(contraseña));
+            stream = sha256.ComputeHash(encoding.GetBytes(pass));
             for (int i = 0; i < stream.Length; i++) sb.AppendFormat("{0:x2}", stream[i]);
             return sb.ToString();
         }

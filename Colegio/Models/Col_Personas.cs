@@ -26,5 +26,6 @@ namespace Colegio.Models
         public bool Empleado { get; set; }
         public string Direccion { get; set; }
         public string CorreoPersonal { get; set; }
+        public char Progreso { get; set; }
     }
 }

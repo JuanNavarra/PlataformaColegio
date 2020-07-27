@@ -32,12 +32,15 @@ namespace Colegio.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             if (User.Identity.IsAuthenticated)
             {
                 if (Permisos("PermisoSubModulo").PSMAPB || (!Permisos("PermisoSubModulo").PSMAPB && Permisos("PermisoModulo").PMMAPB))
                 {
+                    var registros = await service.MostrarEmpleados();
+                    ViewBag.Registros = registros;
+
                     string modulo = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
                     var permisos = Permisos(modulo).PMMAPL;
                     ViewBag.Leer = permisos.Where(w => w.Value.Contains("Leer")).Any();
@@ -53,13 +56,14 @@ namespace Colegio.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GuardarPersonales(string personal, string academico)
+        public async Task<IActionResult> GuardarCambiosPersonales(string personal, string academico, int personaActualizar)
         {
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
                 var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
-                if (crear)
+                var Actualizar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Actualizar")).Any();
+                if (crear || (Actualizar && personaActualizar != 0))
                 {
                     dynamic personalJson = JsonConvert.DeserializeObject(personal);
                     dynamic academicoJson = JsonConvert.DeserializeObject(academico);
@@ -76,7 +80,7 @@ namespace Colegio.Controllers
                     persona.TipoDocumento = personalJson.TipoDocumento;
                     persona.SegundoNombre = personalJson.SegundoNombre;
                     persona.PrimerApellido = personalJson.PrimerApellido;
-                    persona.SegundoApellido = personalJson.PrimerApellido;
+                    persona.SegundoApellido = personalJson.SegundoApellido;
 
                     List<Col_InfoAcademica> infoAcademicas = new List<Col_InfoAcademica>();
                     foreach (var item in academicoJson)
@@ -89,7 +93,8 @@ namespace Colegio.Controllers
                         infoAcademicas.Add(infoAcademica);
                     }
 
-                    var result = await service.GuardarPersonales(persona, infoAcademicas);
+                    var result = personaActualizar == 0 ? await service.GuardarPersonales(persona, infoAcademicas)
+                        : await service.ActualizarPersonales(persona, infoAcademicas, personaActualizar);
                     return Json(result);
                 }
                 return RedirectToAction("Index", "Home");
@@ -98,13 +103,14 @@ namespace Colegio.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GuardarExperiencia(string experiencia, int personaId)
+        public async Task<IActionResult> GuardarExperiencia(string experiencia, int personaId, int experienciaActualzar)
         {
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
                 var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
-                if (crear)
+                var Actualizar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Actualizar")).Any();
+                if (crear || (Actualizar && experienciaActualzar != 0))
                 {
                     dynamic experienciaJson = JsonConvert.DeserializeObject(experiencia);
                     List<Col_Experiencia> experiencias = new List<Col_Experiencia>();
@@ -120,7 +126,8 @@ namespace Colegio.Controllers
                         _experiencia.Funciones = item.Funciones;
                         experiencias.Add(_experiencia);
                     }
-                    var result = await service.GuardarExperiencia(experiencias, personaId);
+                    var result = experienciaActualzar == 0 ? await service.GuardarExperiencia(experiencias, personaId)
+                        : await service.ActualizarExperiencia(experiencias, experienciaActualzar);
                     return Json(result);
                 }
                 return RedirectToAction("Index", "Home");
@@ -129,13 +136,14 @@ namespace Colegio.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GuardarLaboral(string laboral, string insumos, int personaId)
+        public async Task<IActionResult> GuardarLaboral(string laboral, string insumos, int personaId, int laboralActualizar)
         {
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
                 var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
-                if (crear)
+                var Actualizar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Actualizar")).Any();
+                if (crear || (Actualizar && laboralActualizar != 0))
                 {
                     dynamic laboralJson = JsonConvert.DeserializeObject(laboral);
                     dynamic insumosJson = JsonConvert.DeserializeObject(insumos);
@@ -163,7 +171,8 @@ namespace Colegio.Controllers
                         }
                     }
 
-                    var result = await service.GuardarLaboborales(_laboral, insumoLaborales, personaId);
+                    var result = laboralActualizar == 0 ? await service.GuardarLaboborales(_laboral, insumoLaborales, personaId)
+                        : await service.ActualizarLaboborales(_laboral, insumoLaborales, laboralActualizar);
                     return Json(result);
                 }
                 return RedirectToAction("Index", "Home");
@@ -192,7 +201,45 @@ namespace Colegio.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> guardarAfiliacion(string afiliaciones, int rol, int laboralId, string primerNombre, string primerApellido, string numeroDocumento)
+        public async Task<IActionResult> GuardarAfiliacion(string afiliaciones, int rol, int laboralId, string persona, int afiliacioneActualizar)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                var Actualizar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Actualizar")).Any();
+                if (crear || (Actualizar && afiliacioneActualizar != 0))
+                {
+                    dynamic afiliacionesJson = JsonConvert.DeserializeObject(afiliaciones);
+                    dynamic personaJson = JsonConvert.DeserializeObject(persona);
+
+                    Col_Personas _persona = new Col_Personas();
+                    _persona.TipoDocumento = personaJson.TipoDocumento;
+                    _persona.PrimerNombre = personaJson.PrimerNombre;
+                    _persona.PrimerApellido = personaJson.PrimerApellido;
+                    _persona.NumeroDocumento = personaJson.NumeroDocumento;
+
+                    List<Col_Afiliacion> _afiliaciones = new List<Col_Afiliacion>();
+                    foreach (var item in afiliacionesJson)
+                    {
+                        Col_Afiliacion afiliacion = new Col_Afiliacion();
+                        afiliacion.FechaAfiliacion = Convert.ToDateTime(item.FechaAfiliacion.ToString());
+                        afiliacion.NombreEntidad = item.NombreEntidad;
+                        afiliacion.TipoEntidad = item.TipoEntidad;
+                        _afiliaciones.Add(afiliacion);
+                    }
+                    var result = afiliacioneActualizar == 0 ? await service.GuardarAfiliacion(_afiliaciones, rol, laboralId, _persona)
+                        : await service.ActualizarAfiliciacion(_afiliaciones, afiliacioneActualizar);
+                    return Json(result);
+                }
+                return RedirectToAction("Index", "Home");
+            }
+            return RedirectToAction("Index", "Login");
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MostrarPendientes(char progreso, int idPersona)
         {
             try
             {
@@ -202,17 +249,7 @@ namespace Colegio.Controllers
                     var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
                     if (crear)
                     {
-                        dynamic afiliacionesJson = JsonConvert.DeserializeObject(afiliaciones);
-                        List<Col_Afiliacion> _afiliaciones = new List<Col_Afiliacion>();
-                        foreach (var item in afiliacionesJson)
-                        {
-                            Col_Afiliacion afiliacion = new Col_Afiliacion();
-                            afiliacion.FechaAfiliacion = Convert.ToDateTime(item.FechaAfiliacion.ToString());
-                            afiliacion.NombreEntidad = item.NombreEntidad;
-                            afiliacion.TipoEntidad = item.TipoEntidad;
-                            _afiliaciones.Add(afiliacion);
-                        }
-                        var result = await service.GuardarAfiliacion(_afiliaciones, rol, laboralId, primerNombre, primerApellido, numeroDocumento);
+                        var result = await service.MostrarPendientes(progreso, idPersona);
                         return Json(result);
                     }
                     return RedirectToAction("Index", "Home");
@@ -258,6 +295,52 @@ namespace Colegio.Controllers
                 return null;
             }
             #endregion
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EliminarEmpleado(int personaId, bool op)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                var eliminar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Eliminar")).Any();
+                if (eliminar)
+                {
+                    var result = await service.EliminarEmpleado(personaId, op);
+                    return Json(result);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> ActivarEmpleado(int personaId)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                var actualizar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Actualizar")).Any();
+                if (actualizar)
+                {
+                    var result = await service.ActivarPerfil(personaId);
+                    return Json(result);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Login");
+            }
         }
     }
 }

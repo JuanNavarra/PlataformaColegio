@@ -1,0 +1,80 @@
+﻿@{
+    List<Colegio.Models.ModelHelper.EmpleadosContratados> registros = ViewBag.Registros;
+}
+
+<div class="card-body">
+    <table id="detalle_perfiles_table" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Usuario</th>
+                <th>Perfil</th>
+                <th>Nombre</th>
+                <th>Ingreso</th>
+                <th>Correo</th>
+                <th>Celular</th>
+                <th>Creación</th>
+                <th>Último Login</th>
+                <th>Estado</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="empleados_tabla_index" style="font-size: 90%;">
+            @if (registros != null)
+            {
+                int count = 1;
+                @foreach (var item in registros)
+                {
+                    <tr id="emp_@item.Id">
+                        <td>@count</td>
+                        <td>@item.Usuario</td>
+                        <td>@item.Perfil</td>
+                        <td>@item.Nombre</td>
+                        <td>
+                            @if (!item.Estado.Equals("PENDIENTE"))
+                            {
+                                @item.Ingreso.ToString("dd/MM/yyyy")
+                            }
+                        </td>
+                        <td>@item.Correo</td>
+                        <td>@item.Celular</td>
+                        <td>@item.Creacion.ToString("dd/MM/yyyy")</td>
+                        <td>@item.UltimoLogin</td>
+                        <td>@item.Estado</td>
+                        <td>
+                            @if (ViewBag.Actualizar)
+                            {
+                                @if (item.Estado.Equals("PENDIENTE"))
+                                {
+                                    <a href='#' onclick="mostrarPendientes(@item.Id, '@item.Progreso')" id="icon_pendiente_@item.Id">
+                                        <i class="fas fa-clipboard-list"></i>
+                                    </a>
+                                }
+                                if (item.Estado.Equals("ACTIVO"))
+                                {
+                                    <a href='#' onclick="mostrarPendientes(@item.Id, '@item.Progreso')" id="icon_activo_@item.Id">
+                                        <i class='fas fa-edit'></i>
+                                    </a>
+                                }
+                                if (item.Estado.Equals("INACTIVO"))
+                                {
+                                    <a href="#" onclick="activarEmpleado(@item.Id, '@item.Progreso')" id="icon_activars_@item.Id">
+                                        <i class="far fa-hand-point-up"></i>
+                                    </a>
+                                }
+                            }
+                            @if (ViewBag.Eliminar)
+                            {
+                                <a href='#' onclick="modalEliminarEmpleado(@item.Id)" id="icon_eliminar_@item.Id">
+                                    <i class='fas fa-trash'></i>
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                    count++;
+                }
+            }
+
+        </tbody>
+    </table>
+</div>

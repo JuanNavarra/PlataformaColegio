@@ -2,14 +2,23 @@
 }
 <link href="~/css/wizard.css" rel="stylesheet" />
 
+
 @if (ViewBag.Crear)
 {
+    <div class="row">
+        <div class="col-md-1 col-sm-2 col-12">
+            <div class="info-box" style="box-shadow: none;">
+                <span class="info-box-icon bg-primary" id="btn_crear_personal"><i class="fas fa-plus"></i></span>
+            </div>
+        </div>
+    </div>
     <div class="list-content">
-        <a href="#listone" data-toggle="collapse" aria-expanded="false" aria-controls="listone" style="background-color: #f2f4f6 !important;
-        color: black !important">Forumulario de contratación de empleados<i class="fa fa-chevron-down"></i></a>
+        <a id="collapse_bar_formulario" href="#listone" data-toggle="collapse" aria-expanded="false" aria-controls="listone" style="color: #fff; background-color: #007bff;">
+            Forumulario de contratación de empleados<i class="fa fa-chevron-down"></i>
+        </a>
         <div class="collapse" id="listone">
             <div class="list-box">
-                <section class="signup-step-container" style="margin-top: -123px;">
+                <section class="signup-step-container" style="margin-top: -123px;margin-bottom: -79px;">
                     <div class="row d-flex justify-content-center">
                         <div class="col-md-12">
                             <div class="wizard">
@@ -44,6 +53,7 @@
                                                 <ul class="list-inline pull-right">
                                                     <li><button type="button" class="btn btn-danger" id="btn_atras_contrato" style="display:none;">Atrás</button></li>
                                                     <li><button type="button" class="btn btn-primary" id="btn_continuar_contrato">Continuar</button></li>
+                                                    <li><button type="button" class="btn btn-primary" id="btn_terminar_actualizar" onclick="guardarAfiliacion()" style="display:none;">Terminar</button></li>
                                                     <li><button type="button" class="btn btn-primary" id="btn_terminar_contrato" data-toggle="modal" data-target="#asignar_rol_modal" style="display:none;">Terminar</button></li>
                                                 </ul>
                                             </div>
@@ -58,6 +68,11 @@
         </div>
     </div>
     @await Html.PartialAsync("_ModalAsignarRol")
+}
+
+@if (ViewBag.Leer)
+{
+    @await Html.PartialAsync("_TablaPersonas")
 }
 <script src="~/js/ControllerJS/contratacion.js"></script>
 <script src="~/js/Wizard.js"></script>

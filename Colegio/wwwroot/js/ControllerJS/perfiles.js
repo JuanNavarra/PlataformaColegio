@@ -521,12 +521,12 @@ function modalVerAutorizacion(rolId) {
                     var ca = "<tr>"
                     ca += "<td>" + res.data.usuarios[index].nombreUsuario + "</td>"
                     ca += "<td>" + res.data.usuarios[index].nombrePersona + "</td>"
-                    ca += "<td>" + res.data.usuarios[index].fechaCreacion + "</td>"
+                    ca += "<td>" + convertirFechaEspecifica(res.data.usuarios[index].fechaCreacion) + "</td>"
                     ca += "<td>"
-                    ca += res.data.usuarios[index].fechaActualizacion == null ? "Sin registros" : res.data.usuarios[index].fechaActualizacion
+                    ca += res.data.usuarios[index].fechaActualizacion == null ? "Sin registros" : convertirFechaEspecifica(res.data.usuarios[index].fechaActualizacion)
                     ca += "</td>"
                     ca += "<td>"
-                    ca += res.data.usuarios[index].ultimoLogin == null ? "Sin registros" : res.data.usuarios[index].ultimoLogin
+                    ca += res.data.usuarios[index].ultimoLogin == null ? "Sin registros" : convertirFechaEspecifica(res.data.usuarios[index].ultimoLogin)
                     ca += "</td>"
                     ca += "<td>" + res.data.usuarios[index].estado + "</td>"
                     ca += "</tr>"

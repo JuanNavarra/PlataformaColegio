@@ -1,6 +1,7 @@
 ﻿@{
 }
     <div class="tab-pane" role="tabpanel" id="datos_experiencia">
+        <input type="hidden" id="id_persona_actualizar" autocomplete="off">
         <input type="hidden" id="id_persona" autocomplete="off">
         <div class="row">
             <div class="col-md-3">
@@ -63,7 +64,7 @@
             </div>
             <div class="col-md-2">
                 <ul class="list-inline pull-right">
-                    <li><button type="button" class="btn btn-primary" style="margin-top: 18%;" onclick="agreagarExperiencia();">Agregar Experiencia</button></li>
+                    <li><button type="button" class="btn btn-primary" id="btn_agregar_experiencia" style="margin-top: 18%;" onclick="agreagarExperiencia();">Agregar Experiencia</button></li>
                 </ul>
             </div>
         </div>
@@ -82,7 +83,7 @@
                                     <th style="width: 10px;text-align:center">Tiempo</th>
                                     <th style="text-align:center">Funciones</th>
                                     <th style="text-align:center">Logros</th>
-                                    <th style="text-align:center">Quitar</th>
+                                    <th style="text-align:left">Quitar</th>
                                 </tr>
                             </thead>
                             <tbody id="tbody_experiencia_laboral"></tbody>
@@ -91,7 +92,7 @@
                 </div>
             </div>
         </div>
-        <div class="row">
+        @*<div class="row">
             <div class="col-md-6">
                 <div class="form-group">
                     <div class="form-group">
@@ -105,5 +106,5 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>*@
     </div>

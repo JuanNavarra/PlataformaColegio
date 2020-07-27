@@ -14,7 +14,7 @@ namespace Colegio.Data.Configuarations
             builder.Property(p => p.TipoContrato).HasMaxLength(50).IsRequired(false);
             builder.Property(p => p.Horas).HasMaxLength(50).IsRequired(false);
             builder.Property(p => p.JornadaLaboral).HasMaxLength(50).IsRequired(false);
-            builder.Property(p => p.FechaIngreso).IsRequired(false);
+            builder.Property(p => p.FechaIngreso).IsRequired();
             builder.Property(p => p.FechaBaja).IsRequired(false);
             builder.Property(p => p.CorreoCorporativo).HasMaxLength(50).IsRequired(false);
             builder.Property(p => p.AuxilioTransporte).HasMaxLength(50).IsRequired(false);

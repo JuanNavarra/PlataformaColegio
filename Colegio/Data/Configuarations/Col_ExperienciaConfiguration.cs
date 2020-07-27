@@ -11,8 +11,8 @@ namespace Colegio.Data.Configuarations
             builder.HasKey(e => e.ExperienciaId);
             builder.Property(p => p.Empresa).HasMaxLength(250).IsRequired(false);
             builder.Property(p => p.Cargo).HasMaxLength(250).IsRequired(false);
-            builder.Property(p => p.FechaInicio).IsRequired(false);
-            builder.Property(p => p.FechaFin).IsRequired(false);
+            builder.Property(p => p.FechaInicio).IsRequired();
+            builder.Property(p => p.FechaFin).IsRequired();
             builder.Property(p => p.Funciones).HasMaxLength(500).IsRequired(false);
             builder.Property(p => p.Logros).HasMaxLength(500).IsRequired(false);
 
