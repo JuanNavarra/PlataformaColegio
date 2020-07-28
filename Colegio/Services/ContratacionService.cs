@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Data.Entity.Validation;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Colegio.Services
@@ -297,13 +299,14 @@ namespace Colegio.Services
                     maxId = await context.Col_Usuarios.MaxAsync(m => (int?)m.Id);
                     id = maxId == null ? 1 : maxId + 1;
                     Col_Usuarios usuario = new Col_Usuarios();
-                    var numero = await context.Col_Personas
-                        .Where(w => w.PrimerApellido.ToLower() == persona.PrimerApellido.ToLower())
-                        .Select(s => s.PersonaId)
-                        .MaxAsync();
+                    var _usuario = await context.Col_Usuarios
+                        .Where(w => w.Usuario.Contains(persona.PrimerApellido.ToLower()))
+                        .OrderByDescending(o => o.Id)
+                        .Select(s => s.Usuario).FirstOrDefaultAsync();
+                    var numero = _usuario == null ? "0" : Regex.Match(_usuario, @"\d+").Value;
                     usuario.RolId = _rol.RolId;
                     usuario.Contrasena = TokenProvider.SHA256(persona.NumeroDocumento);
-                    usuario.Usuario = (persona.PrimerNombre.Substring(0, 1) + persona.PrimerApellido + (numero + 1).ToString()).ToLower();
+                    usuario.Usuario = (persona.PrimerNombre.Substring(0, 1) + persona.PrimerApellido + (Int32.Parse(numero) + 1).ToString()).ToLower();
                     usuario.Estado = "A";
                     usuario.Id = Convert.ToInt32(id);
                     usuario.UltimaContrasena = null;
@@ -545,6 +548,11 @@ namespace Colegio.Services
                                         NombreEntidad = s.NombreEntidad,
                                         TipoEntidad = s.TipoEntidad,
                                     }).ToListAsync();
+                                _progreso.Rol = await (from t0 in context.Col_Roles
+                                                       join t1 in context.Col_Usuarios on t0.RolId equals t1.RolId
+                                                       join t2 in context.Col_Personas on t1.Id equals t2.UsuarioId
+                                                       where t2.PersonaId.Equals(idPersona)
+                                                       select new Col_Roles { RolId = t0.RolId }).FirstOrDefaultAsync();
                             }
                         }
                     }

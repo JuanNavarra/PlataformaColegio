@@ -37,7 +37,7 @@
                     guardarExperiencia();
                 }
             } else {
-                toastr.warning("¡Llenar la tabla de experiencia laboral es obligatoria!");
+                toastr.warning("¡Llenar la tabla de experiencia es obligatoria para continuar, si no tiene experiencia pulsar en saltar!");
             }
         } else if ($("#tab_datos_laborales").hasClass("active")) {
             if (validarCampos("laborales")) {
@@ -66,6 +66,7 @@
             }
         }
     });
+
     $("#btn_atras_contrato").on("click", function (e) {
         e.preventDefault();
         if ($("#tab_datos_afiliacion").hasClass("active")) {
@@ -82,14 +83,24 @@
             $("#datos_laborales").removeClass("active");
             $("#datos_experiencia").addClass("active");
             $("#tab_datos_experiencia").addClass("active");
+            $("#btn_saltar_contrato").removeAttr("style");
         } else if ($("#tab_datos_experiencia").hasClass("active")) {
             $("#tab_datos_experiencia").removeClass("active");
             $("#datos_experiencia").removeClass("active");
             $("#datos_personales").addClass("active");
             $("#tab_datos_personales").addClass("active");
             $("#btn_atras_contrato").css("display", "none");
+            $("#btn_saltar_contrato").css("display", "none");
         }
     });
+
+    $("#btn_saltar_contrato").on("click", function () {
+        $("#tab_datos_experiencia").removeClass("active");
+        $("#datos_experiencia").removeClass("active");
+        $("#datos_laborales").addClass("active");
+        $("#tab_datos_laborales").addClass("active");
+        $("#btn_saltar_contrato").css("display", "none");
+    })
 
     $("#btn_crear_personal").on("click", function () {
         if (!$("#listone").hasClass("show")) {
@@ -136,6 +147,8 @@ function limpiarFormulario() {
     $("#horas").val(""); $("#auxilio_transporte").val("");
     $("#tbody_afiliacion").empty(); $("#id_persona_actualizar").val("")
     $("#id_laboral_afiliacion_actualizar").val("");
+    $("#btn_saltar_contrato").css("display", "none");
+    $("#escoger_rol").val("0");
 }
 
 function agregarInfAca() {
@@ -243,11 +256,13 @@ function guardarDatosPersonales() {
             }
             else {
                 $("#id_persona").val(res);
+                $("#id_pesrona_experiencia").val(res);
                 $("#tab_datos_personales").removeClass("active");
                 $("#datos_personales").removeClass("active");
                 $("#tab_datos_experiencia").addClass("active");
                 $("#datos_experiencia").addClass("active");
                 $("#btn_atras_contrato").removeAttr('style');
+                $("#btn_saltar_contrato").removeAttr("style");
                 if ($("#persona_actualizar").val() == "") {
                     $("#primer_nombre").prop("disabled", true); $("#numero_documento").prop("disabled", true);
                     $("#segundo_nombre").prop("disabled", true); $("#celular").prop("disabled", true);
@@ -303,11 +318,11 @@ function guardarExperiencia() {
                 toastr.error("Error al llenar los datos", "Contacte con el administrador");
             }
             else {
-                $("#id_pesrona_experiencia").val($("#id_persona").val());
                 $("#tab_datos_experiencia").removeClass("active");
                 $("#datos_experiencia").removeClass("active");
                 $("#datos_laborales").addClass("active");
                 $("#tab_datos_laborales").addClass("active");
+                $("#btn_saltar_contrato").css("display", "none");
                 if ($("#id_persona_actualizar").val() == "") {
                     $("#empresa").prop("disabled", true); $("#cargo_empleado").prop("disabled", true);
                     $("#fecha_inicio").prop("disabled", true); $("#fecha_fin").prop("disabled", true);
@@ -515,6 +530,7 @@ function mostrarPendientes(idPersona, progreso) {
                     $("#tab_datos_experiencia").addClass("active");
                     $("#datos_experiencia").addClass("active");
                     $("#btn_atras_contrato").removeAttr("style");
+                    $("#btn_saltar_contrato").removeAttr("style");
                     $("#btn_terminar_contrato").css('display', 'none');
                     $("#datos_personales").removeClass("active");
                     $("#tab_datos_personales").removeClass("active");
@@ -523,6 +539,7 @@ function mostrarPendientes(idPersona, progreso) {
                     $("#collapse_bar_formulario").click();
                 }
                 $("#tbody_estudios_personales").empty();
+                $("#id_pesrona_experiencia").val(res.persona.personaId);
                 var fechaNacimiento = res.persona.fechaNacimiento.split("T")
                 $("#persona_actualizar").val(res.persona.personaId); $("#id_persona").val(res.persona.personaId);
                 $("#primer_nombre").val(res.persona.primerNombre); $("#numero_documento").val(res.persona.numeroDocumento);
@@ -556,9 +573,10 @@ function mostrarPendientes(idPersona, progreso) {
                         $("#btn_terminar_contrato").css('display', 'none');
                         $("#datos_personales").removeClass("active");
                         $("#tab_datos_personales").removeClass("active");
+                        $("#btn_saltar_contrato").css('display', 'none');
                     }
                     $("#tbody_experiencia_laboral").empty();
-                    $("#id_persona_actualizar").val(res.persona.personaId); $("#id_pesrona_experiencia").val(res.persona.personaId);
+                    $("#id_persona_actualizar").val(res.persona.personaId);
                     $.each(res.experiencias, function (index, item) {
                         var id = ((index + 1) + item.empresa + item.cargo + item.meses);
                         var funciones = item.funciones.length > 20 ? item.funciones.substring(0, 20) + "..." : item.funciones;
@@ -591,6 +609,7 @@ function mostrarPendientes(idPersona, progreso) {
                             $("#datos_personales").removeClass("active");
                             $("#tab_datos_personales").removeClass("active");
                             $("#btn_terminar_actualizar").css('display', 'none');
+                            $("#btn_saltar_contrato").css('display', 'none');
                         }
                         $("#tbody_insumolaboral_formurlario").empty();
                         $("#id_laboral_afiliacion").val(res.laboral.laboralId); $("#id_pesrona_experiencia_actualizar").val(res.laboral.laboralId);
@@ -623,10 +642,12 @@ function mostrarPendientes(idPersona, progreso) {
                                 $("#datos_personales").addClass("active");
                                 $("#tab_datos_personales").addClass("active");
                                 $("#btn_terminar_contrato").css('display', 'none');
+                                $("#btn_saltar_contrato").css('display', 'none');
                                 $("#btn_terminar_actualizar").css('display', 'none');
                             }
                             $("#id_laboral_afiliacion_actualizar").val(res.laboral.laboralId);
                             $("#tbody_afiliacion").empty();
+                            $("#escoger_rol").val(res.rol.rolId);
                             $.each(res.afiliaciones, function (index, item) {
                                 var afiliacion = item.fechaAfiliacion.split("T");
                                 var id = ((index + 1) + item.tipoEntidad + item.nombreEntidad);

@@ -151,7 +151,7 @@ namespace Colegio.Controllers
                     Col_Laborales _laboral = new Col_Laborales();
                     _laboral.AuxilioTransporte = laboralJson.AuxilioTransporte;
                     _laboral.CorreoCorporativo = laboralJson.CorreoCorporativo;
-                    _laboral.FechaBaja = Convert.ToDateTime(laboralJson.FechaBaja.ToString());
+                    _laboral.FechaBaja = laboralJson.FechaBaja == "" ? null : Convert.ToDateTime(laboralJson.FechaBaja.ToString());
                     _laboral.FechaIngreso = Convert.ToDateTime(laboralJson.FechaIngreso.ToString());
                     _laboral.Horas = laboralJson.Horas;
                     _laboral.JornadaLaboral = laboralJson.JornadaLaboral;
@@ -241,60 +241,18 @@ namespace Colegio.Controllers
         [HttpGet]
         public async Task<IActionResult> MostrarPendientes(char progreso, int idPersona)
         {
-            try
+            if (User.Identity.IsAuthenticated)
             {
-                if (User.Identity.IsAuthenticated)
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                if (crear)
                 {
-                    string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                    var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
-                    if (crear)
-                    {
-                        var result = await service.MostrarPendientes(progreso, idPersona);
-                        return Json(result);
-                    }
-                    return RedirectToAction("Index", "Home");
+                    var result = await service.MostrarPendientes(progreso, idPersona);
+                    return Json(result);
                 }
-                return RedirectToAction("Index", "Login");
+                return RedirectToAction("Index", "Home");
             }
-            #region catch
-            catch (DbEntityValidationException e)
-            {
-                string err = "";
-                foreach (var eve in e.EntityValidationErrors)
-                {
-                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
-                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
-                    {
-                        err += ve.ErrorMessage;
-                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
-                            ve.PropertyName, ve.ErrorMessage);
-                    }
-                }
-                return null;
-            }
-
-            catch (Exception e)
-            {
-                string err = "";
-                if (e.InnerException != null)
-                {
-                    if (e.InnerException.Message != null)
-                    {
-                        err = (e.InnerException.Message);
-                        if (e.InnerException.InnerException != null)
-                        {
-                            err += e.InnerException.InnerException.Message;
-                        }
-                    }
-                }
-                else
-                {
-                    err = (e.Message);
-                }
-                return null;
-            }
-            #endregion
+            return RedirectToAction("Index", "Login");
         }
 
         [HttpPost]

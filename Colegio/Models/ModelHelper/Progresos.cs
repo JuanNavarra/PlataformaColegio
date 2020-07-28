@@ -13,5 +13,6 @@ namespace Colegio.Models.ModelHelper
         public Col_Laborales Laboral { get; set; }
         public List<Col_InsumoLaboral> InsumosLaborales { get; set; }
         public List<Col_Afiliacion> Afiliaciones { get; set; }
+        public Col_Roles Rol { get; set; }
     }
 }

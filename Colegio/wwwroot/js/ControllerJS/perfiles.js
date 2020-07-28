@@ -551,13 +551,13 @@ function modalEliminarAuorizacion(rolId) {
         }).then((value) => {
             if (value) {
                 swal({
-                    title: "Inactivar un perfil o eliminarlo para siempre",
+                    title: "Desactivar un perfil o eliminarlo para siempre",
                     text: "Si hay usuarios con este rol, actualice el rol de de los usuarios," +
                         " de lo contrario los usuarios serán eliminados",
                     buttons: {
                         cancel: "Cancelar",
                         defeat: {
-                            text: "Inactivar",
+                            text: "Desactivar",
                             value: "defeat",
                         },
                         catch: {
