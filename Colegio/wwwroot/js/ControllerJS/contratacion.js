@@ -50,8 +50,14 @@
                     $("#btn_terminar_actualizar").css("display", "none");
                     $("#btn_terminar_contrato").removeAttr('style');
                 } else {
-                    $("#btn_terminar_contrato").css("display", "none");
-                    $("#btn_terminar_actualizar").removeAttr('style');
+                    if ($("#id_laboral_afiliacion").val() == "") {
+                        $("#btn_terminar_actualizar").css("display", "none");
+                        $("#btn_terminar_contrato").removeAttr('style');
+                    }
+                    if ($("#id_pesrona_experiencia_actualizar").val() != "") {
+                        $("#btn_terminar_actualizar").removeAttr('style');
+                        $("#btn_terminar_contrato").css("display", "none");
+                    }
                     $("#btn_continuar_contrato").css("display", "none");
                     guardarLaboral();
                 }
@@ -90,6 +96,14 @@
             $("#collapse_bar_formulario").click();
         }
         limpiarFormulario()
+    })
+
+    $("#btn_terminar_contrato").on("click", function () {
+        if ($("#tbody_afiliacion tr").length > 0) {
+            $('#asignar_rol_modal').modal('show');
+        } else {
+            toastr.warning("¡Llenar la tabla de afiliaciones que es obligatoria!");
+        }
     })
 });
 
@@ -349,7 +363,6 @@ function guardarLaboral() {
                 $("#datos_afiliacion").addClass("active");
                 $("#tab_datos_afiliacion").addClass("active");
                 if ($("#id_pesrona_experiencia_actualizar").val() == "") {
-                    $("#btn_terminar_contrato").removeAttr('style');
                     $("#nombre_cargo").prop("disabled", true); $("#fecha_alta").prop("disabled", true);
                     $("#salario").prop("disabled", true); $("#fecha_baja").prop("disabled", true);
                     $("#tipo_contrado").prop("disabled", true); $("#correo_corporativo").prop("disabled", true);
@@ -404,54 +417,58 @@ function agregarInsumo() {
 }
 
 function guardarAfiliacion() {
-    if (validarCampos("asignar-rol")) {
-        var afiliacionArr = new Array();
-        var elemento = document.getElementById("tbody_afiliacion");
-        if (elemento.children.length != 0) {
-            for (var i = 0; i < elemento.children.length; i++) {
-                var entidad = elemento.children[i].cells[1].attributes[0].textContent;
-                var nombre = elemento.children[i].cells[2].textContent;
-                var fecha = elemento.children[i].cells[3].textContent;
-                item = {
-                    TipoEntidad: entidad,
-                    NombreEntidad: nombre,
-                    FechaAfiliacion: fecha
-                };
-                afiliacionArr.push(item);
+    if ($("#tbody_afiliacion tr").length > 0) {
+        if (validarCampos("asignar-rol")) {
+            var afiliacionArr = new Array();
+            var elemento = document.getElementById("tbody_afiliacion");
+            if (elemento.children.length != 0) {
+                for (var i = 0; i < elemento.children.length; i++) {
+                    var entidad = elemento.children[i].cells[1].attributes[0].textContent;
+                    var nombre = elemento.children[i].cells[2].textContent;
+                    var fecha = elemento.children[i].cells[3].textContent;
+                    item = {
+                        TipoEntidad: entidad,
+                        NombreEntidad: nombre,
+                        FechaAfiliacion: fecha
+                    };
+                    afiliacionArr.push(item);
+                }
             }
-        }
 
-        var personaObj = new Object({
-            PrimerNombre: $("#primer_nombre").val(), PrimerApellido: $("#primer_apellido").val(),
-            NumeroDocumento: $("#numero_documento").val(), TipoDocumento: $("#tipo_documento").val(),
-        })
-        $.ajax({
-            type: "POST",
-            url: "Contratacion/GuardarAfiliacion",
-            data: {
-                afiliaciones: JSON.stringify(afiliacionArr), rol: $("#escoger_rol").val(), laboralId: $("#id_laboral_afiliacion").val(),
-                persona: JSON.stringify(personaObj), afiliacioneActualizar: $("#id_laboral_afiliacion_actualizar").val(),
-            },
-            dataType: "json",
-            async: true,
-            success: function (res) {
-                if (!res.status) {
-                    toastr.error(res.title + ": " + res.message);
-                }
-                else {
-                    if ($("#id_laboral_afiliacion_actualizar").val() == "") {
-                        $('#asignar_rol_modal').modal('toggle');
+            var personaObj = new Object({
+                PrimerNombre: $("#primer_nombre").val(), PrimerApellido: $("#primer_apellido").val(),
+                NumeroDocumento: $("#numero_documento").val(), TipoDocumento: $("#tipo_documento").val(),
+            })
+            $.ajax({
+                type: "POST",
+                url: "Contratacion/GuardarAfiliacion",
+                data: {
+                    afiliaciones: JSON.stringify(afiliacionArr), rol: $("#escoger_rol").val(), laboralId: $("#id_laboral_afiliacion").val(),
+                    persona: JSON.stringify(personaObj), afiliacioneActualizar: $("#id_laboral_afiliacion_actualizar").val(),
+                },
+                dataType: "json",
+                async: true,
+                success: function (res) {
+                    if (!res.status) {
+                        toastr.error(res.title + ": " + res.message);
                     }
-                    toastr.success(res.title + ": " + res.message);
-                    setTimeout(function () { location.reload(); }, 1000);
+                    else {
+                        if ($("#id_laboral_afiliacion_actualizar").val() == "") {
+                            $('#asignar_rol_modal').modal('toggle');
+                        }
+                        toastr.success(res.title + ": " + res.message);
+                        setTimeout(function () { location.reload(); }, 700);
+                    }
+                },
+                error: function (error) {
+                    toastr.error("No se ha podido obtener la información");
                 }
-            },
-            error: function (error) {
-                toastr.error("No se ha podido obtener la información");
-            }
-        })
+            })
+        } else {
+            toastr.warning("Atención", "¡Asignar un rol es requeriso!");
+        }
     } else {
-        toastr.warning("Atención", "¡Asignar un rol es requeriso!");
+        toastr.warning("¡Llenar la tabla de afiliaciones que es obligatoria!");
     }
 }
 
@@ -506,12 +523,13 @@ function mostrarPendientes(idPersona, progreso) {
                     $("#collapse_bar_formulario").click();
                 }
                 $("#tbody_estudios_personales").empty();
+                var fechaNacimiento = res.persona.fechaNacimiento.split("T")
                 $("#persona_actualizar").val(res.persona.personaId); $("#id_persona").val(res.persona.personaId);
                 $("#primer_nombre").val(res.persona.primerNombre); $("#numero_documento").val(res.persona.numeroDocumento);
                 $("#segundo_nombre").val(res.persona.segundoNombre); $("#celular").val(res.persona.celular);
                 $("#primer_apellido").val(res.persona.primerApellido); $("#estado_civil").val(res.persona.estadoCivil);
                 $("#segundo_apellido").val(res.persona.segundoApellido); $("#correo_personal").val(res.persona.correoPersonal);
-                $("#fecha_nacimiento").val(res.persona.fechaNacimiento); $("#direccion").val(res.persona.direccion);
+                $("#fecha_nacimiento").val(fechaNacimiento[0].replace(/^(\d{4})-(\d{2})-(\d{2})$/g, '$3/$2/$1')); $("#direccion").val(res.persona.direccion);
                 $("#barrio").val(res.persona.barrio); $("#tipo_documento").val(res.persona.tipoDocumento);
                 $.each(res.infoAcademicas, function (index, item) {
                     var id = ((index + 1) + item.NivelFormacion + item.nombreIns + $("#titulo").val());
@@ -563,15 +581,16 @@ function mostrarPendientes(idPersona, progreso) {
                         if (!$("#tab_datos_afiliacion").hasClass("active")) {
                             $("#tab_datos_afiliacion").addClass("active");
                             $("#datos_afiliacion").addClass("active");
-                            $("#btn_continuar_contrato").removeAttr('style');
+                            $("#btn_continuar_contrato").css('display', 'none');
                             $("#tab_datos_laborales").removeClass("active");
                             $("#datos_laborales").removeClass("active");
                             $("#btn_atras_contrato").removeAttr('style');
                             $("#tab_datos_experiencia").removeClass("active");
                             $("#datos_experiencia").removeClass("active");
-                            $("#btn_terminar_contrato").css('display', 'none');
+                            $("#btn_terminar_contrato").removeAttr('style');
                             $("#datos_personales").removeClass("active");
                             $("#tab_datos_personales").removeClass("active");
+                            $("#btn_terminar_actualizar").css('display', 'none');
                         }
                         $("#tbody_insumolaboral_formurlario").empty();
                         $("#id_laboral_afiliacion").val(res.laboral.laboralId); $("#id_pesrona_experiencia_actualizar").val(res.laboral.laboralId);
@@ -601,9 +620,10 @@ function mostrarPendientes(idPersona, progreso) {
                                 $("#btn_atras_contrato").css('display', 'none');
                                 $("#tab_datos_experiencia").removeClass("active");
                                 $("#datos_experiencia").removeClass("active");
-                                $("#btn_terminar_contrato").css('display', 'none');
                                 $("#datos_personales").addClass("active");
                                 $("#tab_datos_personales").addClass("active");
+                                $("#btn_terminar_contrato").css('display', 'none');
+                                $("#btn_terminar_actualizar").css('display', 'none');
                             }
                             $("#id_laboral_afiliacion_actualizar").val(res.laboral.laboralId);
                             $("#tbody_afiliacion").empty();
@@ -642,7 +662,7 @@ function modalEliminarEmpleado(personaId) {
         }).then((value) => {
             if (value) {
                 swal({
-                    title: "Inactivar un empleado o eliminarlo para siempre",
+                    title: "Desactivar un empleado o eliminarlo para siempre",
                     buttons: {
                         cancel: "Cancelar",
                         defeat: {
