@@ -12,6 +12,7 @@
         }
         if ($('#actualizar_no').is(':checked')) {
             cargarSubModulos();
+
         }
     });
 
@@ -29,8 +30,7 @@
 
     $('#actualizar_no').on('switchChange.bootstrapSwitch', function () {
         if ($(this).is(':checked')) {
-            vaciarModal(false);
-            cargarModulos();
+            cargarModalActualizar(false);
             $("#custom-tabs-one-home-tab").addClass("active").addClass("show");
             $("#custom-tabs-one-home").addClass("show").addClass("active");
             $("#custom-tabs-one-profile-tab").removeClass("active").removeClass("show");
@@ -68,7 +68,9 @@
                         $("#btnLeft").css("display", "none");
                         $("#btnAllLeft").css("display", "none");
                     } else {
-                        cargarSubModulos();
+                        if ($("#id_rol_actualizar").val() == "") {
+                            cargarSubModulos();
+                        }
                         $("#btnAllRight").removeAttr("style");
                         $("#btnRight").removeAttr("style");
                         $("#btnLeft").removeAttr("style");
@@ -80,7 +82,9 @@
                     $("#modal_guardar_cambios").removeAttr("style");
                     if ($("#id_rol_actualizar").val() != "") {
                         if ($('#actualizar_no').is(':checked')) {
-                            cargarPermisosCRUD();
+                            if (!$("#customCheckbox1").is(":checked")) {
+                                cargarPermisosCRUD();
+                            }
                         }
                         else {
                             cargarModalActualizar();
@@ -95,9 +99,6 @@
                 $("#custom-tabs-one-home-tab").removeClass("active");
                 $("#custom-tabs-one-home").removeClass("show").removeClass("active");
                 $("#modal_atras_detalle").removeAttr("style");
-                if ($('#actualizar_no').is(':checked')) {
-                    cargarSubModulos();
-                }
             } else {
                 toastr.warning("¡Falta llenar los campos obligatorios!");
             }
@@ -180,12 +181,10 @@
                     if (!$('#actualizar_no').is(':checked')) {
                         cargarModalActualizar();
                     } else {
-                        cargarModulos();
+                        cargarModalActualizar(false);
                         $(this).css("display", "none");
-                        $("#modal_nombre_perfil").val('');
-                        $("#modal_descripcion_autorizacion").val('');
                         $("#profile_tab").css("display", "none");
-                        $("#customCheckbox1").prop("disabled", true);
+                        $("#customCheckbox1").prop("disabled", false);
                         $("#customCheckbox1").prop('checked', false);
                     }
                 }
@@ -212,14 +211,11 @@
                     cargarModalActualizar();
                     $(this).css("display", "none");
                 } else {
-                    cargarModulos();
+                    cargarModalActualizar(false);
                     $(this).css("display", "none");
-                    $("#modal_nombre_perfil").val('');
-                    $("#modal_descripcion_autorizacion").val('');
                     $("#profile_tab").css("display", "none");
                     $("#customCheckbox1").prop("disabled", true);
                     $("#customCheckbox1").prop('checked', false);
-                    $("#modal_submodulos2").html('');
                 }
             } else {
                 cargarModulos();
@@ -474,7 +470,7 @@ function modalVerAutorizacion(rolId) {
                     if (res.data.modulos[index].relaciones.length > 0) {
                         ca += "<li class='list-group-item active'>" + item.nombreModulo + "</li>"
                         $.each(res.data.modulos[index].relaciones, function (index2, item2) {
-                            ca += "<li class='list-group-item' style='margin-bottom:11%;'>"
+                            ca += "<li class='list-group-item'>"
                             ca += item2.nombreSubModulo
                             $.each(item2.permisos, function (index3, item3) {
                                 if (item3.includes("Crear")) {
@@ -492,6 +488,7 @@ function modalVerAutorizacion(rolId) {
                             })
                             ca += "</li>"
                         });
+                        ca += "<div style='margin-bottom:11%;'></div>"
                     } else {
                         ca += "<li class='list-group-item active' style='margin-bottom:11%;'>"
                         ca += item.nombreModulo
@@ -639,7 +636,7 @@ function cargarPermisosCRUD() {
         for (var i in modulos) {
             var moduloNombre = modulos[i].innerHTML;
             var moduloId = modulos[i].value;
-            if (subModuloArray.find(f => f.ModuloId != moduloId)) {
+            if (!subModuloArray.find(f => f.ModuloId == moduloId)) {
                 var item = {
                     SubModuloId: null,
                     ModuloId: moduloId,
@@ -681,7 +678,7 @@ function cargarPermisosCRUD() {
     $('.select2').select2()
 }
 
-function cargarModalActualizar() {
+function cargarModalActualizar(opcion) {
     $.ajax({
         type: "GET",
         url: "Perfiles/CargarDatosActualizar",
@@ -696,30 +693,42 @@ function cargarModalActualizar() {
                 $("#modal_nombre_modulo").empty();
                 $("#modal_submodulos").empty();
                 $("#tbody_permisos").empty();
-                $("#modal_nombre_perfil").val(res.data.rol.nombreRol).prop("disabled", true);
-                $("#modal_descripcion_autorizacion").val(res.data.rol.descripcion).prop("disabled", true);
-                $("#customCheckbox1").prop('checked', false).prop("disabled", true);
+                var disabled = "";
+                if (opcion == undefined) {
+                    opcion = true;
+                    disabled = "disabled";
+                }
+                $("#modal_nombre_perfil").val(res.data.rol.nombreRol).prop("disabled", opcion);
+                $("#modal_descripcion_autorizacion").val(res.data.rol.descripcion).prop("disabled", opcion);
+                $("#customCheckbox1").prop('checked', false).prop("disabled", opcion);
                 if (res.data.rol.restringir) {
-                    $("#customCheckbox1").prop('checked', true).prop("disabled", true);
+                    $("#customCheckbox1").prop('checked', true).prop("disabled", opcion);
                     $("#profile_tab").removeAttr("style");
                 }
-
+                var moduloArr = [];
                 $.each(res.data.modulos, function (index, item) {
                     ca = "<option selected value=" + item.moduloId + ">" + item.nombre + "</option>"
                     $("#modal_nombre_modulo").append(ca);
+                    moduloArr.push(item.moduloId);
+                });
+                $.each(res.data.modulosNoSeleccionado, function (index, item) {
+                    if (!moduloArr.includes(item.moduloId)) {
+                        ca = "<option value=" + item.moduloId + ">" + item.nombre + "</option>"
+                        $("#modal_nombre_modulo").append(ca);
+                    }
                 });
                 $.each(res.data.seleccionados, function (index, item) {
-                    ca = "<option value=" + item.subModuloId + "-" + item.moduloId + ">" + item.nombre + "</option>"
+                    ca = "<option value=" + item.subModuloId + "-" + item.moduloId + ">" + item.nombre + " (" + item.descripcion + ")  </option>"
                     $("#modal_submodulos2").append(ca);
                 });
                 $.each(res.data.noSeleccionados, function (index, item) {
-                    ca = "<option value=" + item.subModuloId + "-" + item.moduloId + ">" + item.nombre + " (" + item.descripcion + ")</option>"
+                    ca = "<option value=" + item.subModuloId + "-" + item.moduloId + ">" + item.nombre + " (" + item.descripcion + ")  </option>"
                     $("#modal_submodulos").append(ca);
                 });
 
-                $("#modal_nombre_modulo").prop("disabled", true);
-                $("#modal_submodulos").prop("disabled", true);
-                $("#modal_submodulos2").prop("disabled", true);
+                $("#modal_nombre_modulo").prop("disabled", opcion);
+                $("#modal_submodulos").prop("disabled", opcion);
+                $("#modal_submodulos2").prop("disabled", opcion);
                 $("#modal_submodulos2 option").prop("selected", "true");
 
                 var cont = 1
@@ -745,7 +754,7 @@ function cargarModalActualizar() {
                         ca += "<td>" + cont + "</td>"
                         ca += "<td>" + (item.nombreModulo) + "</td>"
                         ca += "<td>"
-                        ca += "<select disabled class='select2' multiple='multiple' name=tags[] style='width:100%;'>"
+                        ca += "<select " + disabled + " class='select2' multiple='multiple' name=tags[] style='width:100%;'>"
                         $.each(item.permisos, function (index2, item2) {
                             ca += "<option selected value='" + item2 + "'>" + item2 + "</option>"
                         })

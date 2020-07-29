@@ -602,6 +602,7 @@ namespace Colegio.Services
 
                 select.Rol = await context.Col_Roles.Where(w => w.RolId.Equals(rolId)).FirstOrDefaultAsync();
                 select.Modulos = query.Where(w => w.RolId.Equals(rolId)).ToList();
+                select.ModulosNoSeleccionado = context.Col_Modulos.Where(w => w.Estado == "A").ToList();
 
                 List<ModulosSelect> subModulos = new List<ModulosSelect>();
                 foreach (var grupo in query.GroupBy(g => g.ModuloId))
