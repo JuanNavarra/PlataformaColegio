@@ -352,6 +352,7 @@ function guardarCambios() {
     var moduloArray = new Array();
     var subModuloArray = new Array();
 
+
     var selectModulos = document.getElementById("modal_nombre_modulo");
     for (var i = 0; i < selectModulos.length; i++) {
         var modulo = $("#null-" + $("#modal_nombre_modulo").val()[i]).children().eq(2);

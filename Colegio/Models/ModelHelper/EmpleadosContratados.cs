@@ -15,5 +15,6 @@ namespace Colegio.Models.ModelHelper
         public string Correo { get; set; }
         public string Estado { get; set; }
         public char Progreso { get; set; }
+        public int UsuarioId { get; set; }
     }
 }

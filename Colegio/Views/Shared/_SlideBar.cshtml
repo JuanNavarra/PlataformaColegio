@@ -171,12 +171,12 @@
                                     </a>
                                 </li>
                             }
-                            @if (PSMA.Where(w => w.Value.Contains("Estudiantes")).Any() || PSMA_PMA)
+                            @if (PSMA.Where(w => w.Value.Contains("Almacen")).Any() || PSMA_PMA)
                             {
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
+                                    <a href="@Url.Action("Index","Almacen")" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Estudiantes</p>
+                                        <p>Almacén de Suministros</p>
                                     </a>
                                 </li>
                             }

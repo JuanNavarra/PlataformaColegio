@@ -498,9 +498,12 @@ function CargarRoles() {
             if (res.result == "ok") {
                 var ca = "";
                 $("#escoger_rol").empty();
+                ca = '<option value="0">Seleccione</option>'
+                ca += '<option value="-1">Sin Acceso a la platataforma</option>'
+                $("#escoger_rol").append(ca);
                 $.each(res.data, function (index, item) {
-                    ca = "<option value=" + item.rolId + ">" + item.nombreRol + "</option>"
-                    $("#escoger_rol").append(ca);
+                    cv = "<option value=" + item.rolId + ">" + item.nombreRol + "</option>"
+                    $("#escoger_rol").append(cv);
                 });
             }
         },

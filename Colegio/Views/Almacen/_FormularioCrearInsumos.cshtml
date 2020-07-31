@@ -1,0 +1,109 @@
+﻿@{
+}
+<div class="col-md-12">
+    <div class="card card-primary">
+        <form role="form">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Nombre</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-industry"></i></span>
+                                </div>
+                                <input type="text" class="form-control agregar-suministro" id="nombre_insumo_crear" name="nombre_insumo_crear" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>Línea Insumo</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-shopping-bag"></i></span>
+                                </div>
+                                <input class="form-control agregar-suministro" type="text" id="linea_crear_insumo" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>Stock</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-industry"></i></span>
+                                </div>
+                                <input class="form-control agregar-suministro" type="text" id="stock_crear_insumo" autocomplete="off" onKeyPress="return soloNumeros(event)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>Tipo</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-industry"></i></span>
+                                </div>
+                                <select class="form-control agregar-suministro" id="tipo_insumo_crear">
+                                    <option value="0">Selecciona</option>
+                                    <option value="pa">Papeleria</option>
+                                    <option value="za">Zapatos</option>
+                                    <option value="ro">Ropa</option>
+                                    <option value="te">Tecnología</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2" style="display:none" id="zapatos_insumos">
+                        <div class="form-group">
+                            <label>Talla</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-industry"></i></span>
+                                </div>
+                                <select class="form-control" id="tallas_zapatos_insumo_crear">
+                                    <option value="0">Selecciona</option>
+                                    <option value="37">37</option>
+                                    <option value="38">38</option>
+                                    <option value="39">39</option>
+                                    <option value="40">40</option>
+                                    <option value="41">41</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2" style="display:none" id="ropa_insumos">
+                        <div class="form-group">
+                            <label>Talla</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-industry"></i></span>
+                                </div>
+                                <select class="form-control" id="tallas_ropa_insumo_crear">
+                                    <option value="0">Selecciona</option>
+                                    <option value="XS">XS</option>
+                                    <option value="S">S</option>
+                                    <option value="M">M</option>
+                                    <option value="L">L</option>
+                                    <option value="XL">XL</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Especificaciones</label>
+                            <textarea class="form-control" rows="3" id="descripcion_insumo_crear"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button type="button" class="btn btn-primary" style="width: 19%;" onclick="guardarSuministros()">Guardar Suministros</button>
+            </div>
+        </form>
+    </div>
+</div>

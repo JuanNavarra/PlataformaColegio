@@ -276,7 +276,7 @@ namespace Colegio.Services
                 string message = "Se presento un error al asignar un Usuario y el Perfil a este Empleado";
 
                 var _rol = await context.Col_Roles.Where(w => w.RolId.Equals(rol) && w.Estado.Equals("A")).FirstOrDefaultAsync();
-                if (_rol != null)
+                if (_rol != null || rol == -1)
                 {
                     int? maxId = await context.Col_Afiliacion.MaxAsync(m => (int?)m.AfiliacionId);
                     int? id = maxId == null ? 1 : maxId + 1;
@@ -295,32 +295,34 @@ namespace Colegio.Services
                         id++;
                     }
                     await context.AddRangeAsync(_afiliaciones);
-
-                    maxId = await context.Col_Usuarios.MaxAsync(m => (int?)m.Id);
-                    id = maxId == null ? 1 : maxId + 1;
-                    Col_Usuarios usuario = new Col_Usuarios();
-                    var _usuario = await context.Col_Usuarios
-                        .Where(w => w.Usuario.Contains(persona.PrimerApellido.ToLower()))
-                        .OrderByDescending(o => o.Id)
-                        .Select(s => s.Usuario).FirstOrDefaultAsync();
-                    var numero = _usuario == null ? "0" : Regex.Match(_usuario, @"\d+").Value;
-                    usuario.RolId = _rol.RolId;
-                    usuario.Contrasena = TokenProvider.SHA256(persona.NumeroDocumento);
-                    usuario.Usuario = (persona.PrimerNombre.Substring(0, 1) + persona.PrimerApellido + (Int32.Parse(numero) + 1).ToString()).ToLower();
-                    usuario.Estado = "A";
-                    usuario.Id = Convert.ToInt32(id);
-                    usuario.UltimaContrasena = null;
-                    usuario.UltimoLogin = null;
-                    usuario.FechaActualizacion = null;
-                    usuario.FechaCreacion = DateTime.Now;
-                    await context.AddAsync<Col_Usuarios>(usuario);
+                    if (rol != -1)
+                    {
+                        maxId = await context.Col_Usuarios.MaxAsync(m => (int?)m.Id);
+                        id = maxId == null ? 1 : maxId + 1;
+                        Col_Usuarios usuario = new Col_Usuarios();
+                        var _usuario = await context.Col_Usuarios
+                            .Where(w => w.Usuario.Contains(persona.PrimerApellido.ToLower()))
+                            .OrderByDescending(o => o.Id)
+                            .Select(s => s.Usuario).FirstOrDefaultAsync();
+                        var numero = _usuario == null ? "0" : Regex.Match(_usuario, @"\d+").Value;
+                        usuario.RolId = _rol.RolId;
+                        usuario.Contrasena = TokenProvider.SHA256(persona.NumeroDocumento);
+                        usuario.Usuario = (persona.PrimerNombre.Substring(0, 1) + persona.PrimerApellido + (Int32.Parse(numero) + 1).ToString()).ToLower();
+                        usuario.Estado = "A";
+                        usuario.Id = Convert.ToInt32(id);
+                        usuario.UltimaContrasena = null;
+                        usuario.UltimoLogin = null;
+                        usuario.FechaActualizacion = null;
+                        usuario.FechaCreacion = DateTime.Now;
+                        await context.AddAsync<Col_Usuarios>(usuario);
+                    }
 
                     var _persona = await context.Col_Personas
                         .Where(w => w.NumeroDocumento.Equals(persona.NumeroDocumento) && w.TipoDocumento.Equals(persona.TipoDocumento))
                         .FirstOrDefaultAsync();
                     _persona.Estado = "A";
                     _persona.FechaActualizacion = DateTime.Now;
-                    _persona.UsuarioId = usuario.Id;
+                    _persona.UsuarioId = rol == -1 ? -1 : Convert.ToInt32(id);
                     _persona.Progreso = 'A';
                     context.Col_Personas.Update(_persona);
 
@@ -400,6 +402,7 @@ namespace Colegio.Services
                                            Perfil = t0.NombreRol,
                                            UltimoLogin = t1.UltimoLogin,
                                            Progreso = t2.Progreso,
+                                           UsuarioId = t2.UsuarioId,
                                        }).ToListAsync();
 
                 var postulados = await context.Col_Personas.Where(w => w.Estado.Equals("P"))
@@ -412,9 +415,26 @@ namespace Colegio.Services
                         Creacion = s.FechaCreacion,
                         Nombre = $"{s.PrimerNombre} {s.PrimerApellido}",
                         Progreso = s.Progreso,
+                        UsuarioId = s.UsuarioId
                     }).ToListAsync();
 
-                var personas = empleados.Union(postulados);
+                var sinRol = await (from t2 in context.Col_Personas
+                                    join t3 in context.Col_Laborales on t2.PersonaId equals t3.PersonaId
+                                    where !t2.Estado.Equals("P") && t2.UsuarioId.Equals(-1)
+                                    select new EmpleadosContratados
+                                    {
+                                        Id = t2.PersonaId,
+                                        Estado = t2.Estado == "A" ? "ACTIVO" : "INACTIVO",
+                                        Celular = t2.Celular,
+                                        Correo = t3.CorreoCorporativo == "" ? t2.CorreoPersonal : t3.CorreoCorporativo,
+                                        Creacion = t2.FechaCreacion,
+                                        Ingreso = t3.FechaIngreso,
+                                        Nombre = $"{t2.PrimerNombre} {t2.PrimerApellido}",
+                                        Progreso = t2.Progreso,
+                                        UsuarioId = t2.UsuarioId,
+                                    }).ToListAsync();
+
+                var personas = empleados.Union(postulados).Union(sinRol);
 
                 return personas.OrderByDescending(o => o.Creacion).ToList();
             }

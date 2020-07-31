@@ -1,7 +1,8 @@
 ﻿@{
     List<Colegio.Models.ModelHelper.EmpleadosContratados> registros = ViewBag.Registros;
+    string style = "style=background-color:#d9edf7;color:#31708f; ";
+    string styleInsumo = "style=background-color:#fcf8e3;color:#8a6d3b; ";
 }
-
 <div class="card-body">
     <table id="detalle_perfiles_table" class="table table-bordered table-striped">
         <thead>
@@ -16,7 +17,7 @@
                 <th>Creación</th>
                 <th>Último Login</th>
                 <th>Estado</th>
-                <th></th>
+                <th style="width: 5%;"></th>
             </tr>
         </thead>
         <tbody id="empleados_tabla_index" style="font-size: 90%;">
@@ -25,7 +26,8 @@
                 int count = 1;
                 @foreach (var item in registros)
                 {
-                    <tr id="emp_@item.Id">
+                    string tono = item.UsuarioId == -1 ? style : "";
+                    <tr @tono id="emp_@item.Id">
                         <td>@count</td>
                         <td>@item.Usuario</td>
                         <td>@item.Perfil</td>

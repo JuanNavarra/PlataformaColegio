@@ -28,7 +28,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
                     </div>
-                    <input class="form-control laborales" type="text" name="salario" id="salario" pattern="^[0-9]+$" autocomplete="off">
+                    <input class="form-control laborales" type="text" name="salario" id="salario" pattern="^[0-9]+$" autocomplete="off" onKeyPress="return soloNumeros(event)">
                     <div class="input-group-prepend">
                         <span class="input-group-text">.00</span>
                     </div>
@@ -57,7 +57,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-clock"></i></span>
                     </div>
-                    <input class="form-control laborales" type="text" name="horas" id="horas" pattern="^[0-9]+$" autocomplete="off">
+                    <input class="form-control laborales" type="text" name="horas" id="horas" pattern="^[0-9]+$" autocomplete="off" onKeyPress="return soloNumeros(event)">
                     <div class="input-group-prepend">
                         <span class="input-group-text">HORAS</span>
                     </div>
@@ -124,7 +124,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-shuttle-van"></i></span>
                     </div>
-                    <input class="form-control" type="email" name="auxilio_transporte" id="auxilio_transporte" autocomplete="off">
+                    <input class="form-control" type="email" name="auxilio_transporte" id="auxilio_transporte" autocomplete="off" onKeyPress="return soloNumeros(event)">
                     <div class="input-group-prepend">
                         <span class="input-group-text">.00</span>
                     </div>

@@ -26,7 +26,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-passport"></i></span>
                     </div>
-                    <input class="form-control personal" type="text" name="numero_documento" id="numero_documento" pattern="^[0-9]+$" autocomplete="off">
+                    <input class="form-control personal" type="text" name="numero_documento" id="numero_documento" pattern="^[0-9]+$" autocomplete="off" onKeyPress="return soloNumeros(event)">
                 </div>
             </div>
         </div>

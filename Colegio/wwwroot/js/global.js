@@ -70,3 +70,8 @@ function cantidadMeses(_fecha1, _fecha2) {
     var meses = (Math.round(resta / (1000 * 60 * 60 * 24))) / 30
     return meses.toFixed();
 }
+
+function soloNumeros(e) {
+    var key = window.Event ? e.which : e.keyCode
+    return ((key >= 48 && key <= 57) || (key == 8))
+}
