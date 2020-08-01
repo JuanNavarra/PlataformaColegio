@@ -10,5 +10,6 @@ namespace Colegio.Models.ModelHelper
         public bool Status { get; set; }
         public string Title { get; set; }
         public string Message { get; set; }
+        public dynamic Comodin { get; set; }
     }
 }

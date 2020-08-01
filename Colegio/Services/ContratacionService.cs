@@ -391,6 +391,7 @@ namespace Colegio.Services
                                        where t0.Estado.Equals("A") && !t1.Estado.Equals("P") && !t2.Estado.Equals("P")
                                        select new EmpleadosContratados
                                        {
+
                                            Id = t2.PersonaId,
                                            Usuario = t1.Usuario,
                                            Estado = t2.Estado == "A" ? "ACTIVO" : "INACTIVO",
@@ -403,6 +404,14 @@ namespace Colegio.Services
                                            UltimoLogin = t1.UltimoLogin,
                                            Progreso = t2.Progreso,
                                            UsuarioId = t2.UsuarioId,
+                                           Prestamos = !context.Col_Prestamos
+                                                    .Where(w => w.PersonaId.Equals(t2.PersonaId)).Any()
+                                                && context.Col_InsumoLaboral
+                                                    .Where(w => w.LaboralId.Equals(t3.LaboralId)).Count() > 0 ? "NECESITA" :
+                                                    context.Col_Prestamos
+                                                    .Where(w => w.PersonaId.Equals(t2.PersonaId)).Any() ? "PRESTADO" :
+                                                    context.Col_InsumoLaboral
+                                                    .Where(w => w.LaboralId.Equals(t3.LaboralId)).Count() < 0 ? "NO NECESITA" : "",
                                        }).ToListAsync();
 
                 var postulados = await context.Col_Personas.Where(w => w.Estado.Equals("P"))
@@ -432,6 +441,14 @@ namespace Colegio.Services
                                         Nombre = $"{t2.PrimerNombre} {t2.PrimerApellido}",
                                         Progreso = t2.Progreso,
                                         UsuarioId = t2.UsuarioId,
+                                        Prestamos = !context.Col_Prestamos
+                                                    .Where(w => w.PersonaId.Equals(t2.PersonaId)).Any()
+                                                && context.Col_InsumoLaboral
+                                                    .Where(w => w.LaboralId.Equals(t3.LaboralId)).Count() > 0 ? "NECESITA" :
+                                                    context.Col_Prestamos
+                                                    .Where(w => w.PersonaId.Equals(t2.PersonaId)).Any() ? "PRESTADO" :
+                                                    context.Col_InsumoLaboral
+                                                    .Where(w => w.LaboralId.Equals(t3.LaboralId)).Count() < 0 ? "NO NECESITA" : "",
                                     }).ToListAsync();
 
                 var personas = empleados.Union(postulados).Union(sinRol);

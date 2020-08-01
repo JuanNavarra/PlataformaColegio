@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Colegio.Models.ModelHelper
 {
@@ -16,5 +17,11 @@ namespace Colegio.Models.ModelHelper
         public string Estado { get; set; }
         public char Progreso { get; set; }
         public int UsuarioId { get; set; }
+        public string Documento { get; set; }
+        public string NombreCargo { get; set; }
+        public List<Col_InsumoLaboral> Insumos { get; set; }
+        public bool NecesitaInsumo { get; set; }
+        public EmpleadosContratados Empleado { get; set; }
+        public string Prestamos { get; set; }
     }
 }

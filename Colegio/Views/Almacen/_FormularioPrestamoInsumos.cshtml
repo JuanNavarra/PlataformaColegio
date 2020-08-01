@@ -1,5 +1,10 @@
 ﻿@{
 }
+<style>
+    .select2-selection {
+        height: 100% !important;
+    }
+</style>
 <div class="card card-default">
     <div class="card-header">
         <div class="row">
@@ -9,16 +14,12 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-search"></i></span>
                     </div>
-                    <input type="text" autocomplete="off" class="form-control" id="buscar_persona_insumo" placeholder="Enter para buscar" onKeyPress="return soloNumeros(event)" />
+                    <input type="text" autocomplete="off" class="form-control" id="buscar_persona_insumo" placeholder="Enter para buscar" onKeyPress="return soloNumeros(event)" onpaste="return false" />
                 </div>
-            </div>
-            <div class="col-md-6"></div>
-            <div class="col-md-3">
-               <button type="button" class="btn btn-primary" style="width: 84%; margin-top: 10%;">Agregar insumo</button>
             </div>
         </div>
     </div>
-    <div class="card-body">
+    <div class="card-body" id="div_resultado_busqueda_empleado_insumo" style="display:none">
         <div class="row">
             <div class="col-md-9">
                 <div class="row">
@@ -28,7 +29,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fas fa-user"></i></span>
                             </div>
-                            <input type="text" autocomplete="off" class="form-control" id="documento_persona_insumo" disabled />
+                            <input type="text" autocomplete="off" class="form-control insumos-prestar" id="documento_persona_insumo" disabled />
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -37,7 +38,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fas fa-user"></i></span>
                             </div>
-                            <input type="text" autocomplete="off" class="form-control" id="nombre_persona_insumo" disabled />
+                            <input type="text" autocomplete="off" class="form-control insumos-prestar" id="nombre_persona_insumo" disabled />
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -46,7 +47,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fas fa-user"></i></span>
                             </div>
-                            <input type="text" autocomplete="off" class="form-control" id="cargo_persona_insumo" disabled />
+                            <input type="text" autocomplete="off" class="form-control insumos-prestar" id="cargo_persona_insumo" disabled />
                         </div>
                     </div>
                 </div>
@@ -57,7 +58,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fas fa-solar-panel"></i></span>
                             </div>
-                            <select class="form-control" id="prestar_insumo">
+                            <select class="form-control select2 insumos-prestar" id="prestar_insumo">
                                 <option value="0">Seleccione</option>
                             </select>
                         </div>
@@ -69,7 +70,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-sort-numeric-up"></i></span>
                                 </div>
-                                <input class="form-control" type="text" id="cantidad_prestar_insumo" autocomplete="off" onKeyPress="return soloNumeros(event)">
+                                <input class="form-control insumos-prestar" disabled type="text" id="cantidad_prestar_insumo" autocomplete="off" onKeyPress="return soloNumeros(event)">
                             </div>
                         </div>
                     </div>
@@ -80,7 +81,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-industry"></i></span>
                                 </div>
-                                <input class="form-control" type="text" id="motivo_prestar_insumo" autocomplete="off">
+                                <input class="form-control insumos-prestar" type="text" id="motivo_prestar_insumo" autocomplete="off" disabled>
                             </div>
                         </div>
                     </div>
@@ -91,13 +92,18 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                                 </div>
-                                <input type="text" class="form-control" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask id="fecha_prestamo_insumo" name="fecha_prestamo_insumo">
+                                <input type="text" class="form-control insumos-prestar" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask id="fecha_prestamo_insumo" name="fecha_prestamo_insumo" disabled>
                             </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="info-box" style="display: flex;min-height: 64px;padding: .5rem;width: 85%;margin-top: 16px;box-shadow: none;">
+                            <span class="info-box-icon bg-primary" id="btn_agregar_insumo_prestar" style="width:55px;" onclick="agregarInsumoPrestar()"><i class="fas fa-plus"></i></span>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3" style="display:none" id="div_tabla_insumos_necesarios">
                 <h4 style="text-align:center">Insumos solicitados</h4>
                 <table class="table table-striped table-responsive">
                     <thead>
@@ -107,59 +113,36 @@
                         </tr>
                     </thead>
                     <tbody id="tbody_insumolaboral_formurlario">
-                        <tr>
-                            <td style="text-align:center">1</td>
-                            <td style="text-align:center">Marcadores</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:center">1</td>
-                            <td style="text-align:center">Marcadores</td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:center">1</td>
-                            <td style="text-align:center">Marcadores</td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <button type="button" class="btn btn-primary" style="width: 19%;">Prestar insumos de la tablas</button>
-            </div>
-            <div class="card-body p-0 table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th style="width: 10px">#</th>
-                            <th style="text-align:center">Documento</th>
-                            <th style="text-align:center">Suministro</th>
-                            <th style="text-align:center">Empleado</th>
-                            <th style="text-align:center">Cargo</th>
-                            <th style="text-align:center">Cantidad</th>
-                            <th style="text-align:center">Motivo</th>
-                            <th style="text-align:center">Fecha prestamo</th>
-                            <th style="text-align:left">Quitar</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody_prestamo_suministro" style="font-size: 90%;">
-                        <tr>
-                            <td style="width: 10px">1</td>
-                            <td style="text-align:center">1140861826</td>
-                            <td style="text-align:center">Camisa</td>
-                            <td style="text-align:center">Juan Navarra</td>
-                            <td style="text-align:center">Psicologo</td>
-                            <td style="text-align:center;width:1%">10</td>
-                            <td style="text-align:center">Dotacion</td>
-                            <td style="text-align:center">22/12/1998</td>
-                            <td style='text-align:center;width:1%'><a href='#'><i class='fas fa-trash'></i></a></td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body p-0 table-responsive" style="text-align: center;">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10px">#</th>
+                                    <th>Documento</th>
+                                    <th>Suministro</th>
+                                    <th>Empleado</th>
+                                    <th>Cargo</th>
+                                    <th>Cantidad</th>
+                                    <th>Motivo</th>
+                                    <th>Fecha prestamo</th>
+                                    <th style="text-align:left">Quitar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody_prestamo_suministro" style="font-size: 90%;">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <button type="button" class="btn btn-primary" style="width: 19%;" onclick="prestarInsumos()">Prestar insumos</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

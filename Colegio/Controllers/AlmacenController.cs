@@ -66,6 +66,7 @@ namespace Colegio.Controllers
                     _suministro.Nombre = suministroJson.Nombre;
                     _suministro.Stock = suministroJson.Stock;
                     _suministro.Talla = suministroJson.Talla;
+                    _suministro.Linea = suministroJson.Linea;
                     _suministro.TipoSuministro = suministroJson.TipoSuministro;
                     var result = await service.GuardarSuministros(_suministro);
                     return Json(result);
@@ -91,7 +92,63 @@ namespace Colegio.Controllers
                 if (crear)
                 {
                     var empleado = await service.BuscarEmpleado(documento);
-                    return Json("");
+                    return Json(new { data = empleado });
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MostrarSuministros()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                if (crear)
+                {
+                    var suministros = await service.MostrarSuministros();
+                    return Json(new { data = suministros });
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        }
+
+        public async Task<IActionResult> PrestarInsumos(string prestamos, string documento)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                if (crear)
+                {
+                    dynamic prestamosJson = JsonConvert.DeserializeObject(prestamos);
+                    List<Col_Prestamos> _prestamos = new List<Col_Prestamos>();
+                    foreach (var item in prestamosJson)
+                    {
+                        Col_Prestamos _prestamo = new Col_Prestamos();
+                        _prestamo.Cantidad = item.Cantidad;
+                        _prestamo.FechaPrestamo = Convert.ToDateTime(item.FechaPrestamo.ToString());
+                        _prestamo.Motivo = item.Motivo;
+                        _prestamo.SuministroId = item.SuministroId;
+                        _prestamos.Add(_prestamo);
+                    }
+                    var data = await service.PrestarInsumos(_prestamos, documento);
+                    return Json(data);
                 }
                 else
                 {

@@ -75,3 +75,12 @@ function soloNumeros(e) {
     var key = window.Event ? e.which : e.keyCode
     return ((key >= 48 && key <= 57) || (key == 8))
 }
+
+function numeroMaximo(id) {
+    $('#' + id).on('input', function () {
+        var value = $(this).val();
+        if ((value !== '') && (value.indexOf('.') === -1)) {
+            cantidad = $(this).val(Math.max(Math.min(value, $(this).attr("maximo")), -90));
+        }
+    });
+}

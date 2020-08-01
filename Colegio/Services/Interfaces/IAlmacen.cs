@@ -11,6 +11,8 @@ namespace Colegio.Services.Interfaces
     {
         public Task<ApiCallResult> GuardarSuministros(Col_Suministros suministros);
         public Task<List<Col_Suministros>> ListarSuministros();
-        public Task<Col_Personas> BuscarEmpleado(string documento);
+        public Task<EmpleadosContratados> BuscarEmpleado(string documento);
+        public Task<List<Col_Suministros>> MostrarSuministros();
+        public Task<ApiCallResult> PrestarInsumos(List<Col_Prestamos> prestamos, string documento);
     }
 }

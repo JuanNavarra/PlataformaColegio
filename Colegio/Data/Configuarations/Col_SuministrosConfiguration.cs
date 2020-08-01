@@ -15,6 +15,7 @@ namespace Colegio.Data.Configuarations
             builder.Property(p => p.FechaCreacion).IsRequired();
             builder.Property(p => p.FechaActualizacion).IsRequired(false);
             builder.Property(p => p.Talla).HasMaxLength(2).IsRequired(false);
+            builder.Property(p => p.Linea).HasMaxLength(100).IsRequired();
 
             builder.ToTable("Col_Suministros");
         }
