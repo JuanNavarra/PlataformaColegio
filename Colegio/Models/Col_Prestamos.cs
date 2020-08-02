@@ -15,5 +15,6 @@ namespace Colegio.Models
         public DateTime FechaPrestamo { get; set; }
         public DateTime FechaCreacion { get; set; }
         public DateTime? FechaActualizacion { get; set; }
+        public string Estado { get; set; }
     }
 }

@@ -1,0 +1,49 @@
+﻿@{
+}
+<style>
+    .select2-selection {
+        height: 100% !important;
+    }
+</style>
+<div class="card card-default">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-3">
+                <label>Número Documento:</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    </div>
+                    <input type="text" autocomplete="off" class="form-control" id="buscar_persona_insumo_devolucion" placeholder="Enter para buscar" onKeyPress="return soloNumeros(event)" onpaste="return false" />
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="card-body" id="div_resultado_busqueda_empleado_insumo_devolucion" style="display:none">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body p-0 table-responsive" style="text-align: center;">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 10px">#</th>
+                                                <th>Nombre Insumo</th>
+                                                <th>Cantidad Prestada</th>
+                                                <th>Cantidad a Devolver</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody_prestamo_suministro_devolucion" style="font-size: 90%;">
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="card-footer">
+                                    <button type="button" class="btn btn-primary" onclick="devolverInsumos()">Devolver insumos</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

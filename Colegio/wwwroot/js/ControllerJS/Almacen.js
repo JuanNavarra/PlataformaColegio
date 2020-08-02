@@ -1,4 +1,5 @@
-﻿$(document).ready(function () {
+﻿var devolocionArr = new Array();
+$(document).ready(function () {
     $('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' });
     $('[data-mask]').inputmask();
 
@@ -28,6 +29,10 @@
 
     $("#buscar_persona_insumo").on("keypress", function (e) {
         buscarEmpleado(e);
+    });
+
+    $("#buscar_persona_insumo_devolucion").on("keypress", function (e) {
+        buscarDevolver(e);
     });
 
     $("#prestar_insumo").on('select2:select', function () {
@@ -113,6 +118,7 @@ function buscarEmpleado(e) {
                                 ca = "<tr>"
                                 ca += "<td style='text-align:center'>" + (index + 1) + "</td>"
                                 ca += "<td style='text-align:center'>" + item.nombre + "</td>"
+                                ca += "</tr>"
                                 $("#tbody_insumolaboral_formurlario").append(ca);
                             });
                         } else {
@@ -235,4 +241,97 @@ function prestarInsumos() {
     } else {
         toastr.warning("!La tabla de suministros debe tener al menos un registro para ser prestado!");
     }
+}
+
+function buscarDevolver(e) {
+    if (e.keyCode == 13) {
+        if ($("#buscar_persona_insumo_devolucion").val() != "") {
+            $.ajax({
+                type: "GET",
+                url: "Almacen/BuscarDevolver",
+                data: {
+                    documento: $("#buscar_persona_insumo_devolucion").val(),
+                },
+                dataType: "json",
+                async: true,
+                success: function (res) {
+                    if (res.length > 0) {
+                        devolocionArr.length = 0;
+                        $("#tbody_prestamo_suministro_devolucion").empty();
+                        $("#tbody_prestamo_suministro_devolucion").removeAttr("style");
+                        $("#div_resultado_busqueda_empleado_insumo_devolucion").removeAttr("style");
+                        $("#buscar_persona_insumo_devolucion").val("");
+                        $.each(res, function (index, item) {
+                            ca = "<tr id='" + item.idPrestamo + "'>"
+                            ca += "<td style='text-align:center'>" + (index + 1) + "</td>"
+                            ca += "<td style='text-align:center'>" + item.insumo + "</td>"
+                            ca += "<td style='text-align:center'>" + item.cantidad + "</td>"
+                            ca += "<td style='text-align:center'><a href='#' onclick=\"incremetar('" + item.idPrestamo + "'," + item.cantidad + "," + index + ");\"><i class='fas fa-plus'></i></a><a name='cantidad' style='margin-left: 10px;margin-right: 10px;font-size: 22px;'>0</a><a href='#' onclick=\"decrementar('" + item.idPrestamo + "'," + index + ");\"><i class='fas fa-minus'></i></a></td>"
+                            ca += "</tr>"
+                            $("#tbody_prestamo_suministro_devolucion").append(ca);
+                            var item = {
+                                idPrestamo: item.idPrestamo, cantidadActual: item.cantidad,
+                                incremento: 0, idPersona: item.idPersona, suministroId: item.suministroId
+                            }
+                            devolocionArr.push(item);
+                        });
+                    } else {
+                        toastr.warning("No hay insumos por devolver para este empleado");
+                    }
+                },
+                error: function (error) {
+                    toastr.error("No se ha podido obtener la información");
+                }
+            })
+        } else {
+            toastr.warning("El campo de busqueda esta vacío");
+        }
+    }
+}
+
+function incremetar(id, max, index) {
+    if (devolocionArr[index].incremento < max) {
+        devolocionArr.map(function (dato) {
+            if (dato.idPrestamo == id) {
+                dato.incremento = dato.incremento + 1;
+                $("#" + id).children().eq(3).children()[1].innerHTML = dato.incremento
+            }
+        });
+    }
+}
+
+function decrementar(id, index) {
+    if (devolocionArr[index].incremento > 0) {
+        devolocionArr.map(function (dato) {
+            if (dato.idPrestamo == id) {
+                dato.incremento = dato.incremento - 1;
+                $("#" + id).children().eq(3).children()[1].innerHTML = dato.incremento
+            }
+        });
+    }
+}
+
+function devolverInsumos() {
+    $.ajax({
+        type: "POST",
+        url: "Almacen/DevolverInsumos",
+        data: {
+            devoluciones: JSON.stringify(devolocionArr),
+        },
+        dataType: "json",
+        async: true,
+        success: function (res) {
+            if (res.status) {
+                $("#tbody_prestamo_suministro_devolucion").empty();
+                $("#tbody_prestamo_suministro_devolucion").css("display", "none");
+                $("#div_resultado_busqueda_empleado_insumo_devolucion").css("display", "none");
+                toastr.success(res.message, res.title + ":");
+            } else {
+                toastr.error(res.message, res.title + ":");
+            }
+        },
+        error: function (error) {
+            console.log("No se ha podido obtener la información");
+        }
+    })
 }

@@ -14,6 +14,7 @@ namespace Colegio.Data.Configuarations
             builder.Property(p => p.FechaPrestamo).IsRequired();
             builder.Property(p => p.FechaActualizacion).IsRequired(false);
             builder.Property(p => p.FechaCreacion).IsRequired();
+            builder.Property(p => p.Estado).IsRequired().HasDefaultValue("A");
 
             builder.HasOne<Col_Personas>()
                 .WithMany()

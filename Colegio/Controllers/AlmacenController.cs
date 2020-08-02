@@ -128,6 +128,7 @@ namespace Colegio.Controllers
             }
         }
 
+        [HttpPost]
         public async Task<IActionResult> PrestarInsumos(string prestamos, string documento)
         {
             if (User.Identity.IsAuthenticated)
@@ -149,6 +150,64 @@ namespace Colegio.Controllers
                     }
                     var data = await service.PrestarInsumos(_prestamos, documento);
                     return Json(data);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> BuscarDevolver(string documento)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                if (crear)
+                {
+                    var insumos = await service.BuscarDevolucion(documento);
+                    return Json(insumos);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DevolverInsumos(string devoluciones)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                if (crear)
+                {
+                    dynamic devolucionJson = JsonConvert.DeserializeObject(devoluciones);
+                    List<Devoluciones> _devoluciones = new List<Devoluciones>();
+                    foreach (var item in devolucionJson)
+                    {
+                        Devoluciones _devolucion = new Devoluciones();
+                        _devolucion.IdPersona = item.idPersona;
+                        _devolucion.IdPrestamo = item.idPrestamo;
+                        _devolucion.Devolver = item.incremento;
+                        _devolucion.SuministroId = item.suministroId;
+                        _devolucion.Cantidad = item.cantidadActual;
+                        _devoluciones.Add(_devolucion);
+                    }
+                    var insumos = await service.DevolverInsumos(_devoluciones);
+                    return Json(insumos);
                 }
                 else
                 {
