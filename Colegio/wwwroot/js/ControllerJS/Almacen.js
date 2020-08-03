@@ -1,5 +1,6 @@
 ﻿var devolocionArr = new Array();
 $(document).ready(function () {
+    mostrarInfoSuministros()
     $('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' });
     $('[data-mask]').inputmask();
 
@@ -78,7 +79,7 @@ function guardarSuministros() {
                     $("#tallas_ropa_insumo_crear").val(""); $("#tallas_zapatos_insumo_crear").val("");
                     $("#tipo_insumo_crear").click();
                     toastr.success(res.message, res.title + ":");
-                    setTimeout(function () { location.reload(); }, 700);
+                    mostrarInfoSuministros();
                 } else {
                     toastr.error(res.message, res.title + ":");
                 }
@@ -193,8 +194,12 @@ function agregarInsumoPrestar() {
     }
 }
 
+function eliminarFila(id) {
+    $("#" + id).remove();
+}
+
 function prestarInsumos() {
-    if ($("#tbody_prestamo_suministro").length > 0) {
+    if ($("#tbody_prestamo_suministro tr").length > 0) {
         var prestamoArr = new Array();
         var elemento = document.getElementById("tbody_prestamo_suministro");
         for (var i = 0; i < elemento.children.length; i++) {
@@ -227,6 +232,7 @@ function prestarInsumos() {
                     $("#tbody_prestamo_suministro").empty();
                     $("#div_resultado_busqueda_empleado_insumo").css("display", "none");
                     toastr.success(res.message, res.title + ":");
+                    mostrarInfoSuministros();
                 } else {
                     if (res.title == "Error de stock") {
                         $("td[insumoNombre='" + res.comodin + "']").parent().remove();
@@ -326,12 +332,138 @@ function devolverInsumos() {
                 $("#tbody_prestamo_suministro_devolucion").css("display", "none");
                 $("#div_resultado_busqueda_empleado_insumo_devolucion").css("display", "none");
                 toastr.success(res.message, res.title + ":");
+                mostrarInfoSuministros();
             } else {
-                toastr.error(res.message, res.title + ":");
+                toastr.warning(res.message, res.title + ":");
             }
         },
         error: function (error) {
             console.log("No se ha podido obtener la información");
         }
     })
+}
+
+function mostrarInfoSuministros() {
+    $.ajax({
+        type: "GET",
+        url: "Almacen/MostrarInfoSuministros",
+        data: {},
+        dataType: "json",
+        async: true,
+        success: function (res) {
+            if (res.length > 0) {
+                $("#tbody_prestamo_suministros").empty();
+                $.each(res, function (index, item) {
+                    var ultimoPrestamo = item.ultimoPrestamo.split("T")
+                    var fechaCreacion = item.fechaCreacion.split("T")
+                    ca = "<tr id=" + item.suministroId + ">"
+                    ca += "<td style='text-align:center'>" + (index + 1) + "</td>"
+                    ca += "<td style='text-align:center'>" + item.nombre + "</td>"
+                    ca += "<td style='text-align:center'>" + item.descripcion + "</td>"
+                    ca += "<td style='text-align:center'>" + item.linea + "</td>"
+                    ca += "<td style='text-align:center'>" + fechaCreacion[0].replace(/^(\d{4})-(\d{2})-(\d{2})$/g, '$3/$2/$1') + "</td>"
+                    ca += "<td style='text-align:center'>"
+                    ca += item.ultimoPrestamo.includes("0001-01-01T") ? "NO REGISTRA" : ultimoPrestamo[0].replace(/^(\d{4})-(\d{2})-(\d{2})$/g, '$3/$2/$1')
+                    ca += "</td>"
+                    ca += "<td style='text-align:center;background-color:#d9edf7;color:#31708f'>" + item.prestado + "</td>"
+                    ca += "<td style='text-align:center;background-color:#d9edf7;color:#31708f'>" + item.stock + "</td>"
+                    ca += "<td style='text-align:center;background-color:#d9edf7;color:#31708f'>" + item.total + "</td>"
+                    ca += "<td style='text-align:center'>"
+                    ca += "<a href='#' onclick=\"eliminarSuministros('" + item.suministroId + "');\"><i class='fas fa-trash'></i></a>"
+                    ca += item.stock != 0 ? "<a href='#' style='margin-left: -32px;' onclick=\"vaciarStock('" + item.suministroId + "');\"><i class='far fa-folder-open'></i></a>" : ""
+                    ca += "</td >"
+                    ca += "</tr>"
+                    $("#tbody_prestamo_suministros").append(ca);
+                });
+            }
+        },
+        error: function (error) {
+            console.log("No se ha podido obtener la información");
+        }
+    })
+}
+
+function eliminarSuministros(suministroId) {
+    var prestado = $("#" + suministroId).children().eq(6).text();
+    var stock = $("#" + suministroId).children().eq(7).text();
+    if ((prestado && stock) == "0") {
+        swal({
+            title: "¿Está seguro que desea eliminar esto(s) suminstros?",
+            buttons: {
+                cancel: "Cancelar",
+                catch: {
+                    text: "Eliminar",
+                    value: "catch",
+                },
+            },
+            icon: "warning",
+        }).then((value) => {
+            if (value == "catch") {
+                $.ajax({
+                    type: "DELETE",
+                    url: "Almacen/EliminarSuministros",
+                    data: {
+                        suministroId: suministroId
+                    },
+                    dataType: "json",
+                    async: true,
+                    success: function (res) {
+                        if (res.status) {
+                            toastr.success(res.message, res.title + ":");
+                            mostrarInfoSuministros();
+                        } else {
+                            toastr.error(res.message, res.title + ":");
+                        }
+                    },
+                    error: function (error) {
+                        console.log("No se ha podido obtener la información");
+                    }
+                })
+            }
+        });
+    } else {
+        swal({
+            title: "Para eliminar el suministro, no debe tener INSUMOS PRESTADOS, ni en STOCK",
+            icon: "warning",
+        });
+    }
+}
+
+function vaciarStock(suministroId) {
+    var stock = $("#" + suministroId).children().eq(7).text(); {
+        swal({
+            title: "¿Está seguro que desea el STOCK?",
+            buttons: {
+                cancel: "Cancelar",
+                catch: {
+                    text: "Vaciar",
+                    value: "catch",
+                },
+            },
+            icon: "warning",
+        }).then((value) => {
+            if (value == "catch") {
+                $.ajax({
+                    type: "PUT",
+                    url: "Almacen/VaciarStock",
+                    data: {
+                        suministroId: suministroId, stock: stock,
+                    },
+                    dataType: "json",
+                    async: true,
+                    success: function (res) {
+                        if (res.status) {
+                            toastr.success(res.message, res.title + ":");
+                            mostrarInfoSuministros();
+                        } else {
+                            toastr.error(res.message, res.title + ":");
+                        }
+                    },
+                    error: function (error) {
+                        console.log("No se ha podido obtener la información");
+                    }
+                })
+            }
+        });
+    }
 }

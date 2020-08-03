@@ -90,8 +90,14 @@ namespace Colegio.Services
                     Stock = s.Stock,
                     SuministroId = s.SuministroId,
                     Talla = s.Talla,
+                    Linea = s.Linea,
                     TipoSuministro = s.TipoSuministro,
-                    Prestado = s.Prestado // la cantidad prestada que viene de la tabla prestamos
+                    Prestado = context.Col_Prestamos.Where(w => w.SuministroId.Equals(s.SuministroId)).Select(s => s.Cantidad).Sum(),
+                    Total = s.Stock + context.Col_Prestamos.Where(w => w.SuministroId.Equals(s.SuministroId))
+                        .Select(s => s.Cantidad).Sum(),
+                    UltimoPrestamo = context.Col_Prestamos
+                        .Where(w => w.SuministroId.Equals(s.SuministroId))
+                        .OrderByDescending(o => o.FechaPrestamo).Select(s => s.FechaPrestamo).FirstOrDefault()
                 }).ToListAsync();
                 return suministros;
             }
@@ -201,54 +207,11 @@ namespace Colegio.Services
 
         public async Task<List<Col_Suministros>> MostrarSuministros()
         {
-            try
-            {
-                var suministros = await context.Col_Suministros
-                    .Where(w => w.Stock > 0)
-                    .Select(s => new Col_Suministros { Linea = s.Linea, Stock = s.Stock, Nombre = s.Nombre, SuministroId = s.SuministroId })
-                    .ToListAsync();
-                return suministros;
-
-            }
-            #region catch
-            catch (DbEntityValidationException e)
-            {
-                string err = "";
-                foreach (var eve in e.EntityValidationErrors)
-                {
-                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
-                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
-                    {
-                        err += ve.ErrorMessage;
-                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
-                            ve.PropertyName, ve.ErrorMessage);
-                    }
-                }
-                return null;
-            }
-
-            catch (Exception e)
-            {
-                string err = "";
-                if (e.InnerException != null)
-                {
-                    if (e.InnerException.Message != null)
-                    {
-                        err = (e.InnerException.Message);
-                        if (e.InnerException.InnerException != null)
-                        {
-                            err += e.InnerException.InnerException.Message;
-                        }
-                    }
-                }
-                else
-                {
-                    err = (e.Message);
-                }
-                return null;
-            }
-            #endregion
+            var suministros = await context.Col_Suministros
+                .Where(w => w.Stock > 0)
+                .Select(s => new Col_Suministros { Linea = s.Linea, Stock = s.Stock, Nombre = s.Nombre, SuministroId = s.SuministroId })
+                .ToListAsync();
+            return suministros;
         }
 
         public async Task<ApiCallResult> PrestarInsumos(List<Col_Prestamos> prestamos, string documento)
@@ -292,6 +255,7 @@ namespace Colegio.Services
                         _prestamo.FechaPrestamo = item.FechaPrestamo;
                         _prestamo.FechaCreacion = DateTime.Now;
                         _prestamo.Cantidad = item.Cantidad;
+                        _prestamo.Estado = "A";
                         _prestamos.Add(_prestamo);
                         id++;
                         Col_Suministros _suministro = await context.Col_Suministros
@@ -433,26 +397,26 @@ namespace Colegio.Services
                     foreach (var item in devoluciones)
                     {
                         var _prestamos = await context.Col_Prestamos
-                            .Where(w => w.PersonaId.Equals(item.IdPersona) 
+                            .Where(w => w.PersonaId.Equals(item.IdPersona)
                             && w.SuministroId.Equals(item.SuministroId) && w.Estado.Equals("A"))
                             .ToListAsync();
-                        var restar = item.Devolver;
+                        var faltante = item.Devolver;
                         foreach (var temp in _prestamos)
                         {
-                            if (restar > 0)
+                            if (faltante > 0)
                             {
-                                var cantidad = 0;
+                                var cantidadRestar = 0;
                                 for (int i = 1; i <= item.Devolver; i++)
                                 {
                                     if ((temp.Cantidad - i) >= 0)
                                     {
-                                        cantidad = i;
+                                        cantidadRestar = i;
                                     }
                                 }
-                                restar -= cantidad;
+                                faltante -= cantidadRestar;
                                 var _prestamo = await context.Col_Prestamos
                                     .Where(w => w.PrestamoId.Equals(temp.PrestamoId)).FirstOrDefaultAsync();
-                                _prestamo.Cantidad -= cantidad;
+                                _prestamo.Cantidad -= cantidadRestar;
                                 _prestamo.Estado = _prestamo.Cantidad == 0 ? "I" : "A";
                                 _prestamo.FechaActualizacion = DateTime.Now;
                                 context.Col_Prestamos.Update(_prestamo);
@@ -523,6 +487,37 @@ namespace Colegio.Services
                 return new ApiCallResult { Status = false, Title = "Error al guardar", Message = "Favor contacte éste con el administrador" };
             }
             #endregion
+        }
+
+        public async Task<ApiCallResult> VaciarStock(int suministroId, int stock)
+        {
+            var suministro = await context.Col_Suministros
+                .Where(w => w.SuministroId.Equals(suministroId))
+                .FirstOrDefaultAsync();
+            suministro.Stock = 0;
+            context.Col_Suministros.Update(suministro);
+            await context.SaveChangesAsync();
+            return new ApiCallResult
+            {
+                Status = true,
+                Title = "Éxito",
+                Message = $"El stock del suministro {suministro.Nombre} - {suministro.Linea} se ha vaciado con éxito"
+            };
+        }
+
+        public async Task<ApiCallResult> EliminarSuministros(int suministroId)
+        {
+            var suministro = await context.Col_Suministros
+                .Where(w => w.SuministroId.Equals(suministroId))
+                .FirstOrDefaultAsync();
+            context.Col_Suministros.Remove(suministro);
+            await context.SaveChangesAsync();
+            return new ApiCallResult
+            {
+                Status = true,
+                Title = "Éxito",
+                Message = $"El suministro {suministro.Nombre} - {suministro.Linea} se ha eliminado con éxito"
+            };
         }
     }
 }

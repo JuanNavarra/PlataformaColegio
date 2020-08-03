@@ -4,11 +4,6 @@
     <div class="card card-primary card-tabs">
         <div class="card-header p-0 pt-1">
             <ul class="nav nav-tabs" id="custom-tabs-two-tab" role="tablist">
-                <li class="nav-item">
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
-                    </div>
-                </li>
                 <li class="pt-2 px-3"><h3 class="card-title">Gestión de Suministros</h3></li>
                 <li class="nav-item">
                     <a class="nav-link active" id="custom-tabs-two-crear-tab" data-toggle="pill" href="#custom-tabs-two-crear" role="tab" aria-controls="custom-tabs-two-crear" aria-selected="true">Crear existencias</a>
@@ -21,7 +16,7 @@
                 </li>
             </ul>
         </div>
-        <div class="card-body collapse">
+        <div class="card-body">
             <div class="tab-content" id="custom-tabs-two-tabContent">
                 <div class="tab-pane fade show active" id="custom-tabs-two-crear" role="tabpanel" aria-labelledby="custom-tabs-two-crear-tab">
                     @await Html.PartialAsync("_FormularioCrearInsumos")

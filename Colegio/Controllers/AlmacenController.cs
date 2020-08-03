@@ -37,7 +37,6 @@ namespace Colegio.Controllers
             {
                 if (Permisos("PermisoSubModulo").PSMAPB || (!Permisos("PermisoSubModulo").PSMAPB && Permisos("PermisoModulo").PMMAPB))
                 {
-                    ViewBag.Registros = await service.ListarSuministros();
                     string modulo = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
                     var permisos = Permisos(modulo).PMMAPL;
                     ViewBag.Leer = permisos.Where(w => w.Value.Contains("Leer")).Any();
@@ -207,6 +206,76 @@ namespace Colegio.Controllers
                         _devoluciones.Add(_devolucion);
                     }
                     var insumos = await service.DevolverInsumos(_devoluciones);
+                    return Json(insumos);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MostrarInfoSuministros()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                var leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
+                if (crear && leer)
+                {
+                    var insumos = await service.ListarSuministros();
+                    return Json(insumos);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> VaciarStock(int suministroId, int stock)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                var eliminar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Eliminar")).Any();
+                if (eliminar)
+                {
+                    var insumos = await service.VaciarStock(suministroId, stock);
+                    return Json(insumos);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> EliminarSuministros(int suministroId)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                var eliminar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Eliminar")).Any();
+                if (eliminar)
+                {
+                    var insumos = await service.EliminarSuministros(suministroId);
                     return Json(insumos);
                 }
                 else

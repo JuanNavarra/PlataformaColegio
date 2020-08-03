@@ -96,14 +96,40 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Especificaciones</label>
-                            <textarea class="form-control" rows="3" id="descripcion_insumo_crear"></textarea>
+                            <textarea class="form-control agregar-suministro" rows="3" id="descripcion_insumo_crear"></textarea>
                         </div>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-primary" style="margin-top: 36px;" onclick="guardarSuministros()">Guardar Suministros</button>
                     </div>
                 </div>
             </div>
-            <div class="card-footer">
-                <button type="button" class="btn btn-primary" style="width: 19%;" onclick="guardarSuministros()">Guardar Suministros</button>
-            </div>
         </form>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body p-0 table-responsive" style="text-align: center;">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10px">#</th>
+                                    <th>Nombre Insumo</th>
+                                    <th>Descripción</th>
+                                    <th>Línea</th>
+                                    <th>Fecha Creación</th>
+                                    <th>Último prestamo</th>
+                                    <th style="background-color:#d9edf7;color:#31708f;width:1%">Prestado</th>
+                                    <th style="background-color:#d9edf7;color:#31708f;width:1%">Stock</th>
+                                    <th style="background-color:#d9edf7;color:#31708f;width:1%">Total</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody_prestamo_suministros" style="font-size: 90%;">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

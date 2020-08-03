@@ -15,6 +15,10 @@ namespace Colegio.Models
         public DateTime? FechaActualizacion { get; set; }
         [NotMapped]
         public int Prestado { get; set; }
+        [NotMapped]
+        public int Total { get; set; }
+        [NotMapped]
+        public DateTime UltimoPrestamo { get; set; }
         public string Linea { get; set; }
     }
 }
