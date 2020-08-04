@@ -1,0 +1,45 @@
+﻿@{
+}
+
+<style>
+    .materias-listas {
+        width: 100%;
+        height: 28px;
+        margin-bottom: 6px;
+        font-size: 17px;
+        text-align: left;
+    }
+</style>
+<div class="sticky-top mb-3">
+    <div class="card scrollbar" style="height: 30vh;">
+        <div class="overflow">
+            <div class="card-header">
+                <h4 class="card-title">Listado de materias</h4>
+            </div>
+            <div class="card-body" id="listado_materias">
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title justify-content-center">Crea la materia</h3>
+        </div>
+        <div class="card-body">
+            <div class="btn-group" style="width: 100%; margin-bottom: 10px;">
+                <p class="card-title" style="font-size:15px;">Click en un color para guardar la materia</p>
+                <ul class="fc-color-picker" id="color-chooser">
+                    <li><a class="text-primary cuadrado-color" href="#" onclick="guardarMaterias('primary')"><i class="fas fa-square"></i></a></li>
+                    <li><a class="text-warning cuadrado-color" href="#" onclick="guardarMaterias('warning')"><i class="fas fa-square"></i></a></li>
+                    <li><a class="text-success cuadrado-color" href="#" onclick="guardarMaterias('success')"><i class="fas fa-square"></i></a></li>
+                    <li><a class="text-danger cuadrado-color" href="#" onclick="guardarMaterias('danger')"><i class="fas fa-square"></i></a></li>
+                    <li><a class="text-info cuadrado-color" href="#" onclick="guardarMaterias('info')"><i class="fas fa-square"></i></a></li>
+                </ul>
+            </div>
+            <div class="row">
+                <input type="text" class="form-control materia-color" id="codigo_materia" placeholder="Código" style="margin-bottom: 6px;">
+                <input type="text" class="form-control materia-color" id="nombre_materia" placeholder="Nombre" style="margin-bottom: 6px;">
+                <input type="text" class="form-control materia-color" id="desc_materia" placeholder="Breve Descripción" style="margin-bottom: 6px;">
+            </div>
+        </div>
+    </div>
+</div>

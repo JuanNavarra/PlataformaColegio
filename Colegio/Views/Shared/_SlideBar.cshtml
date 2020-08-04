@@ -8,10 +8,8 @@
         .Where(w => w.Type.Equals("PermisoModulo") && w.Value.Contains("Maestro Administrativo"))
         .ToList();
 }
-<!-- Navbar -->
 <nav class="main-header navbar navbar-expand navbar-white navbar-light" style=" position: relative !important;">
 
-    <!-- SEARCH FORM -->
     <form class="form-inline ml-3">
         <div class="input-group input-group-sm">
             <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
@@ -23,9 +21,7 @@
         </div>
     </form>
 
-    <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
-        <!-- Messages Dropdown Menu -->
         <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
                 <i class="far fa-comments"></i>
@@ -33,7 +29,6 @@
             </a>
             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                 <a href="#" class="dropdown-item">
-                    <!-- Message Start -->
                     <div class="media">
                         <img src="#" alt="User Avatar" class="img-size-50 mr-3 img-circle">
                         <div class="media-body">
@@ -45,11 +40,9 @@
                             <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
                         </div>
                     </div>
-                    <!-- Message End -->
                 </a>
                 <div class="dropdown-divider"></div>
                 <a href="#" class="dropdown-item">
-                    <!-- Message Start -->
                     <div class="media">
                         <img src="#" alt="User Avatar" class="img-size-50 img-circle mr-3">
                         <div class="media-body">
@@ -61,11 +54,9 @@
                             <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
                         </div>
                     </div>
-                    <!-- Message End -->
                 </a>
                 <div class="dropdown-divider"></div>
                 <a href="#" class="dropdown-item">
-                    <!-- Message Start -->
                     <div class="media">
                         <img src="#" alt="User Avatar" class="img-size-50 img-circle mr-3">
                         <div class="media-body">
@@ -77,13 +68,11 @@
                             <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
                         </div>
                     </div>
-                    <!-- Message End -->
                 </a>
                 <div class="dropdown-divider"></div>
                 <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
             </div>
         </li>
-        <!-- Notifications Dropdown Menu -->
         <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
                 <i class="far fa-bell"></i>
@@ -117,25 +106,18 @@
         </li>
     </ul>
 </nav>
-<!-- /.navbar -->
-<!-- Main Sidebar Container -->
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
-    <!-- Brand Logo -->
     <a href="index3.html" class="brand-link">
         <img src="#" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
         <span class="brand-text font-weight-light">Aula virtual</span>
     </a>
-
-    <!-- Sidebar -->
     <div class="sidebar">
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="info">
                 <a href="#" class="d-block">Bienvenido <b>@ViewBag.Usuario</b></a>
             </div>
         </div>
-        <!-- Sidebar Menu -->
         <nav class="mt-2">
-            <!-- Listado de modulos -->
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 @if (PMA.Any())
                 {
@@ -180,12 +162,12 @@
                                     </a>
                                 </li>
                             }
-                            @if (PSMA.Where(w => w.Value.Contains("Materias")).Any() || PSMA_PMA)
+                            @if (PSMA.Where(w => w.Value.Contains("Horarios")).Any() || PSMA_PMA)
                             {
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
+                                    <a href="@Url.Action("Index","Horarios")"  class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Materias</p>
+                                        <p>Horarios</p>
                                     </a>
                                 </li>
                             }
@@ -194,7 +176,5 @@
                 }
             </ul>
         </nav>
-        <!-- /.sidebar-menu -->
     </div>
-    <!-- /.sidebar -->
 </aside>
