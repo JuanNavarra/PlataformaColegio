@@ -5,7 +5,7 @@
     <div class="col-md-3">
         <div class="form-group">
             <label>Materia</label>
-            <select class="form-control agregar-horario select2" id="materias_formulario">
+            <select class="form-control agregar-horario select2" id="materias_formulario" disabled>
             </select>
         </div>
     </div>
@@ -13,7 +13,7 @@
         <div class="form-group">
             <label>Hora Inicio</label>
             <div class="input-group date" id="timepicker" data-target-input="nearest">
-                <input type="text" class="form-control datetimepicker-input agregar-horario" data-target="#timepicker" id="hora_ini" onKeyPress="return soloNumeros(event)" />
+                <input type="text" class="form-control datetimepicker-input agregar-horario" disabled data-target="#timepicker" id="hora_ini" onKeyPress="return soloNumeros(event)" />
                 <div class="input-group-append" data-target="#timepicker" data-toggle="datetimepicker">
                     <div class="input-group-text"><i class="far fa-clock"></i></div>
                 </div>
@@ -24,7 +24,7 @@
         <div class="form-group">
             <label>Hora Fin</label>
             <div class="input-group date" id="timepicker_fin" data-target-input="nearest">
-                <input type="text" class="form-control datetimepicker-input agregar-horario" data-target="#timepicker_fin" id="hora_fin" onKeyPress="return soloNumeros(event)" />
+                <input type="text" class="form-control datetimepicker-input agregar-horario" disabled data-target="#timepicker_fin" id="hora_fin" onKeyPress="return soloNumeros(event)" />
                 <div class="input-group-append" data-target="#timepicker_fin" data-toggle="datetimepicker">
                     <div class="input-group-text"><i class="far fa-clock"></i></div>
                 </div>
@@ -34,7 +34,7 @@
     <div class="col-md-2">
         <div class="form-group">
             <label>Día Semana</label>
-            <select class="form-control agregar-horario" id="dia_semana_horario">
+            <select class="form-control agregar-horario" id="dia_semana_horario" disabled>
                 <option value="0">Selecciona</option>
                 <option value="l">Lunes</option>
                 <option value="m">Martes</option>
@@ -46,6 +46,6 @@
         </div>
     </div>
     <div class="col-md-3">
-        <button class="btn btn-primary" style="margin-top:14%;">Agregar al Horario</button>
+        <button class="btn btn-primary" style="margin-top:14%;" disabled id="btn_formulario_horarios" onclick="agregarMateriaHorario();">Agregar al Horario</button>
     </div>
 </div>

@@ -29,6 +29,8 @@ namespace Colegio.Data
         public DbSet<Col_Suministros> Col_Suministros { get; set; }
         public DbSet<Col_Prestamos> Col_Prestamos { get; set; }
         public DbSet<Col_Materias> Col_Materias { get; set; }
+        public DbSet<Col_Cursos> Col_Cursos { get; set; }
+        public DbSet<Col_Horarios> Col_Horarios { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -49,6 +51,8 @@ namespace Colegio.Data
             modelBuilder.ApplyConfiguration(new Col_SuministrosConfiguration());
             modelBuilder.ApplyConfiguration(new Col_PrestamosConfiguration());
             modelBuilder.ApplyConfiguration(new Col_MateriasConfiguration());
+            modelBuilder.ApplyConfiguration(new Col_CursosConfiguration());
+            modelBuilder.ApplyConfiguration(new Col_HorariosConfiguration());
         }
     }
 }
