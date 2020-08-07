@@ -164,11 +164,28 @@
                             }
                             @if (PSMA.Where(w => w.Value.Contains("Horarios")).Any() || PSMA_PMA)
                             {
-                                <li class="nav-item">
-                                    <a href="@Url.Action("Index","Horarios")"  class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Horarios</p>
+                                <li class="nav-item has-treeview">
+                                    <a href="#" class="nav-link">
+                                        <i class="nav-icon fas fa-circle"></i>
+                                        <p>
+                                            Configurar Horarios
+                                            <i class="right fas fa-angle-left"></i>
+                                        </p>
                                     </a>
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("MostrarHorarios","Horarios")" class="nav-link">
+                                                <i class="far fa-circle nav-icon"></i>
+                                                <p>Horarios</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="#" class="nav-link">
+                                                <i class="far fa-circle nav-icon"></i>
+                                                <p>Level 2</p>
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </li>
                             }
                         </ul>

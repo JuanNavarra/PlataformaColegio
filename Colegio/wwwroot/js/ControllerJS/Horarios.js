@@ -13,25 +13,37 @@
         if ($(this).val() == "0") {
             $("#hora_ini").prop("disabled", true).val("");
             $("#hora_fin").prop("disabled", true).val("");
-            $("#materias_formulario").prop("disabled", true).select2('val', "0");;
+            $("#materias_formulario").prop("disabled", true).select2('val', "0");
             $("#dia_semana_horario").prop("disabled", true).val("0");
             $("#btn_formulario_horarios").prop("disabled", true);
         } else {
             $("#hora_ini").prop("disabled", false).val("");
             $("#hora_fin").prop("disabled", false).val("");
-            $("#materias_formulario").prop("disabled", false).select2('val', "0");;
+            $("#materias_formulario").prop("disabled", false).select2('val', "0");
             $("#dia_semana_horario").prop("disabled", false).val("0");
             $("#btn_formulario_horarios").prop("disabled", false);
+        }
+        mostrarHorasMaterias();
+    });
+    mostrarHorasMaterias();
+
+    $("#btn_add_horario").on("click", function () {
+        if ($('#cursos_formulario_horario').val() != "0") {
+            $("#hora_ini").prop("disabled", true).val("");
+            $("#hora_fin").prop("disabled", true).val("");
+            $("#materias_formulario").prop("disabled", true).select2('val', "0");
+            $("#dia_semana_horario").prop("disabled", true).val("0");
+            $("#btn_formulario_horarios").prop("disabled", true);
+            $('#cursos_formulario_horario').select2('val', "0");
             mostrarHorasMaterias();
         }
     });
-    mostrarHorasMaterias();
 })
 
 function mostrarMaterias() {
     $.ajax({
         type: "GET",
-        url: "Horarios/MostrarMarterias",
+        url: "MostrarMarterias",
         data: {},
         dataType: "json",
         async: true,
@@ -64,7 +76,7 @@ function guardarMaterias(color) {
         })
         $.ajax({
             type: "POST",
-            url: "Horarios/GuardarMarterias",
+            url: "GuardarMarterias",
             data: {
                 materia: JSON.stringify(materiaObj)
             },
@@ -101,7 +113,7 @@ function agregarMateriaHorario() {
             })
             $.ajax({
                 type: "POST",
-                url: "Horarios/AgregarMateriasHorario",
+                url: "AgregarMateriasHorario",
                 data: {
                     horario: JSON.stringify(horarioObj)
                 },
@@ -131,7 +143,7 @@ function agregarMateriaHorario() {
 function mostarCursos() {
     $.ajax({
         type: "GET",
-        url: "Horarios/MostrarCursos",
+        url: "MostrarCursos",
         data: {},
         dataType: "json",
         async: true,
@@ -153,27 +165,63 @@ function mostarCursos() {
 function mostrarHorasMaterias() {
     $.ajax({
         type: "GET",
-        url: "Horarios/MostrarHorasMaterias",
+        url: "MostrarHorasMaterias",
         data: {
             cursoId: $('#cursos_formulario_horario').val(),
         },
         dataType: "json",
         async: true,
         success: function (res) {
+            $("td").children().remove();
             if (res.length > 0) {
-                $.each(res, function (index, item) {
-                    $("#" + item.horaIni).append("<div class='badge badge-" + item.color + " materias-listas'><p style='margin-top:1px;color: white;'>" + item.materia + "</p></div>");
-                    $("#" + item.horaFin).append("<div class='badge badge-" + item.color + " materias-listas'><p style='margin-top:1px;color: white;'>" + item.materia + "</p></div>");
+                $.each(res.sort(sort_by('orden', false, parseInt)), function (index, item) {
+                    $("#" + item.horaIni).append("<div style='cursor: pointer;' class='badge badge-" + item.color + " materias-listas' onclick=\"eliminarHoriorMateria('" + item.materia + "'," + item.id + ");\"><p style='margin-top:1px;color: white;'>" + item.materia + "</p></div>");
+                    $("#" + item.horaFin).append("<div style='cursor: pointer;'class='badge badge-" + item.color + " materias-listas' onclick=\"eliminarHoriorMateria('" + item.materia + "'," + item.id + ");\"><p style='margin-top:1px;color: white;'>" + item.materia + "</p></div>");
                     $.each(item.intervalo, function (_index, _item) {
-                        $("#" + _item).append("<div class='badge badge-" + item.color + " materias-listas'><p style='margin-top:1px;color: white;'>" + item.materia + "</p></div>");
+                        $("#" + _item).append("<div style='cursor: pointer;' class='badge badge-" + item.color + " materias-listas' onclick=\"eliminarHoriorMateria('" + item.materia + "'," + item.id + ");\"><p style='margin-top:1px;color: white;'>" + item.materia + "</p></div>");
                     });
                 })
-            } else {
-                $("td").children().remove();
             }
         },
         error: function (error) {
             toastr.error("No se ha podido obtener la información");
         }
     })
+}
+
+function eliminarHoriorMateria(materia, id) {
+    swal({
+        title: "Está seguro que desea eliminar " + materia + " de éste horario",
+        buttons: {
+            cancel: "Cancelar",
+            catch: {
+                text: "Eliminar",
+                value: "catch",
+            },
+        },
+        icon: "warning",
+    }).then((value) => {
+        if (value == "catch") {
+            $.ajax({
+                type: "DELETE",
+                url: "EliminarHoriorMateria",
+                data: {
+                    horarioId: id,
+                },
+                dataType: "json",
+                async: true,
+                success: function (res) {
+                    if (res.status) {
+                        toastr.success(res.message, res.title + ":");
+                        mostrarHorasMaterias();
+                    } else {
+                        toastr.error(res.message, res.title + ":");
+                    }
+                },
+                error: function (error) {
+                    toastr.error("No se ha podido obtener la información");
+                }
+            })
+        }
+    });
 }

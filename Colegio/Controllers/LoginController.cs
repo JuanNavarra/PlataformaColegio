@@ -45,7 +45,7 @@ namespace Colegio.Controllers
         {
             try
             {
-                var userToken = await tokenProvider.LoginUser(user.Usuario.Trim(), user.Contrasena);
+                System.Security.Claims.ClaimsIdentity userToken = await tokenProvider.LoginUser(user.Usuario.Trim(), user.Contrasena);
                 if (userToken != null)
                 {
                     //Save token in session object
@@ -59,11 +59,11 @@ namespace Colegio.Controllers
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",

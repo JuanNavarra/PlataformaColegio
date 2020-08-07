@@ -40,11 +40,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -81,7 +81,7 @@ namespace Colegio.Services
         {
             try
             {
-                var suministros = await context.Col_Suministros.Select(s => new Col_Suministros
+                List<Col_Suministros> suministros = await context.Col_Suministros.Select(s => new Col_Suministros
                 {
                     Descripcion = s.Descripcion,
                     FechaActualizacion = s.FechaActualizacion,
@@ -105,11 +105,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -168,11 +168,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -207,7 +207,7 @@ namespace Colegio.Services
 
         public async Task<List<Col_Suministros>> MostrarSuministros()
         {
-            var suministros = await context.Col_Suministros
+            List<Col_Suministros> suministros = await context.Col_Suministros
                 .Where(w => w.Stock > 0)
                 .Select(s => new Col_Suministros { Linea = s.Linea, Stock = s.Stock, Nombre = s.Nombre, SuministroId = s.SuministroId })
                 .ToListAsync();
@@ -221,13 +221,13 @@ namespace Colegio.Services
                 bool status = false;
                 string title = "Error";
                 string message = "Error al ingresar el prestamo";
-                var personaId = await context.Col_Personas
+                Col_Personas personaId = await context.Col_Personas
                     .Where(w => w.NumeroDocumento.Equals(documento) && w.Estado.Equals("A"))
                     .FirstOrDefaultAsync();
                 if (personaId != null)
                 {
-                    var suministros = await context.Col_Suministros.ToListAsync();
-                    var cantidadSuperior = suministros.Where(w => w.Stock < prestamos.Where(p => p.SuministroId == w.SuministroId)
+                    List<Col_Suministros> suministros = await context.Col_Suministros.ToListAsync();
+                    List<Col_Suministros> cantidadSuperior = suministros.Where(w => w.Stock < prestamos.Where(p => p.SuministroId == w.SuministroId)
                         .Select(s => s.Cantidad).Sum()).ToList();
                     if (cantidadSuperior.Any())
                     {
@@ -245,7 +245,7 @@ namespace Colegio.Services
                     int? maxId = await context.Col_Prestamos.MaxAsync(m => (int?)m.PrestamoId);
                     int? id = maxId == null ? 1 : maxId + 1;
                     List<Col_Prestamos> _prestamos = new List<Col_Prestamos>();
-                    foreach (var item in prestamos)
+                    foreach (Col_Prestamos item in prestamos)
                     {
                         Col_Prestamos _prestamo = new Col_Prestamos();
                         _prestamo.PrestamoId = Convert.ToInt32(id);
@@ -277,11 +277,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -318,7 +318,7 @@ namespace Colegio.Services
         {
             try
             {
-                var query = await (from t0 in context.Col_Personas
+                List<Devoluciones> query = await (from t0 in context.Col_Personas
                                    join t1 in context.Col_Prestamos on t0.PersonaId equals t1.PersonaId
                                    join t2 in context.Col_Suministros on t1.SuministroId equals t2.SuministroId
                                    where t0.NumeroDocumento.Equals(documento) && t1.Estado.Equals("A")
@@ -330,7 +330,7 @@ namespace Colegio.Services
                                        Insumo = $"{t2.Nombre} - {t2.Linea}",
                                        SuministroId = t2.SuministroId,
                                    }).ToListAsync();
-                var devoluciones = query
+                IEnumerable<Devoluciones> devoluciones = query
                     .GroupBy(g => g.SuministroId)
                     .Select(s => new Devoluciones
                     {
@@ -346,11 +346,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -391,21 +391,21 @@ namespace Colegio.Services
                 string title = "Error";
                 string message = "Error al devolver el insumo";
 
-                var query = devoluciones.Where(w => !w.Devolver.Equals(0)).Any();
+                bool query = devoluciones.Where(w => !w.Devolver.Equals(0)).Any();
                 if (query)
                 {
-                    foreach (var item in devoluciones)
+                    foreach (Devoluciones item in devoluciones)
                     {
-                        var _prestamos = await context.Col_Prestamos
+                        List<Col_Prestamos> _prestamos = await context.Col_Prestamos
                             .Where(w => w.PersonaId.Equals(item.IdPersona)
                             && w.SuministroId.Equals(item.SuministroId) && w.Estado.Equals("A"))
                             .ToListAsync();
-                        var faltante = item.Devolver;
-                        foreach (var temp in _prestamos)
+                        int faltante = item.Devolver;
+                        foreach (Col_Prestamos temp in _prestamos)
                         {
                             if (faltante > 0)
                             {
-                                var cantidadRestar = 0;
+                                int cantidadRestar = 0;
                                 for (int i = 1; i <= item.Devolver; i++)
                                 {
                                     if ((temp.Cantidad - i) >= 0)
@@ -414,7 +414,7 @@ namespace Colegio.Services
                                     }
                                 }
                                 faltante -= cantidadRestar;
-                                var _prestamo = await context.Col_Prestamos
+                                Col_Prestamos _prestamo = await context.Col_Prestamos
                                     .Where(w => w.PrestamoId.Equals(temp.PrestamoId)).FirstOrDefaultAsync();
                                 _prestamo.Cantidad -= cantidadRestar;
                                 _prestamo.Estado = _prestamo.Cantidad == 0 ? "I" : "A";
@@ -423,7 +423,7 @@ namespace Colegio.Services
                                 await context.SaveChangesAsync();
                             }
                         }
-                        var suministro = await context.Col_Suministros
+                        Col_Suministros suministro = await context.Col_Suministros
                             .Where(w => w.SuministroId.Equals(item.SuministroId)).FirstOrDefaultAsync();
                         suministro.Stock += item.Devolver;
                         suministro.FechaActualizacion = DateTime.Now;
@@ -452,11 +452,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -491,7 +491,7 @@ namespace Colegio.Services
 
         public async Task<ApiCallResult> VaciarStock(int suministroId, int stock)
         {
-            var suministro = await context.Col_Suministros
+            Col_Suministros suministro = await context.Col_Suministros
                 .Where(w => w.SuministroId.Equals(suministroId))
                 .FirstOrDefaultAsync();
             suministro.Stock = 0;
@@ -507,7 +507,7 @@ namespace Colegio.Services
 
         public async Task<ApiCallResult> EliminarSuministros(int suministroId)
         {
-            var suministro = await context.Col_Suministros
+            Col_Suministros suministro = await context.Col_Suministros
                 .Where(w => w.SuministroId.Equals(suministroId))
                 .FirstOrDefaultAsync();
             context.Col_Suministros.Remove(suministro);

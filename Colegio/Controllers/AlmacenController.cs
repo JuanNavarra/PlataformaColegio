@@ -22,7 +22,7 @@ namespace Colegio.Controllers
         private PermisosCRUD Permisos(string modulo)
         {
             PermisosCRUD permiso = new PermisosCRUD();
-            var permisos = User.Claims
+            List<System.Security.Claims.Claim> permisos = User.Claims
                         .Where(w => w.Type.Equals(modulo) && w.Value.Contains("Maestro Administrativo")).ToList();
             permiso.PSMAPB = permisos.Where(w => w.Value.Contains("Almacen")).Any();
             permiso.PMMAPB = permisos.Any();
@@ -38,7 +38,7 @@ namespace Colegio.Controllers
                 if (Permisos("PermisoSubModulo").PSMAPB || (!Permisos("PermisoSubModulo").PSMAPB && Permisos("PermisoModulo").PMMAPB))
                 {
                     string modulo = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                    var permisos = Permisos(modulo).PMMAPL;
+                    List<System.Security.Claims.Claim> permisos = Permisos(modulo).PMMAPL;
                     ViewBag.Leer = permisos.Where(w => w.Value.Contains("Leer")).Any();
                     ViewBag.Crear = permisos.Where(w => w.Value.Contains("Crear")).Any();
                     ViewBag.Actualizar = permisos.Where(w => w.Value.Contains("Actualizar")).Any();
@@ -56,7 +56,7 @@ namespace Colegio.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                bool crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
                 if (crear)
                 {
                     dynamic suministroJson = JsonConvert.DeserializeObject(suministros);
@@ -67,7 +67,7 @@ namespace Colegio.Controllers
                     _suministro.Talla = suministroJson.Talla;
                     _suministro.Linea = suministroJson.Linea;
                     _suministro.TipoSuministro = suministroJson.TipoSuministro;
-                    var result = await service.GuardarSuministros(_suministro);
+                    ApiCallResult result = await service.GuardarSuministros(_suministro);
                     return Json(result);
                 }
                 else
@@ -87,10 +87,10 @@ namespace Colegio.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                bool crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
                 if (crear)
                 {
-                    var empleado = await service.BuscarEmpleado(documento);
+                    EmpleadosContratados empleado = await service.BuscarEmpleado(documento);
                     return Json(new { data = empleado });
                 }
                 else
@@ -110,10 +110,10 @@ namespace Colegio.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                bool crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
                 if (crear)
                 {
-                    var suministros = await service.MostrarSuministros();
+                    List<Col_Suministros> suministros = await service.MostrarSuministros();
                     return Json(new { data = suministros });
                 }
                 else
@@ -133,12 +133,12 @@ namespace Colegio.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                bool crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
                 if (crear)
                 {
                     dynamic prestamosJson = JsonConvert.DeserializeObject(prestamos);
                     List<Col_Prestamos> _prestamos = new List<Col_Prestamos>();
-                    foreach (var item in prestamosJson)
+                    foreach (dynamic item in prestamosJson)
                     {
                         Col_Prestamos _prestamo = new Col_Prestamos();
                         _prestamo.Cantidad = item.Cantidad;
@@ -147,7 +147,7 @@ namespace Colegio.Controllers
                         _prestamo.SuministroId = item.SuministroId;
                         _prestamos.Add(_prestamo);
                     }
-                    var data = await service.PrestarInsumos(_prestamos, documento);
+                    ApiCallResult data = await service.PrestarInsumos(_prestamos, documento);
                     return Json(data);
                 }
                 else
@@ -167,10 +167,10 @@ namespace Colegio.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                bool crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
                 if (crear)
                 {
-                    var insumos = await service.BuscarDevolucion(documento);
+                    List<Devoluciones> insumos = await service.BuscarDevolucion(documento);
                     return Json(insumos);
                 }
                 else
@@ -190,12 +190,12 @@ namespace Colegio.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                bool crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
                 if (crear)
                 {
                     dynamic devolucionJson = JsonConvert.DeserializeObject(devoluciones);
                     List<Devoluciones> _devoluciones = new List<Devoluciones>();
-                    foreach (var item in devolucionJson)
+                    foreach (dynamic item in devolucionJson)
                     {
                         Devoluciones _devolucion = new Devoluciones();
                         _devolucion.IdPersona = item.idPersona;
@@ -205,7 +205,7 @@ namespace Colegio.Controllers
                         _devolucion.Cantidad = item.cantidadActual;
                         _devoluciones.Add(_devolucion);
                     }
-                    var insumos = await service.DevolverInsumos(_devoluciones);
+                    ApiCallResult insumos = await service.DevolverInsumos(_devoluciones);
                     return Json(insumos);
                 }
                 else
@@ -225,11 +225,11 @@ namespace Colegio.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
-                var leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
+                bool crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                bool leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
                 if (crear && leer)
                 {
-                    var insumos = await service.ListarSuministros();
+                    List<Col_Suministros> insumos = await service.ListarSuministros();
                     return Json(insumos);
                 }
                 else
@@ -249,10 +249,10 @@ namespace Colegio.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                var eliminar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Eliminar")).Any();
+                bool eliminar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Eliminar")).Any();
                 if (eliminar)
                 {
-                    var insumos = await service.VaciarStock(suministroId, stock);
+                    ApiCallResult insumos = await service.VaciarStock(suministroId, stock);
                     return Json(insumos);
                 }
                 else
@@ -272,10 +272,10 @@ namespace Colegio.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                var eliminar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Eliminar")).Any();
+                bool eliminar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Eliminar")).Any();
                 if (eliminar)
                 {
-                    var insumos = await service.EliminarSuministros(suministroId);
+                    ApiCallResult insumos = await service.EliminarSuministros(suministroId);
                     return Json(insumos);
                 }
                 else

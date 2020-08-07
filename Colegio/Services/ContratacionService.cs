@@ -24,7 +24,7 @@ namespace Colegio.Services
         {
             try
             {
-                var existeUsuario = await context.Col_Personas
+                bool existeUsuario = await context.Col_Personas
                     .Where(w => w.NumeroDocumento.Equals(persona.NumeroDocumento) && w.TipoDocumento.Equals(persona.TipoDocumento))
                     .AnyAsync();
 
@@ -45,7 +45,7 @@ namespace Colegio.Services
 
                     maxId = await context.Col_InfoAcademica.MaxAsync(m => (int?)m.AcademicoId);
                     id = maxId == null ? 1 : maxId + 1;
-                    foreach (var item in infoAcademicas)
+                    foreach (Col_InfoAcademica item in infoAcademicas)
                     {
                         Col_InfoAcademica infoAcademica = new Col_InfoAcademica();
                         infoAcademica.AcademicoId = Convert.ToInt32(id);
@@ -69,11 +69,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -113,7 +113,7 @@ namespace Colegio.Services
                 int? maxId = await context.Col_Experiencia.MaxAsync(m => (int?)m.ExperienciaId);
                 int? id = maxId == null ? 1 : maxId + 1;
                 List<Col_Experiencia> _experiencias = new List<Col_Experiencia>();
-                foreach (var item in experiencias)
+                foreach (Col_Experiencia item in experiencias)
                 {
                     Col_Experiencia experiencia = new Col_Experiencia();
                     experiencia.ExperienciaId = Convert.ToInt32(id);
@@ -129,7 +129,7 @@ namespace Colegio.Services
                 }
                 await context.AddRangeAsync(_experiencias);
 
-                var persona = await context.Col_Personas.Where(w => w.PersonaId == personaId).FirstOrDefaultAsync();
+                Col_Personas persona = await context.Col_Personas.Where(w => w.PersonaId == personaId).FirstOrDefaultAsync();
                 persona.Progreso = 'E';
                 context.Col_Personas.Update(persona);
 
@@ -140,11 +140,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -194,7 +194,7 @@ namespace Colegio.Services
                     _insumos = new List<Col_InsumoLaboral>();
                     maxId = await context.Col_InsumoLaboral.MaxAsync(m => (int?)m.InsLabId);
                     id = maxId == null ? 1 : maxId + 1;
-                    foreach (var item in insumos)
+                    foreach (Col_InsumoLaboral item in insumos)
                     {
                         Col_InsumoLaboral insumo = new Col_InsumoLaboral();
                         insumo.InsLabId = Convert.ToInt32(id);
@@ -205,7 +205,7 @@ namespace Colegio.Services
                     }
                     await context.AddRangeAsync(_insumos);
                 }
-                var persona = await context.Col_Personas.Where(w => w.PersonaId.Equals(personaId)).FirstOrDefaultAsync();
+                Col_Personas persona = await context.Col_Personas.Where(w => w.PersonaId.Equals(personaId)).FirstOrDefaultAsync();
                 persona.Progreso = 'L';
                 context.Col_Personas.Update(persona);
                 await context.SaveChangesAsync();
@@ -216,11 +216,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -255,7 +255,7 @@ namespace Colegio.Services
 
         public async Task<List<Col_Roles>> MostrarRoles()
         {
-            var roles = await context.Col_Roles
+            List<Col_Roles> roles = await context.Col_Roles
                 .Where(w => w.Estado.Equals("A"))
                 .Select(s => new Col_Roles
                 {
@@ -273,13 +273,13 @@ namespace Colegio.Services
                 string title = "Error";
                 string message = "Se presento un error al asignar un Usuario y el Perfil a este Empleado";
 
-                var _rol = await context.Col_Roles.Where(w => w.RolId.Equals(rol) && w.Estado.Equals("A")).FirstOrDefaultAsync();
+                Col_Roles _rol = await context.Col_Roles.Where(w => w.RolId.Equals(rol) && w.Estado.Equals("A")).FirstOrDefaultAsync();
                 if (_rol != null || rol == -1)
                 {
                     int? maxId = await context.Col_Afiliacion.MaxAsync(m => (int?)m.AfiliacionId);
                     int? id = maxId == null ? 1 : maxId + 1;
                     List<Col_Afiliacion> _afiliaciones = new List<Col_Afiliacion>();
-                    foreach (var item in afiliaciones)
+                    foreach (Col_Afiliacion item in afiliaciones)
                     {
                         Col_Afiliacion afiliacion = new Col_Afiliacion();
                         afiliacion.AfiliacionId = Convert.ToInt32(id);
@@ -298,11 +298,11 @@ namespace Colegio.Services
                         maxId = await context.Col_Usuarios.MaxAsync(m => (int?)m.Id);
                         id = maxId == null ? 1 : maxId + 1;
                         Col_Usuarios usuario = new Col_Usuarios();
-                        var _usuario = await context.Col_Usuarios
+                        string _usuario = await context.Col_Usuarios
                             .Where(w => w.Usuario.Contains(persona.PrimerApellido.ToLower()))
                             .OrderByDescending(o => o.Id)
                             .Select(s => s.Usuario).FirstOrDefaultAsync();
-                        var numero = _usuario == null ? "0" : Regex.Match(_usuario, @"\d+").Value;
+                        string numero = _usuario == null ? "0" : Regex.Match(_usuario, @"\d+").Value;
                         usuario.RolId = _rol.RolId;
                         usuario.Contrasena = TokenProvider.SHA256(persona.NumeroDocumento);
                         usuario.Usuario = (persona.PrimerNombre.Substring(0, 1) + persona.PrimerApellido + (Int32.Parse(numero) + 1).ToString()).ToLower();
@@ -315,7 +315,7 @@ namespace Colegio.Services
                         await context.AddAsync<Col_Usuarios>(usuario);
                     }
 
-                    var _persona = await context.Col_Personas
+                    Col_Personas _persona = await context.Col_Personas
                         .Where(w => w.NumeroDocumento.Equals(persona.NumeroDocumento) && w.TipoDocumento.Equals(persona.TipoDocumento))
                         .FirstOrDefaultAsync();
                     _persona.Estado = "A";
@@ -341,11 +341,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -382,7 +382,7 @@ namespace Colegio.Services
         {
             try
             {
-                var empleados = await (from t0 in context.Col_Roles
+                List<EmpleadosContratados> empleados = await (from t0 in context.Col_Roles
                                        join t1 in context.Col_Usuarios on t0.RolId equals t1.RolId
                                        join t2 in context.Col_Personas on t1.Id equals t2.UsuarioId
                                        join t3 in context.Col_Laborales on t2.PersonaId equals t3.PersonaId
@@ -412,7 +412,7 @@ namespace Colegio.Services
                                                     .Where(w => w.LaboralId.Equals(t3.LaboralId)).Count() < 0 ? "NO NECESITA" : "",
                                        }).ToListAsync();
 
-                var postulados = await context.Col_Personas.Where(w => w.Estado.Equals("P"))
+                List<EmpleadosContratados> postulados = await context.Col_Personas.Where(w => w.Estado.Equals("P"))
                     .Select(s => new EmpleadosContratados
                     {
                         Id = s.PersonaId,
@@ -425,7 +425,7 @@ namespace Colegio.Services
                         UsuarioId = s.UsuarioId
                     }).ToListAsync();
 
-                var sinRol = await (from t2 in context.Col_Personas
+                List<EmpleadosContratados> sinRol = await (from t2 in context.Col_Personas
                                     join t3 in context.Col_Laborales on t2.PersonaId equals t3.PersonaId
                                     where !t2.Estado.Equals("P") && t2.UsuarioId.Equals(-1)
                                     select new EmpleadosContratados
@@ -449,7 +449,7 @@ namespace Colegio.Services
                                                     .Where(w => w.LaboralId.Equals(t3.LaboralId)).Count() < 0 ? "NO NECESITA" : "",
                                     }).ToListAsync();
 
-                var personas = empleados.Union(postulados).Union(sinRol);
+                IEnumerable<EmpleadosContratados> personas = empleados.Union(postulados).Union(sinRol);
 
                 return personas.OrderByDescending(o => o.Creacion).ToList();
             }
@@ -457,11 +457,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -598,11 +598,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -639,7 +639,7 @@ namespace Colegio.Services
         {
             try
             {
-                var _persona = await context.Col_Personas.Where(w => w.PersonaId.Equals(personaActualizar)).FirstOrDefaultAsync();
+                Col_Personas _persona = await context.Col_Personas.Where(w => w.PersonaId.Equals(personaActualizar)).FirstOrDefaultAsync();
                 if (_persona != null)
                 {
                     _persona.PersonaId = personaActualizar;
@@ -657,7 +657,7 @@ namespace Colegio.Services
                     _persona.SegundoApellido = persona.SegundoApellido;
                     _persona.FechaActualizacion = DateTime.Now;
                     context.Col_Personas.Update(_persona);
-                    var _infoAcademica = await context.Col_InfoAcademica.Where(w => w.PersonaId.Equals(personaActualizar)).ToListAsync();
+                    List<Col_InfoAcademica> _infoAcademica = await context.Col_InfoAcademica.Where(w => w.PersonaId.Equals(personaActualizar)).ToListAsync();
                     if (_infoAcademica.Count() > 0)
                     {
                         context.Col_InfoAcademica.RemoveRange(_infoAcademica);
@@ -665,7 +665,7 @@ namespace Colegio.Services
                     int? maxId = await context.Col_InfoAcademica.MaxAsync(m => (int?)m.AcademicoId);
                     int? id = maxId == null ? 1 : maxId + 1;
                     List<Col_InfoAcademica> _infoAcademicas = new List<Col_InfoAcademica>();
-                    foreach (var item in infoAcademicas)
+                    foreach (Col_InfoAcademica item in infoAcademicas)
                     {
                         Col_InfoAcademica infoAcademica = new Col_InfoAcademica();
                         infoAcademica.AcademicoId = Convert.ToInt32(id);
@@ -687,11 +687,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -728,14 +728,14 @@ namespace Colegio.Services
         {
             try
             {
-                var _experiencia = await context.Col_Experiencia.Where(w => w.PersonaId.Equals(experienciaActualizar)).ToListAsync();
+                List<Col_Experiencia> _experiencia = await context.Col_Experiencia.Where(w => w.PersonaId.Equals(experienciaActualizar)).ToListAsync();
                 if (_experiencia.Count() > 0)
                 {
                     context.Col_Experiencia.RemoveRange(_experiencia);
                     int? maxId = await context.Col_Experiencia.MaxAsync(m => (int?)m.ExperienciaId);
                     int? id = maxId == null ? 1 : maxId + 1;
                     List<Col_Experiencia> _experiencias = new List<Col_Experiencia>();
-                    foreach (var item in experiencias)
+                    foreach (Col_Experiencia item in experiencias)
                     {
                         Col_Experiencia experiencia = new Col_Experiencia();
                         experiencia.ExperienciaId = Convert.ToInt32(id);
@@ -759,11 +759,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -800,7 +800,7 @@ namespace Colegio.Services
         {
             try
             {
-                var _laboral = await context.Col_Laborales.Where(w => w.LaboralId.Equals(laboralActualizar)).FirstOrDefaultAsync();
+                Col_Laborales _laboral = await context.Col_Laborales.Where(w => w.LaboralId.Equals(laboralActualizar)).FirstOrDefaultAsync();
                 if (_laboral != null)
                 {
                     _laboral.AuxilioTransporte = laboral.AuxilioTransporte;
@@ -813,7 +813,7 @@ namespace Colegio.Services
                     _laboral.Salario = laboral.Salario;
                     _laboral.TipoContrato = laboral.TipoContrato;
                     context.Col_Laborales.Update(_laboral);
-                    var _insumoEstado = await context.Col_InsumoLaboral.Where(w => w.LaboralId.Equals(laboralActualizar)).ToListAsync();
+                    List<Col_InsumoLaboral> _insumoEstado = await context.Col_InsumoLaboral.Where(w => w.LaboralId.Equals(laboralActualizar)).ToListAsync();
                     context.Col_InsumoLaboral.RemoveRange(_insumoEstado);
                     if (insumos != null)
                     {
@@ -821,7 +821,7 @@ namespace Colegio.Services
                         _insumos = new List<Col_InsumoLaboral>();
                         int? maxId = await context.Col_InsumoLaboral.MaxAsync(m => (int?)m.InsLabId);
                         int? id = maxId == null ? 1 : maxId + 1;
-                        foreach (var item in insumos)
+                        foreach (Col_InsumoLaboral item in insumos)
                         {
                             Col_InsumoLaboral insumo = new Col_InsumoLaboral();
                             insumo.InsLabId = Convert.ToInt32(id);
@@ -841,11 +841,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -882,7 +882,7 @@ namespace Colegio.Services
         {
             try
             {
-                var _afiliacion = await context.Col_Afiliacion.Where(w => w.LaboralId.Equals(afiliacioneActualizar)).ToListAsync();
+                List<Col_Afiliacion> _afiliacion = await context.Col_Afiliacion.Where(w => w.LaboralId.Equals(afiliacioneActualizar)).ToListAsync();
                 if (_afiliacion.Count() > 0)
                 {
                     context.Col_Afiliacion.RemoveRange(_afiliacion);
@@ -890,7 +890,7 @@ namespace Colegio.Services
                 int? maxId = await context.Col_Afiliacion.MaxAsync(m => (int?)m.AfiliacionId);
                 int? id = maxId == null ? 1 : maxId + 1;
                 List<Col_Afiliacion> _afiliaciones = new List<Col_Afiliacion>();
-                foreach (var item in afiliaciones)
+                foreach (Col_Afiliacion item in afiliaciones)
                 {
                     Col_Afiliacion afiliacion = new Col_Afiliacion();
                     afiliacion.AfiliacionId = Convert.ToInt32(id);
@@ -920,11 +920,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -964,21 +964,21 @@ namespace Colegio.Services
                 bool status = false;
                 string title = "Error";
                 string message = "Error al eliminar el empleado";
-                var persona = await context.Col_Personas.Where(w => w.PersonaId.Equals(personaId)).FirstOrDefaultAsync();
+                Col_Personas persona = await context.Col_Personas.Where(w => w.PersonaId.Equals(personaId)).FirstOrDefaultAsync();
                 switch (op)
                 {
                     case true:
-                        var academicos = await context.Col_InfoAcademica.Where(w => w.PersonaId.Equals(persona.PersonaId)).ToListAsync();
-                        var usuario = await context.Col_Usuarios.Where(w => w.Id.Equals(persona.UsuarioId)).FirstOrDefaultAsync();
-                        var experiencia = await context.Col_Experiencia.Where(w => w.PersonaId.Equals(persona.PersonaId)).ToListAsync();
-                        var laboral = await context.Col_Laborales.Where(w => w.PersonaId.Equals(persona.PersonaId)).FirstOrDefaultAsync();
+                        List<Col_InfoAcademica> academicos = await context.Col_InfoAcademica.Where(w => w.PersonaId.Equals(persona.PersonaId)).ToListAsync();
+                        Col_Usuarios usuario = await context.Col_Usuarios.Where(w => w.Id.Equals(persona.UsuarioId)).FirstOrDefaultAsync();
+                        List<Col_Experiencia> experiencia = await context.Col_Experiencia.Where(w => w.PersonaId.Equals(persona.PersonaId)).ToListAsync();
+                        Col_Laborales laboral = await context.Col_Laborales.Where(w => w.PersonaId.Equals(persona.PersonaId)).FirstOrDefaultAsync();
                         context.Col_Personas.Remove(persona);
                         if (academicos.Count() > 0) context.Col_InfoAcademica.RemoveRange(academicos);
                         if (experiencia.Count() > 0) context.Col_Experiencia.RemoveRange(experiencia);
                         if (laboral != null)
                         {
-                            var insumos = await context.Col_InsumoLaboral.Where(w => w.LaboralId.Equals(laboral.LaboralId)).ToListAsync();
-                            var afiliciones = await context.Col_Afiliacion.Where(w => w.LaboralId.Equals(laboral.LaboralId)).ToListAsync();
+                            List<Col_InsumoLaboral> insumos = await context.Col_InsumoLaboral.Where(w => w.LaboralId.Equals(laboral.LaboralId)).ToListAsync();
+                            List<Col_Afiliacion> afiliciones = await context.Col_Afiliacion.Where(w => w.LaboralId.Equals(laboral.LaboralId)).ToListAsync();
                             if (insumos.Count() > 0) context.Col_InsumoLaboral.RemoveRange(insumos);
                             if (afiliciones.Count() > 0)
                             {
@@ -1007,11 +1007,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -1046,7 +1046,7 @@ namespace Colegio.Services
 
         public async Task<ApiCallResult> ActivarPerfil(int personaId)
         {
-            var empleado = await context.Col_Personas.Where(w => w.PersonaId.Equals(personaId)).FirstOrDefaultAsync();
+            Col_Personas empleado = await context.Col_Personas.Where(w => w.PersonaId.Equals(personaId)).FirstOrDefaultAsync();
             empleado.Estado = "A";
             empleado.FechaActualizacion = DateTime.Now;
             context.Col_Personas.Update(empleado);

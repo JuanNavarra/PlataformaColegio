@@ -22,7 +22,7 @@ namespace Colegio.Controllers
         private PermisosCRUD Permisos(string modulo)
         {
             PermisosCRUD permiso = new PermisosCRUD();
-            var permisos = User.Claims
+            System.Collections.Generic.List<System.Security.Claims.Claim> permisos = User.Claims
                         .Where(w => w.Type.Equals(modulo) && w.Value.Contains("Maestro Administrativo")).ToList();
             permiso.PSMAPB = permisos.Where(w => w.Value.Contains("Contratacion")).Any();
             permiso.PMMAPB = permisos.Any();
@@ -31,9 +31,23 @@ namespace Colegio.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult MostrarHorarios()
         {
-            return View();
+            if (User.Identity.IsAuthenticated)
+            {
+                if (Permisos("PermisoSubModulo").PSMAPB || (!Permisos("PermisoSubModulo").PSMAPB && Permisos("PermisoModulo").PMMAPB))
+                {
+                    string modulo = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                    System.Collections.Generic.List<System.Security.Claims.Claim> permisos = Permisos(modulo).PMMAPL;
+                    ViewBag.Leer = permisos.Where(w => w.Value.Contains("Leer")).Any();
+                    ViewBag.Crear = permisos.Where(w => w.Value.Contains("Crear")).Any();
+                    ViewBag.Actualizar = permisos.Where(w => w.Value.Contains("Actualizar")).Any();
+                    ViewBag.Eliminar = permisos.Where(w => w.Value.Contains("Eliminar")).Any();
+                    return View();
+                }
+                return RedirectToAction("Index", "Home");
+            }
+            return RedirectToAction("Index", "Login");
         }
 
         [HttpPost]
@@ -42,7 +56,7 @@ namespace Colegio.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                bool crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
                 if (crear)
                 {
                     dynamic materiaJson = JsonConvert.DeserializeObject(materia);
@@ -51,7 +65,7 @@ namespace Colegio.Controllers
                     _materia.Nombre = materiaJson.Nombre;
                     _materia.Color = materiaJson.Color;
                     _materia.Descripcion = materiaJson.Descripcion;
-                    var result = await service.GuardarMaterias(_materia);
+                    ApiCallResult result = await service.GuardarMaterias(_materia);
                     return Json(result);
                 }
                 else
@@ -71,10 +85,10 @@ namespace Colegio.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                var leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
+                bool leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
                 if (leer)
                 {
-                    var result = await service.MostrarMarterias();
+                    System.Collections.Generic.List<Col_Materias> result = await service.MostrarMarterias();
                     return Json(result);
                 }
                 else
@@ -94,7 +108,7 @@ namespace Colegio.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                bool crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
                 if (crear)
                 {
                     dynamic horarioJson = JsonConvert.DeserializeObject(horario);
@@ -103,7 +117,7 @@ namespace Colegio.Controllers
                     _horario.CursoId = horarioJson.CursoId;
                     _horario.HoraIni = horarioJson.HoraIni;
                     _horario.HoraFin = horarioJson.HoraFin;
-                    var result = await service.AgregarMateriasHorario(_horario);
+                    ApiCallResult result = await service.AgregarMateriasHorario(_horario);
                     return Json(result);
                 }
                 else
@@ -122,10 +136,10 @@ namespace Colegio.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                var leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
+                bool leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
                 if (leer)
                 {
-                    var result = await service.MostrarCursos();
+                    System.Collections.Generic.List<Col_Cursos> result = await service.MostrarCursos();
                     return Json(result);
                 }
                 else
@@ -145,10 +159,33 @@ namespace Colegio.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                var leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
+                bool leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
                 if (leer)
                 {
-                    var result = await service.MostrarHorasMaterias(cursoId);
+                    System.Collections.Generic.List<Horarios> result = await service.MostrarHorasMaterias(cursoId);
+                    return Json(result);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> EliminarHoriorMateria(int horarioId)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                bool eliminar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Eliminar")).Any();
+                if (eliminar)
+                {
+                    ApiCallResult result = await service.EliminarHoriorMateria(horarioId);
                     return Json(result);
                 }
                 else

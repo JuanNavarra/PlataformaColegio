@@ -14,5 +14,6 @@ namespace Colegio.Services.Interfaces
         public Task<List<Col_Cursos>> MostrarCursos();
         public Task<ApiCallResult> AgregarMateriasHorario(Col_Horarios _horario);
         public Task<List<Horarios>> MostrarHorasMaterias(int cursoId);
+        public Task<ApiCallResult> EliminarHoriorMateria(int horarioId);
     }
 }

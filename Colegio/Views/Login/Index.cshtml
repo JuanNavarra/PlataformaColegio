@@ -17,7 +17,7 @@
             {
                 @Html.AntiForgeryToken()
                 <div class="input-group mb-3">
-                    @Html.TextBoxFor(m => m.Usuario, new { @class = "form-control txtbox", placeholder = "Usuario", required = "required" })
+                    @Html.TextBoxFor(m => m.Usuario, new { @class = "form-control txtbox", placeholder = "Usuario", required = "required", id = "user_login"})
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <span class="fas fa-envelope"></span>
@@ -25,7 +25,7 @@
                     </div>
                 </div>
                 <div class="input-group mb-3">
-                    @Html.PasswordFor(m => m.Contrasena, new { @class = "form-control txtbox", placeholder = "Contraseña", required = "required" })
+                    @Html.PasswordFor(m => m.Contrasena, new { @class = "form-control txtbox", placeholder = "Contraseña", required = "required", id = "pass_login" })
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <span class="fas fa-lock"></span>

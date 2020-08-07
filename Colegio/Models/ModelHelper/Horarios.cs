@@ -12,5 +12,7 @@ namespace Colegio.Models.ModelHelper
         public string HoraIni { get; set; }
         public string HoraFin { get; set; }
         public List<string> Intervalo { get; set; }
+        public int Id { get; set; }
+        public int orden { get; set; }
     }
 }

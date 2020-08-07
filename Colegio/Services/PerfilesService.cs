@@ -23,7 +23,7 @@ namespace Colegio.Services
         public async Task<List<Col_Modulos>> CargarModulos()
         {
 
-            var modulos = await context.Col_Modulos
+            List<Col_Modulos> modulos = await context.Col_Modulos
                 .Where(w => w.Estado.Equals("A"))
                 .Select(s => new Col_Modulos
                 {
@@ -35,7 +35,7 @@ namespace Colegio.Services
 
         public async Task<List<Col_SubModulos>> CargarSubModulos(int[] modulos)
         {
-            var subModulos = await context.Col_SubModulos
+            List<Col_SubModulos> subModulos = await context.Col_SubModulos
                 .Where(w => w.Estado.Equals("A") && modulos.Contains(w.ModuloId))
                 .Select(s => new Col_SubModulos
                 {
@@ -54,7 +54,7 @@ namespace Colegio.Services
         {
             try
             {
-                var query = await context.Col_Roles
+                List<Col_Roles> query = await context.Col_Roles
                     .Select(s => new Col_Roles
                     {
                         NombreRol = s.NombreRol,
@@ -78,11 +78,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -119,7 +119,7 @@ namespace Colegio.Services
         {
             try
             {
-                var query = await context.Col_Roles
+                Col_Roles query = await context.Col_Roles
                     .Where(w => w.RolId.Equals(idRol))
                     .Select(s => new Col_Roles
                     {
@@ -139,11 +139,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -182,7 +182,7 @@ namespace Colegio.Services
             {
                 List<ModulosToSubModulos> relaciones = new List<ModulosToSubModulos>();
 
-                var query = await (from t0 in context.Col_Roles
+                List<ModulosToSubModulos> query = await (from t0 in context.Col_Roles
                                    join t1 in context.Col_RolModulos on t0.RolId equals t1.RolId
                                    join t2 in context.Col_Modulos on t1.ModuloId equals t2.ModuloId
                                    join t3 in context.Col_SubModuloModulo on new { t2.ModuloId, t0.RolId } equals new { t3.ModuloId, t3.RolId }
@@ -215,7 +215,7 @@ namespace Colegio.Services
                                    }).ToListAsync();
                 }
 
-                foreach (var item in query)
+                foreach (ModulosToSubModulos item in query)
                 {
                     ModulosToSubModulos relacion = new ModulosToSubModulos();
                     if (!relaciones.Where(w => w.NombreModulo == item.NombreModulo).Any())
@@ -229,14 +229,14 @@ namespace Colegio.Services
                         {
                             string reemplazarModulo = item.PermisoModulo.Replace('\n', ' ');
                             List<string> permisosModulo = reemplazarModulo.Split(',').ToList();
-                            foreach (var temp in permisosModulo)
+                            foreach (string temp in permisosModulo)
                             {
                                 _permisos.Add(temp);
                             }
                         }
                         else
                         {
-                            foreach (var temp in query.Where(w => w.NombreModulo == item.NombreModulo && w.NombreSubModulo != null).ToList())
+                            foreach (ModulosToSubModulos temp in query.Where(w => w.NombreModulo == item.NombreModulo && w.NombreSubModulo != null).ToList())
                             {
                                 ModulosToSubModulos _relacion = new ModulosToSubModulos();
                                 string reemplazarSubModulo = temp.PermisoSubModulo.Replace('\n', ' ');
@@ -259,11 +259,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -300,7 +300,7 @@ namespace Colegio.Services
         {
             try
             {
-                var query = await (from t0 in context.Col_Roles
+                List<UsuariosPerfiles> query = await (from t0 in context.Col_Roles
                                    join t1 in context.Col_Usuarios on t0.RolId equals t1.RolId
                                    join t2 in context.Col_Personas on t1.Id equals t2.UsuarioId
                                    where t0.RolId.Equals(rolId) && t0.Estado.Equals("A")
@@ -319,11 +319,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -374,18 +374,18 @@ namespace Colegio.Services
                 string title = "Error";
                 string message = "Error al eliminar el perfil";
 
-                var query = await context.Col_Roles
+                int query = await context.Col_Roles
                     .Join(context.Col_Usuarios,
                         r => r.RolId,
                         u => u.RolId,
                         (r, u) => new { Col_Roles = r, Col_Usuarios = u })
                     .Where(w => w.Col_Roles.RolId.Equals(rolId)).CountAsync();
-                var usuario = await context.Col_Usuarios.Where(w => w.RolId.Equals(rolId)).ToListAsync();
-                var rol = await context.Col_Roles.Where(w => w.RolId.Equals(rolId)).FirstOrDefaultAsync();
+                List<Col_Usuarios> usuario = await context.Col_Usuarios.Where(w => w.RolId.Equals(rolId)).ToListAsync();
+                Col_Roles rol = await context.Col_Roles.Where(w => w.RolId.Equals(rolId)).FirstOrDefaultAsync();
                 if (op)
                 {
-                    var subModulo = await context.Col_SubModuloModulo.Where(w => w.RolId.Equals(rolId)).ToListAsync();
-                    var modulo = await context.Col_RolModulos.Where(w => w.RolId.Equals(rolId)).ToListAsync();
+                    List<Col_SubModuloModulo> subModulo = await context.Col_SubModuloModulo.Where(w => w.RolId.Equals(rolId)).ToListAsync();
+                    List<Col_RolModulos> modulo = await context.Col_RolModulos.Where(w => w.RolId.Equals(rolId)).ToListAsync();
                     if (query > 0)
                     {
                         context.Col_Usuarios.RemoveRange(usuario);
@@ -404,7 +404,7 @@ namespace Colegio.Services
                 {
                     if (query > 0)
                     {
-                        foreach (var item in usuario)
+                        foreach (Col_Usuarios item in usuario)
                         {
                             item.FechaActualizacion = DateTime.Now;
                             item.Estado = "I";
@@ -427,11 +427,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -472,7 +472,7 @@ namespace Colegio.Services
                 string title = "Error";
                 string message = "Ya existe un rol con este nombre";
 
-                var existeNombre = await context.Col_Roles.Where(w => w.NombreRol.Equals(rolNombre.ToUpper())).AnyAsync();
+                bool existeNombre = await context.Col_Roles.Where(w => w.NombreRol.Equals(rolNombre.ToUpper())).AnyAsync();
                 if (!existeNombre)
                 {
                     Col_Roles rol = new Col_Roles();
@@ -496,7 +496,7 @@ namespace Colegio.Services
 
                     maxId = await context.Col_RolModulos.MaxAsync(m => (int?)m.Id);
                     id = maxId == null ? 1 : maxId + 1;
-                    foreach (var item in modulo)
+                    foreach (Col_RolModulos item in modulo)
                     {
                         Col_RolModulos _rolModulo = new Col_RolModulos();
                         _rolModulo.Id = Convert.ToInt32(id);
@@ -511,8 +511,8 @@ namespace Colegio.Services
                     {
                         maxId = await context.Col_SubModuloModulo.MaxAsync(m => (int?)m.Id);
                         id = maxId == null ? 1 : maxId + 1;
-                        var queryModulo = modulo.Where(w => !subModulo.Where(s => s.ModuloId == w.ModuloId).Any()).ToList();
-                        foreach (var item in queryModulo)
+                        List<Col_RolModulos> queryModulo = modulo.Where(w => !subModulo.Where(s => s.ModuloId == w.ModuloId).Any()).ToList();
+                        foreach (Col_RolModulos item in queryModulo)
                         {
                             Col_SubModuloModulo _subModulo = new Col_SubModuloModulo();
                             _subModulo.Id = Convert.ToInt32(id);
@@ -524,7 +524,7 @@ namespace Colegio.Services
                             id++;
                         }
 
-                        foreach (var item in subModulo)
+                        foreach (Col_SubModuloModulo item in subModulo)
                         {
                             Col_SubModuloModulo _subModulo = new Col_SubModuloModulo();
                             _subModulo.Id = Convert.ToInt32(id);
@@ -551,11 +551,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -595,7 +595,7 @@ namespace Colegio.Services
                 ModulosSelect select = new ModulosSelect();
 
                 #region Primer Tab
-                var query = await (from t0 in context.Col_Roles
+                List<ModulosSelect> query = await (from t0 in context.Col_Roles
                                    join t1 in context.Col_RolModulos on t0.RolId equals t1.RolId
                                    join t2 in context.Col_Modulos on t1.ModuloId equals t2.ModuloId
                                    select new ModulosSelect { ModuloId = t2.ModuloId, Nombre = t2.Nombre, RolId = t0.RolId }).ToListAsync();
@@ -605,7 +605,7 @@ namespace Colegio.Services
                 select.ModulosNoSeleccionado = context.Col_Modulos.Where(w => w.Estado == "A").ToList();
 
                 List<ModulosSelect> subModulos = new List<ModulosSelect>();
-                foreach (var grupo in query.GroupBy(g => g.ModuloId))
+                foreach (IGrouping<int, ModulosSelect> grupo in query.GroupBy(g => g.ModuloId))
                 {
                     ModulosSelect subModulo = new ModulosSelect();
                     subModulo.ModuloId = grupo.Select(s => s.ModuloId).FirstOrDefault();
@@ -630,7 +630,7 @@ namespace Colegio.Services
                                                   Descripcion = t3.Nombre
                                               }).ToListAsync();
 
-                var AllSubModulos = await (from t0 in context.Col_Roles
+                List<ModulosSelect> AllSubModulos = await (from t0 in context.Col_Roles
                                            join t1 in context.Col_RolModulos on t0.RolId equals t1.RolId
                                            join t2 in context.Col_Modulos on t1.ModuloId equals t2.ModuloId
                                            join t3 in context.Col_SubModulos on t2.ModuloId equals t3.ModuloId
@@ -656,11 +656,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -701,7 +701,7 @@ namespace Colegio.Services
                 string title = "Error";
                 string message = "Ya existe un rol con este nombre";
 
-                var existeNombre = await context.Col_Roles.Where(w => w.NombreRol.Equals(rolNombre.ToUpper()) && w.RolId != idRol).AnyAsync();
+                bool existeNombre = await context.Col_Roles.Where(w => w.NombreRol.Equals(rolNombre.ToUpper()) && w.RolId != idRol).AnyAsync();
 
                 if (!existeNombre)
                 {
@@ -710,7 +710,7 @@ namespace Colegio.Services
                     message = "Los datos fueron actualizados correctamente en la plataforma";
 
                     #region Roles
-                    var _rol = await context.Col_Roles.Where(w => w.RolId.Equals(idRol)).FirstOrDefaultAsync();
+                    Col_Roles _rol = await context.Col_Roles.Where(w => w.RolId.Equals(idRol)).FirstOrDefaultAsync();
                     _rol.NombreRol = rolNombre.ToUpper();
                     _rol.Restringir = subModulos.Count() > 0 ? true : false;
                     _rol.FechaActualizacion = DateTime.Now;
@@ -719,13 +719,13 @@ namespace Colegio.Services
                     #endregion
 
                     #region Modulos
-                    var _rolModulos = await context.Col_RolModulos.Where(w => w.RolId.Equals(idRol)).ToListAsync();
+                    List<Col_RolModulos> _rolModulos = await context.Col_RolModulos.Where(w => w.RolId.Equals(idRol)).ToListAsync();
                     context.Col_RolModulos.RemoveRange(_rolModulos);
-                    var maxId = await context.Col_RolModulos.MaxAsync(m => (int?)m.Id);
-                    var id = maxId == null ? 1 : maxId + 1;
+                    int? maxId = await context.Col_RolModulos.MaxAsync(m => (int?)m.Id);
+                    int? id = maxId == null ? 1 : maxId + 1;
                     List<Col_RolModulos> rolModulos = new List<Col_RolModulos>();
 
-                    foreach (var item in modulos)
+                    foreach (Col_RolModulos item in modulos)
                     {
                         Col_RolModulos _rolModulo = new Col_RolModulos();
                         _rolModulo.Id = Convert.ToInt32(id);
@@ -739,16 +739,16 @@ namespace Colegio.Services
                     #endregion
 
                     #region SubModulos
-                    var _subModulos = await context.Col_SubModuloModulo.Where(w => w.RolId.Equals(idRol)).ToListAsync();
+                    List<Col_SubModuloModulo> _subModulos = await context.Col_SubModuloModulo.Where(w => w.RolId.Equals(idRol)).ToListAsync();
                     context.Col_SubModuloModulo.RemoveRange(_subModulos);
                     if (subModulos.Count() > 0)
                     {
                         maxId = await context.Col_SubModuloModulo.MaxAsync(m => (int?)m.Id);
                         id = maxId == null ? 1 : maxId + 1;
-                        var queryModulo = modulos.Where(w => !subModulos.Where(s => s.ModuloId == w.ModuloId).Any()).ToList();
+                        List<Col_RolModulos> queryModulo = modulos.Where(w => !subModulos.Where(s => s.ModuloId == w.ModuloId).Any()).ToList();
                         List<Col_SubModuloModulo> subModuloModulos = new List<Col_SubModuloModulo>();
 
-                        foreach (var item in queryModulo)
+                        foreach (Col_RolModulos item in queryModulo)
                         {
                             Col_SubModuloModulo _subModulo = new Col_SubModuloModulo();
                             _subModulo.Id = Convert.ToInt32(id);
@@ -760,7 +760,7 @@ namespace Colegio.Services
                             id++;
                         }
 
-                        foreach (var item in subModulos)
+                        foreach (Col_SubModuloModulo item in subModulos)
                         {
                             Col_SubModuloModulo _subModulo = new Col_SubModuloModulo();
                             _subModulo.Id = Convert.ToInt32(id);
@@ -789,11 +789,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -828,7 +828,7 @@ namespace Colegio.Services
 
         public async Task<ApiCallResult> ActivarPerfil(int rolId)
         {
-            var rol = await context.Col_Roles.Where(w => w.RolId.Equals(rolId)).FirstOrDefaultAsync();
+            Col_Roles rol = await context.Col_Roles.Where(w => w.RolId.Equals(rolId)).FirstOrDefaultAsync();
             rol.Estado = "A";
             rol.FechaActualizacion = DateTime.Now;
             context.Col_Roles.Update(rol);

@@ -23,7 +23,7 @@ namespace Colegio.Controllers
         private PermisosCRUD Permisos(string modulo)
         {
             PermisosCRUD permiso = new PermisosCRUD();
-            var permisos = User.Claims
+            List<System.Security.Claims.Claim> permisos = User.Claims
                         .Where(w => w.Type.Equals(modulo) && w.Value.Contains("Maestro Administrativo")).ToList();
             permiso.PSMAPB = permisos.Where(w => w.Value.Contains("Perfiles")).Any();
             permiso.PMMAPB = permisos.Any();
@@ -38,11 +38,11 @@ namespace Colegio.Controllers
             {
                 if (Permisos("PermisoSubModulo").PSMAPB || (!Permisos("PermisoSubModulo").PSMAPB && Permisos("PermisoModulo").PMMAPB))
                 {
-                    var registros = await service.MostrarAutorizaciones();
+                    List<Col_Roles> registros = await service.MostrarAutorizaciones();
                     ViewBag.Registros = registros;
 
                     string modulo = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                    var permisos = Permisos(modulo).PMMAPL;
+                    List<System.Security.Claims.Claim> permisos = Permisos(modulo).PMMAPL;
                     ViewBag.Leer = permisos.Where(w => w.Value.Contains("Leer")).Any();
                     ViewBag.Crear = permisos.Where(w => w.Value.Contains("Crear")).Any();
                     ViewBag.Actualizar = permisos.Where(w => w.Value.Contains("Actualizar")).Any();
@@ -61,15 +61,15 @@ namespace Colegio.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                var crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
-                var actualizar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Actualizar")).Any();
+                bool crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                bool actualizar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Actualizar")).Any();
                 if ((crear && idRol == 0) || (actualizar && idRol != 0))
                 {
                     dynamic moduloJson = JsonConvert.DeserializeObject(modulo);
                     dynamic subModuloJson = JsonConvert.DeserializeObject(subModulo);
                     List<Col_RolModulos> modulos = new List<Col_RolModulos>();
                     List<Col_SubModuloModulo> subModulos = new List<Col_SubModuloModulo>();
-                    foreach (var item in moduloJson)
+                    foreach (dynamic item in moduloJson)
                     {
                         Col_RolModulos _modulo = new Col_RolModulos();
                         _modulo.ModuloId = item.ModuloId;
@@ -78,7 +78,7 @@ namespace Colegio.Controllers
                     }
                     if (subModuloJson.Count > 0)
                     {
-                        foreach (var item in subModuloJson)
+                        foreach (dynamic item in subModuloJson)
                         {
                             Col_SubModuloModulo _subModulos = new Col_SubModuloModulo();
                             _subModulos.SubModuloId = item.SubModuloId;
@@ -108,7 +108,7 @@ namespace Colegio.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                var modulos = await service.CargarModulos();
+                List<Col_Modulos> modulos = await service.CargarModulos();
                 return Json(new { result = "ok", data = modulos });
             }
             return RedirectToAction("Index", "Login");
@@ -119,7 +119,7 @@ namespace Colegio.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                var subModulos = await service.CargarSubModulos(modulos);
+                List<Col_SubModulos> subModulos = await service.CargarSubModulos(modulos);
                 return Json(new { result = "ok", data = subModulos });
             }
             return RedirectToAction("Index", "Login");
@@ -131,10 +131,10 @@ namespace Colegio.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                var leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
+                bool leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
                 if (leer)
                 {
-                    var perfil = await service.MostrarDetallePerfil(rolId);
+                    PerfilesViewModel perfil = await service.MostrarDetallePerfil(rolId);
                     return Json(new { result = "ok", data = perfil });
                 }
                 else
@@ -151,10 +151,10 @@ namespace Colegio.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                var eliminar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Eliminar")).Any();
+                bool eliminar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Eliminar")).Any();
                 if (eliminar)
                 {
-                    var result = await service.EliminarPerfiles(rolId, op);
+                    ApiCallResult result = await service.EliminarPerfiles(rolId, op);
                     return Json(result);
                 }
                 else
@@ -174,10 +174,10 @@ namespace Colegio.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                var actualizar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Actualizar")).Any();
+                bool actualizar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Actualizar")).Any();
                 if (actualizar)
                 {
-                    var data = await service.CargaDatosActualizar(rolId);
+                    ModulosSelect data = await service.CargaDatosActualizar(rolId);
                     return Json(new { result = "ok", data });
                 }
                 else
@@ -197,10 +197,10 @@ namespace Colegio.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                var actualizar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Actualizar")).Any();
+                bool actualizar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Actualizar")).Any();
                 if (actualizar)
                 {
-                    var result = await service.ActivarPerfil(rolId);
+                    ApiCallResult result = await service.ActivarPerfil(rolId);
                     return Json(result);
                 }
                 else

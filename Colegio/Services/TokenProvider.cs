@@ -35,14 +35,14 @@ namespace Colegio.Services
         {
             try
             {
-                var user = await contexto.Col_Usuarios
+                Models.Col_Usuarios user = await contexto.Col_Usuarios
                     .Where(w => w.Usuario.Equals(usuario) && w.Estado.Equals("A"))
                     .FirstOrDefaultAsync();
                 if (user == null)
                     return null;
                 if (SHA256(contrasena) == user.Contrasena)
                 {
-                    var query = await (from t0 in contexto.Col_Roles
+                    List<UsuariosPerfiles> query = await (from t0 in contexto.Col_Roles
                                  join t6 in contexto.Col_Usuarios on t0.RolId equals t6.RolId
                                  join t1 in contexto.Col_RolModulos on t0.RolId equals t1.RolId
                                  join t2 in contexto.Col_Modulos on t1.ModuloId equals t2.ModuloId
@@ -75,11 +75,11 @@ namespace Colegio.Services
                     //Authentication successful, Issue Token with user credentials 
                     //Provide the security key which is given in 
                     //Startup.cs ConfigureServices() method 
-                    var key = Encoding.ASCII.GetBytes
+                    byte[] key = Encoding.ASCII.GetBytes
                     ("YourKey-2374-OFFKDI940NG7:56753253-tyuw-5769-0921-kfirox29zoxv");
                     //Generate Token for user 
-                    var claimsData = GetUserClaims(query, user.Usuario);
-                    var JWToken = new JwtSecurityToken(
+                    List<Claim> claimsData = GetUserClaims(query, user.Usuario);
+                    JwtSecurityToken JWToken = new JwtSecurityToken(
                         issuer: "http://localhost:45092/",
                         audience: "http://localhost:45092/",
                         claims: claimsData,
@@ -90,8 +90,8 @@ namespace Colegio.Services
                         (new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                     );
                     string token = new JwtSecurityTokenHandler().WriteToken(JWToken);
-                    var claimsIdentity = new ClaimsIdentity(claimsData, token);
-                    var _usuario = await contexto.Col_Usuarios.Where(w => w.Id.Equals(user.Id)).FirstOrDefaultAsync();
+                    ClaimsIdentity claimsIdentity = new ClaimsIdentity(claimsData, token);
+                    Models.Col_Usuarios _usuario = await contexto.Col_Usuarios.Where(w => w.Id.Equals(user.Id)).FirstOrDefaultAsync();
                     _usuario.UltimoLogin = DateTime.Now;
                     contexto.Col_Usuarios.Update(_usuario);
                     await contexto.SaveChangesAsync();
@@ -106,11 +106,11 @@ namespace Colegio.Services
             catch (DbEntityValidationException e)
             {
                 string err = "";
-                foreach (var eve in e.EntityValidationErrors)
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
                 {
                     Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
-                    foreach (var ve in eve.ValidationErrors)
+                    foreach (DbValidationError ve in eve.ValidationErrors)
                     {
                         err += ve.ErrorMessage;
                         Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
@@ -153,7 +153,7 @@ namespace Colegio.Services
         {
             List<Claim> claims = new List<Claim>();
             claims.Add(new Claim("Usuario", nombre));
-            foreach (var item in user)
+            foreach (UsuariosPerfiles item in user)
             {
                 claims.Add(new Claim("PermisoModulo", $"{item.Modulos}-{item.PermisosModulo ?? "0"}"));
                 claims.Add(new Claim("PermisoSubModulo", $"{item.Modulos}-{item.PermisosSubModulo ?? "0"}-{item.SubModulos ?? "0"}"));
