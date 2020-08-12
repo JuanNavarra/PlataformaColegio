@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -27,5 +28,8 @@ namespace Colegio.Models
         public string Direccion { get; set; }
         public string CorreoPersonal { get; set; }
         public char Progreso { get; set; }
+        [NotMapped]
+        public string Usuario { get; set; }
+
     }
 }

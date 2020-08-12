@@ -1,0 +1,28 @@
+﻿@{
+}
+<div class="row">
+    <div class="col-md-3">
+        <label>Número Documento:</label>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-user"></i></span>
+            </div>
+            <input type="text" autocomplete="off" class="form-control" id="buscar_profesor_horario" onkeypress="return soloNumeros(event);" />
+        </div>
+    </div>
+    <div class="col-md-4">
+        <label>Nombre Profesor:</label>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-user"></i></span>
+            </div>
+            <select class="select2 form-control" id="buscar_nombre_profesor">
+            </select>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-primary btn-block" style="margin-top: 32px;" onclick="buscarProfesor()">
+            Buscar Profesor <i class="fas fa-search" style="margin-left: 22px;"></i>
+        </button>
+    </div>
+</div>

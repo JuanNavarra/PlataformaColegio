@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity.Validation;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Colegio.Models;
 using Colegio.Models.ModelHelper;
@@ -23,7 +24,7 @@ namespace Colegio.Controllers
         private PermisosCRUD Permisos(string modulo)
         {
             PermisosCRUD permiso = new PermisosCRUD();
-            List<System.Security.Claims.Claim> permisos = User.Claims
+            List<Claim> permisos = User.Claims
                         .Where(w => w.Type.Equals(modulo) && w.Value.Contains("Maestro Administrativo")).ToList();
             permiso.PSMAPB = permisos.Where(w => w.Value.Contains("Contratacion")).Any();
             permiso.PMMAPB = permisos.Any();

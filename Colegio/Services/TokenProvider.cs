@@ -2,11 +2,14 @@
 using Colegio.Models.ModelHelper;
 using Colegio.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.Entity.Validation;
+using System.Data.SqlClient;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -19,9 +22,23 @@ namespace Colegio.Services
     public class TokenProvider : ITokenProvider
     {
         private readonly ColegioContext contexto;
-        public TokenProvider(ColegioContext contexto)
+
+        public IConfiguration Configuration { get; }
+        public TokenProvider(ColegioContext contexto, IConfiguration configuration)
         {
             this.contexto = contexto;
+            Configuration = configuration;
+        }
+
+        private UsuariosPerfiles MapToValue(SqlDataReader reader)
+        {
+            return new UsuariosPerfiles()
+            {
+                PermisosModulo = reader["Value2"].ToString(),
+                PermisosSubModulo = reader["Value2"].ToString(),
+                Modulos = reader["Value2"].ToString(),
+                SubModulos = reader["Value2"].ToString(),
+            };
         }
 
         /// <summary>
@@ -42,34 +59,53 @@ namespace Colegio.Services
                     return null;
                 if (SHA256(contrasena) == user.Contrasena)
                 {
+                    //List<UsuariosPerfiles> _usuario = new List<UsuariosPerfiles>();
+                    //using (SqlConnection sql = new SqlConnection(Configuration.GetConnectionString("DefaultConnection")))
+                    //{
+                    //    using (SqlCommand cmd = new SqlCommand("LoginPermisos", sql))
+                    //    {
+                    //        cmd.CommandType = CommandType.StoredProcedure;
+                    //        cmd.Parameters.Add(new SqlParameter("@Id", user.Id));
+                    //        await sql.OpenAsync();
+
+                    //        using (var reader = await cmd.ExecuteReaderAsync())
+                    //        {
+                    //            while (await reader.ReadAsync())
+                    //            {
+                    //                _usuario.Add(MapToValue(reader));
+                    //            }
+                    //        }
+                    //    }
+                    //}
+
                     List<UsuariosPerfiles> query = await (from t0 in contexto.Col_Roles
-                                 join t6 in contexto.Col_Usuarios on t0.RolId equals t6.RolId
-                                 join t1 in contexto.Col_RolModulos on t0.RolId equals t1.RolId
-                                 join t2 in contexto.Col_Modulos on t1.ModuloId equals t2.ModuloId
-                                 join t3 in contexto.Col_SubModuloModulo on new { t2.ModuloId, t0.RolId } equals new { t3.ModuloId, t3.RolId }
-                                 join t4 in contexto.Col_SubModulos on t3.SubModuloId equals t4.SubModuloId into ModSub
-                                 from t5 in ModSub.DefaultIfEmpty()
-                                 where t6.Id.Equals(user.Id)
-                                 select new UsuariosPerfiles
-                                 {
-                                     PermisosModulo = t1.PermisosCrud.Replace("\n", ""),
-                                     PermisosSubModulo = t3.PermisosCrud.Replace("\n", ""),
-                                     Modulos = t2.Nombre,
-                                     SubModulos = t5.Nombre,
-                                 }).ToListAsync();
+                                                          join t6 in contexto.Col_Usuarios on t0.RolId equals t6.RolId
+                                                          join t1 in contexto.Col_RolModulos on t0.RolId equals t1.RolId
+                                                          join t2 in contexto.Col_Modulos on t1.ModuloId equals t2.ModuloId
+                                                          join t3 in contexto.Col_SubModuloModulo on new { t2.ModuloId, t0.RolId } equals new { t3.ModuloId, t3.RolId }
+                                                          join t4 in contexto.Col_SubModulos on t3.SubModuloId equals t4.SubModuloId into ModSub
+                                                          from t5 in ModSub.DefaultIfEmpty()
+                                                          where t6.Id.Equals(user.Id)
+                                                          select new UsuariosPerfiles
+                                                          {
+                                                              PermisosModulo = t1.PermisosCrud.Replace("\n", ""),
+                                                              PermisosSubModulo = t3.PermisosCrud.Replace("\n", ""),
+                                                              Modulos = t2.Nombre,
+                                                              SubModulos = t5.Nombre,
+                                                          }).ToListAsync();
 
                     if (query.Count() == 0)
                     {
                         query = await (from t0 in contexto.Col_Roles
-                                 join t3 in contexto.Col_Usuarios on t0.RolId equals t3.RolId
-                                 join t1 in contexto.Col_RolModulos on t0.RolId equals t1.RolId
-                                 join t2 in contexto.Col_Modulos on t1.ModuloId equals t2.ModuloId
-                                 where t3.Id.Equals(user.Id)
-                                 select new UsuariosPerfiles
-                                 {
-                                     PermisosModulo = t1.PermisosCrud.Replace("\n", ""),
-                                     Modulos = t2.Nombre
-                                 }).ToListAsync();
+                                       join t3 in contexto.Col_Usuarios on t0.RolId equals t3.RolId
+                                       join t1 in contexto.Col_RolModulos on t0.RolId equals t1.RolId
+                                       join t2 in contexto.Col_Modulos on t1.ModuloId equals t2.ModuloId
+                                       where t3.Id.Equals(user.Id)
+                                       select new UsuariosPerfiles
+                                       {
+                                           PermisosModulo = t1.PermisosCrud.Replace("\n", ""),
+                                           Modulos = t2.Nombre
+                                       }).ToListAsync();
                     }
 
                     //Authentication successful, Issue Token with user credentials 

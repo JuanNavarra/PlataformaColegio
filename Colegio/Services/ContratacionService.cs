@@ -433,6 +433,7 @@ namespace Colegio.Services
                                         Id = t2.PersonaId,
                                         Estado = t2.Estado == "A" ? "ACTIVO" : "INACTIVO",
                                         Celular = t2.Celular,
+                                        Perfil = "SIN ACCESO",
                                         Correo = t3.CorreoCorporativo == "" ? t2.CorreoPersonal : t3.CorreoCorporativo,
                                         Creacion = t2.FechaCreacion,
                                         Ingreso = t3.FechaIngreso,

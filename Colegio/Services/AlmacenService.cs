@@ -81,24 +81,29 @@ namespace Colegio.Services
         {
             try
             {
-                List<Col_Suministros> suministros = await context.Col_Suministros.Select(s => new Col_Suministros
-                {
-                    Descripcion = s.Descripcion,
-                    FechaActualizacion = s.FechaActualizacion,
-                    FechaCreacion = s.FechaCreacion,
-                    Nombre = s.Nombre,
-                    Stock = s.Stock,
-                    SuministroId = s.SuministroId,
-                    Talla = s.Talla,
-                    Linea = s.Linea,
-                    TipoSuministro = s.TipoSuministro,
-                    Prestado = context.Col_Prestamos.Where(w => w.SuministroId.Equals(s.SuministroId)).Select(s => s.Cantidad).Sum(),
-                    Total = s.Stock + context.Col_Prestamos.Where(w => w.SuministroId.Equals(s.SuministroId))
-                        .Select(s => s.Cantidad).Sum(),
-                    UltimoPrestamo = context.Col_Prestamos
-                        .Where(w => w.SuministroId.Equals(s.SuministroId))
-                        .OrderByDescending(o => o.FechaPrestamo).Select(s => s.FechaPrestamo).FirstOrDefault()
-                }).ToListAsync();
+                List<Col_Suministros> suministros = await context.Col_Suministros
+                    .Select(s => new Col_Suministros
+                    {
+                        Descripcion = s.Descripcion,
+                        FechaActualizacion = s.FechaActualizacion,
+                        FechaCreacion = s.FechaCreacion,
+                        Nombre = s.Nombre,
+                        Stock = s.Stock,
+                        SuministroId = s.SuministroId,
+                        Talla = s.Talla,
+                        Linea = s.Linea,
+                        TipoSuministro = s.TipoSuministro,
+                        Prestado = context.Col_Prestamos
+                            .Where(w => w.SuministroId.Equals(s.SuministroId))
+                            .Select(s => s.Cantidad).Sum(),
+                        Total = s.Stock + context.Col_Prestamos
+                            .Where(w => w.SuministroId.Equals(s.SuministroId))
+                            .Select(s => s.Cantidad).Sum(),
+                        UltimoPrestamo = context.Col_Prestamos
+                            .Where(w => w.SuministroId.Equals(s.SuministroId))
+                            .OrderByDescending(o => o.FechaPrestamo)
+                            .Select(s => s.FechaPrestamo).FirstOrDefault()
+                    }).ToListAsync();
                 return suministros;
             }
             #region catch
@@ -227,7 +232,8 @@ namespace Colegio.Services
                 if (personaId != null)
                 {
                     List<Col_Suministros> suministros = await context.Col_Suministros.ToListAsync();
-                    List<Col_Suministros> cantidadSuperior = suministros.Where(w => w.Stock < prestamos.Where(p => p.SuministroId == w.SuministroId)
+                    List<Col_Suministros> cantidadSuperior = suministros
+                        .Where(w => w.Stock < prestamos.Where(p => p.SuministroId == w.SuministroId)
                         .Select(s => s.Cantidad).Sum()).ToList();
                     if (cantidadSuperior.Any())
                     {
@@ -319,17 +325,17 @@ namespace Colegio.Services
             try
             {
                 List<Devoluciones> query = await (from t0 in context.Col_Personas
-                                   join t1 in context.Col_Prestamos on t0.PersonaId equals t1.PersonaId
-                                   join t2 in context.Col_Suministros on t1.SuministroId equals t2.SuministroId
-                                   where t0.NumeroDocumento.Equals(documento) && t1.Estado.Equals("A")
-                                   select new Devoluciones
-                                   {
-                                       IdPrestamo = t1.PrestamoId,
-                                       IdPersona = t1.PersonaId,
-                                       Cantidad = t1.Cantidad,
-                                       Insumo = $"{t2.Nombre} - {t2.Linea}",
-                                       SuministroId = t2.SuministroId,
-                                   }).ToListAsync();
+                                                  join t1 in context.Col_Prestamos on t0.PersonaId equals t1.PersonaId
+                                                  join t2 in context.Col_Suministros on t1.SuministroId equals t2.SuministroId
+                                                  where t0.NumeroDocumento.Equals(documento) && t1.Estado.Equals("A")
+                                                  select new Devoluciones
+                                                  {
+                                                      IdPrestamo = t1.PrestamoId,
+                                                      IdPersona = t1.PersonaId,
+                                                      Cantidad = t1.Cantidad,
+                                                      Insumo = $"{t2.Nombre} - {t2.Linea}",
+                                                      SuministroId = t2.SuministroId,
+                                                  }).ToListAsync();
                 IEnumerable<Devoluciones> devoluciones = query
                     .GroupBy(g => g.SuministroId)
                     .Select(s => new Devoluciones

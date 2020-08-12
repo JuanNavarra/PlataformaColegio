@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Colegio.Models;
 using Colegio.Models.ModelHelper;
@@ -22,7 +23,7 @@ namespace Colegio.Controllers
         private PermisosCRUD Permisos(string modulo)
         {
             PermisosCRUD permiso = new PermisosCRUD();
-            List<System.Security.Claims.Claim> permisos = User.Claims
+            List<Claim> permisos = User.Claims
                         .Where(w => w.Type.Equals(modulo) && w.Value.Contains("Maestro Administrativo")).ToList();
             permiso.PSMAPB = permisos.Where(w => w.Value.Contains("Almacen")).Any();
             permiso.PMMAPB = permisos.Any();
@@ -38,7 +39,7 @@ namespace Colegio.Controllers
                 if (Permisos("PermisoSubModulo").PSMAPB || (!Permisos("PermisoSubModulo").PSMAPB && Permisos("PermisoModulo").PMMAPB))
                 {
                     string modulo = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                    List<System.Security.Claims.Claim> permisos = Permisos(modulo).PMMAPL;
+                    List<Claim> permisos = Permisos(modulo).PMMAPL;
                     ViewBag.Leer = permisos.Where(w => w.Value.Contains("Leer")).Any();
                     ViewBag.Crear = permisos.Where(w => w.Value.Contains("Crear")).Any();
                     ViewBag.Actualizar = permisos.Where(w => w.Value.Contains("Actualizar")).Any();

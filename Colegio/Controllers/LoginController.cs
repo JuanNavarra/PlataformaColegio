@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using System.Data.Entity.Validation;
 using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace Colegio.Controllers
 {
@@ -45,7 +46,7 @@ namespace Colegio.Controllers
         {
             try
             {
-                System.Security.Claims.ClaimsIdentity userToken = await tokenProvider.LoginUser(user.Usuario.Trim(), user.Contrasena);
+                ClaimsIdentity userToken = await tokenProvider.LoginUser(user.Usuario.Trim(), user.Contrasena);
                 if (userToken != null)
                 {
                     //Save token in session object

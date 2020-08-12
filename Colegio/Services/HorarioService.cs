@@ -19,6 +19,7 @@ namespace Colegio.Services
             this.context = context;
         }
 
+        #region Horarios
         public async Task<ApiCallResult> GuardarMaterias(Col_Materias materia)
         {
             try
@@ -77,9 +78,31 @@ namespace Colegio.Services
             #endregion  
         }
 
-        public async Task<List<Col_Materias>> MostrarMarterias()
+        public async Task<List<Col_Materias>> MostrarMarterias(int? cursoId)
         {
-            List<Col_Materias> materias = await context.Col_Materias.ToListAsync();
+            List<Col_Materias> materias = new List<Col_Materias>();
+            if (cursoId == null) materias = await context.Col_Materias.ToListAsync();
+            else
+            {
+                var _materias = await context.Col_Materias
+                    .Join(context.Col_Horarios,
+                        m => m.MateriaId,
+                        h => h.MateriaId,
+                        (m, h) => new { Col_Materias = m, Col_Horarios = h })
+                    .Where(w => w.Col_Horarios.CursoId == cursoId)
+                    .Select(s => new Col_Materias
+                    {
+                        MateriaId = s.Col_Materias.MateriaId,
+                        Nombre = s.Col_Materias.Nombre
+                    }).ToListAsync();
+                foreach (var item in _materias.GroupBy(g => g.MateriaId))
+                {
+                    Col_Materias _materia = new Col_Materias();
+                    _materia.MateriaId = item.Select(s => s.MateriaId).FirstOrDefault();
+                    _materia.Nombre = item.Select(s => s.Nombre).FirstOrDefault();
+                    materias.Add(_materia);
+                }
+            }
             return materias.OrderBy(o => o.Nombre).ToList();
         }
 
@@ -113,22 +136,27 @@ namespace Colegio.Services
                     List<List<string>> rangos = horarioMaterias
                         .Where(w => w.HoraIni.Contains(_horario.HoraIni.Substring(0, 1)))
                         .Select(s => s.Intervalo).ToList();
-                    foreach (List<string> item in rangos)
+                    foreach (List<string> _rango in rangos)
                     {
-                        int numero = item[i].Contains("10") || item[i].Contains("11") || (item[i].Contains("PM") && item[i].Contains("12")) ?
-                                     Convert.ToInt32(item[i].Substring(2, 2) + item[i].Substring(5, 2)) :
-                                     item[i].Contains("PM") && !item[i].Contains("12") ?
-                                     Convert.ToInt32(((Convert.ToInt32(item[i].Substring(2, 1)) + 12).ToString() + item[i].Substring(4, 2))) :
-                                     Convert.ToInt32(item[i].Substring(2, 1) + item[i].Substring(4, 2));
-                        bool pregunta = menor <= numero && numero <= mayor;
-                        if (pregunta)
+                        int j = 0;
+                        foreach (var item in _rango)
                         {
-                            return new ApiCallResult
+                            int numero = item.Contains("10") || item.Contains("11") || (item.Contains("PM") && item.Contains("12")) ?
+                                         Convert.ToInt32(item.Substring(2, 2) + item.Substring(5, 2)) :
+                                         item.Contains("PM") && !item.Contains("12") ?
+                                         Convert.ToInt32(((Convert.ToInt32(item.Substring(2, 1)) + 12).ToString() + item.Substring(4, 2))) :
+                                         Convert.ToInt32(item.Substring(2, 1) + item.Substring(4, 2));
+                            bool pregunta = menor <= numero && numero <= mayor;
+                            if (pregunta)
                             {
-                                Status = false,
-                                Title = "Error",
-                                Message = $"Solo puede insertar una mateteria en estas horas"
-                            };
+                                return new ApiCallResult
+                                {
+                                    Status = false,
+                                    Title = "Error",
+                                    Message = $"Solo puede insertar una mateteria en estas horas"
+                                };
+                            }
+                            j++;
                         }
                         i++;
                     }
@@ -202,17 +230,17 @@ namespace Colegio.Services
                 List<Horarios> _horarios = new List<Horarios>();
 
                 List<Horarios> query = await (from t0 in context.Col_Cursos
-                                   join t1 in context.Col_Horarios on t0.CursoId equals t1.CursoId
-                                   join t2 in context.Col_Materias on t1.MateriaId equals t2.MateriaId
-                                   where t0.CursoId.Equals(cursoId)
-                                   select new Horarios
-                                   {
-                                       Color = t2.Color,
-                                       HoraFin = t1.HoraFin,
-                                       HoraIni = t1.HoraIni,
-                                       Materia = t2.Nombre,
-                                       Id = t1.HorarioId,
-                                   }).ToListAsync();
+                                              join t1 in context.Col_Horarios on t0.CursoId equals t1.CursoId
+                                              join t2 in context.Col_Materias on t1.MateriaId equals t2.MateriaId
+                                              where t0.CursoId.Equals(cursoId)
+                                              select new Horarios
+                                              {
+                                                  Color = t2.Color,
+                                                  HoraFin = t1.HoraFin,
+                                                  HoraIni = t1.HoraIni,
+                                                  Materia = t2.Nombre,
+                                                  Id = t1.HorarioId,
+                                              }).ToListAsync();
 
                 foreach (Horarios item in query)
                 {
@@ -400,5 +428,239 @@ namespace Colegio.Services
             }
             #endregion  
         }
+        #endregion
+
+        #region Enlaces
+        public async Task<List<Col_Personas>> CargarProfesores()
+        {
+            var profesores = await context.Col_Personas
+                .Join(context.Col_Laborales,
+                    p => p.PersonaId,
+                    l => l.PersonaId,
+                    (p, l) => new { Col_Personas = p, Col_Laborales = l })
+                .Where(w => w.Col_Laborales.NombreCargo.Equals("profesor") && w.Col_Personas.Estado.Equals("A")
+                             && w.Col_Personas.UsuarioId != -1)
+                .Select(s => new Col_Personas
+                {
+                    PrimerNombre = $"{s.Col_Personas.PrimerNombre} {s.Col_Personas.SegundoNombre} " +
+                                   $"{s.Col_Personas.PrimerApellido} {s.Col_Personas.SegundoApellido}",
+                    PersonaId = s.Col_Personas.PersonaId,
+                }).ToListAsync();
+            return profesores;
+        }
+
+        public async Task<Horarios> MostrarHorarios(int busqueda)
+        {
+            Col_Personas profesores = await context.Col_Personas
+                    .Join(context.Col_Laborales,
+                        p => p.PersonaId,
+                        l => l.PersonaId,
+                        (p, l) => new { Col_Personas = p, Col_Laborales = l })
+                    .Where(w => w.Col_Laborales.NombreCargo.Equals("profesor") && w.Col_Personas.Estado.Equals("A")
+                                    && w.Col_Personas.UsuarioId != -1
+                                    && (w.Col_Personas.PersonaId.Equals(busqueda) || w.Col_Personas.NumeroDocumento.Equals(busqueda.ToString())))
+                    .Select(s => new Col_Personas
+                    {
+                        PersonaId = s.Col_Personas.PersonaId,
+                    }).FirstOrDefaultAsync();
+
+            if (profesores != null)
+            {
+                Horarios horarios = new Horarios();
+                horarios.Profesor = await CargarProfesorEspecifico(profesores);
+                horarios.Cursos = await MostrarCursos();
+                return horarios;
+            }
+            return null;
+        }
+
+        private async Task<Col_Personas> CargarProfesorEspecifico(Col_Personas persona)
+        {
+            var profesor = await (from t0 in context.Col_Usuarios
+                                  join t1 in context.Col_Personas on t0.Id equals t1.UsuarioId
+                                  join t2 in context.Col_Laborales on t1.PersonaId equals t2.PersonaId
+                                  where t1.NumeroDocumento.Equals(persona.NumeroDocumento) || t1.PersonaId.Equals(persona.PersonaId)
+                                        && t2.NombreCargo.Equals("profesor")
+                                  select new Col_Personas
+                                  {
+                                      NumeroDocumento = t1.NumeroDocumento,
+                                      CorreoPersonal = string.IsNullOrEmpty(t2.CorreoCorporativo) ? t1.CorreoPersonal : t2.CorreoCorporativo,
+                                      PrimerNombre = $"{t1.PrimerNombre} {t1.PrimerApellido} {t1.SegundoApellido}",
+                                      Usuario = t0.Usuario,
+                                  }).FirstOrDefaultAsync();
+            return profesor;
+        }
+
+        public async Task<List<Col_Horarios>> MostrarDiasSemana(int materiaId, int cursoId)
+        {
+            try
+            {
+                var diasSemana = new Dictionary<string, string>
+                {
+                    ["l"] = "Lunes",
+                    ["m"] = "Martes",
+                    ["x"] = "Miércoles",
+                    ["j"] = "Juéves",
+                    ["v"] = "Viernes",
+                    ["s"] = "Sábado",
+                };
+                var _dias = await (from t0 in context.Col_Materias
+                                   join t1 in context.Col_Horarios on t0.MateriaId equals t1.MateriaId
+                                   join t2 in context.Col_Cursos on t1.CursoId equals t2.CursoId
+                                   where t2.CursoId == cursoId && t0.MateriaId == materiaId
+                                   select new Col_Horarios
+                                   {
+                                       HorarioId = t1.HorarioId,
+                                       HoraIni = t1.HoraIni,
+                                   }).ToListAsync();
+
+                List<Col_Horarios> dias = new List<Col_Horarios>();
+                foreach (var item in _dias.GroupBy(g => g.HoraIni.Substring(0, 1)))
+                {
+                    Col_Horarios dia = new Col_Horarios();
+                    dia.HorarioId = item.Select(s => s.HorarioId).FirstOrDefault();
+                    dia.Dia = diasSemana.Where(w => w.Key.StartsWith(item.Select(s => s.HoraIni.Substring(0, 1)).FirstOrDefault()))
+                        .Select(s => s.Value).FirstOrDefault();
+                    dias.Add(dia);
+                }
+                return dias.OrderBy(o => o.Dia).ToList();
+            }
+            #region catch
+            catch (DbEntityValidationException e)
+            {
+                string err = "";
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
+                {
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (DbValidationError ve in eve.ValidationErrors)
+                    {
+                        err += ve.ErrorMessage;
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+                return null;
+            }
+
+            catch (Exception e)
+            {
+                string err = "";
+                if (e.InnerException != null)
+                {
+                    if (e.InnerException.Message != null)
+                    {
+                        err = (e.InnerException.Message);
+                        if (e.InnerException.InnerException != null)
+                        {
+                            err += e.InnerException.InnerException.Message;
+                        }
+                    }
+                }
+                else
+                {
+                    err = (e.Message);
+                }
+                return null;
+            }
+            #endregion  
+        }
+
+        public async Task<List<Horarios>> MostrarHorarios(string dia, int materiaId, int cursoId)
+        {
+            try
+            {
+                var horas = new Dictionary<string, string>
+                {
+                    ["6_30-AM"] = "6:30 AM",
+                    ["7_00-AM"] = "7:00 AM",
+                    ["7_30-AM"] = "7:30 AM",
+                    ["8_00-AM"] = "8:00 AM",
+                    ["8_30-AM"] = "8:30 AM",
+                    ["9_00-AM"] = "9:00 AM",
+                    ["9_30-AM"] = "9:30 AM",
+                    ["10_00-AM"] = "10:00 AM",
+                    ["10_30-AM"] = "10:30 AM",
+                    ["11_00-AM"] = "11:00 AM",
+                    ["11_30-AM"] = "11:30 AM",
+                    ["12_00-PM"] = "12:00 PM",
+                    ["12_30-PM"] = "12:30 PM",
+                    ["1_00-PM"] = "1:00 PM",
+                    ["1_30-PM"] = "1:30 PM",
+                    ["2_00-PM"] = "2:00 PM",
+                    ["2_30-PM"] = "2:30 PM",
+                    ["3_00-PM"] = "3:00 PM",
+                    ["3_30-PM"] = "3:30 PM",
+                    ["4_00-PM"] = "4:00 PM",
+                    ["4_30-PM"] = "4:30 PM",
+                    ["5_00-PM"] = "5:00 PM",
+                    ["5_30-PM"] = "5:30 PM",
+                    ["6_00-PM"] = "6:00 PM",
+                };
+                dia = dia.Equals("Miércoles") ? "x" : dia;
+                var _horarios = await (from t0 in context.Col_Cursos
+                                       join t1 in context.Col_Horarios on t0.CursoId equals t1.CursoId
+                                       join t2 in context.Col_Materias on t1.MateriaId equals t2.MateriaId
+                                       where t0.CursoId == cursoId && t2.MateriaId == materiaId
+                                        && t1.HoraIni.StartsWith(dia.Substring(0, 1))
+                                       select new Horarios
+                                       {
+                                           Curso = t2.Nombre,
+                                           Materia = t2.Nombre,
+                                           HoraFin = t1.HoraFin,
+                                           HoraIni = t1.HoraIni,
+                                       }).ToListAsync();
+                List<Horarios> horarios = new List<Horarios>();
+                foreach (var temp in _horarios)
+                {
+                    Horarios _horario = new Horarios();
+                    _horario.Id = temp.Id;
+                    _horario.Horario = ($" {horas.Where(w => w.Key.Contains(temp.HoraIni.Substring(2))).Select(s => s.Value).FirstOrDefault()} -" +
+                                        $" {horas.Where(w => w.Key.Contains(temp.HoraFin.Substring(2))).Select(s => s.Value).FirstOrDefault()}");
+                    horarios.Add(_horario);
+                }
+                return horarios;
+            }
+            #region catch
+            catch (DbEntityValidationException e)
+            {
+                string err = "";
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
+                {
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (DbValidationError ve in eve.ValidationErrors)
+                    {
+                        err += ve.ErrorMessage;
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+                return null;
+            }
+
+            catch (Exception e)
+            {
+                string err = "";
+                if (e.InnerException != null)
+                {
+                    if (e.InnerException.Message != null)
+                    {
+                        err = (e.InnerException.Message);
+                        if (e.InnerException.InnerException != null)
+                        {
+                            err += e.InnerException.InnerException.Message;
+                        }
+                    }
+                }
+                else
+                {
+                    err = (e.Message);
+                }
+                return null;
+            }
+            #endregion  
+        }
+        #endregion
     }
 }

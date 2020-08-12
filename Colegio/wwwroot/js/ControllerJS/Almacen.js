@@ -367,7 +367,9 @@ function mostrarInfoSuministros() {
                     ca += "</td>"
                     ca += "<td style='text-align:center;background-color:#d9edf7;color:#31708f'>" + item.prestado + "</td>"
                     ca += "<td style='text-align:center;background-color:#d9edf7;color:#31708f'>" + item.stock + "</td>"
-                    ca += "<td style='text-align:center;background-color:#d9edf7;color:#31708f'>" + item.total + "</td>"
+                    ca += "<td style='text-align:center;background-color:#d9edf7;color:#31708f'>"
+                    ca += item.total == 0 ? item.stock : item.total
+                    ca += "</td>"
                     ca += "<td style='text-align:center'>"
                     ca += "<a href='#' onclick=\"eliminarSuministros('" + item.suministroId + "');\"><i class='fas fa-trash'></i></a>"
                     ca += item.stock != 0 ? "<a href='#' style='margin-left: -32px;' onclick=\"vaciarStock('" + item.suministroId + "');\"><i class='far fa-folder-open'></i></a>" : ""

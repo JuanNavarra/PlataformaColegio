@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,5 +14,7 @@ namespace Colegio.Models
         public int PersonaId { get; set; }
         public string HoraIni { get; set; }
         public string HoraFin { get; set; }
+        [NotMapped]
+        public string Dia { get; set; }
     }
 }

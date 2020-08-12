@@ -4,8 +4,10 @@ using Colegio.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity.Validation;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Colegio.Controllers
@@ -30,6 +32,7 @@ namespace Colegio.Controllers
             return permiso;
         }
 
+        #region Horarios
         [HttpGet]
         public IActionResult MostrarHorarios()
         {
@@ -38,7 +41,7 @@ namespace Colegio.Controllers
                 if (Permisos("PermisoSubModulo").PSMAPB || (!Permisos("PermisoSubModulo").PSMAPB && Permisos("PermisoModulo").PMMAPB))
                 {
                     string modulo = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
-                    System.Collections.Generic.List<System.Security.Claims.Claim> permisos = Permisos(modulo).PMMAPL;
+                    List<Claim> permisos = Permisos(modulo).PMMAPL;
                     ViewBag.Leer = permisos.Where(w => w.Value.Contains("Leer")).Any();
                     ViewBag.Crear = permisos.Where(w => w.Value.Contains("Crear")).Any();
                     ViewBag.Actualizar = permisos.Where(w => w.Value.Contains("Actualizar")).Any();
@@ -80,7 +83,7 @@ namespace Colegio.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> MostrarMarterias()
+        public async Task<IActionResult> MostrarMarterias(int? cursoId)
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -88,7 +91,7 @@ namespace Colegio.Controllers
                 bool leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
                 if (leer)
                 {
-                    System.Collections.Generic.List<Col_Materias> result = await service.MostrarMarterias();
+                    List<Col_Materias> result = await service.MostrarMarterias(cursoId);
                     return Json(result);
                 }
                 else
@@ -162,7 +165,7 @@ namespace Colegio.Controllers
                 bool leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
                 if (leer)
                 {
-                    System.Collections.Generic.List<Horarios> result = await service.MostrarHorasMaterias(cursoId);
+                    List<Horarios> result = await service.MostrarHorasMaterias(cursoId);
                     return Json(result);
                 }
                 else
@@ -198,5 +201,114 @@ namespace Colegio.Controllers
                 return RedirectToAction("Index", "Login");
             }
         }
+        #endregion
+
+        #region Enlaces
+        [HttpGet]
+        public IActionResult MostrarEnlaces()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                if (Permisos("PermisoSubModulo").PSMAPB || (!Permisos("PermisoSubModulo").PSMAPB && Permisos("PermisoModulo").PMMAPB))
+                {
+                    return View();
+                }
+                return RedirectToAction("Index", "Home");
+            }
+            return RedirectToAction("Index", "Login");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MostrarHorariosProfesor(int busqueda)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                bool leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
+                if (leer)
+                {
+                    Horarios result = await service.MostrarHorarios(busqueda);
+                    return Json(result);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CargarProfesores()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                bool leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
+                if (leer)
+                {
+                    List<Col_Personas> result = await service.CargarProfesores();
+                    return Json(result);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MostrarDiasSemana(int materiaId, int cursoId)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                bool leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
+                if (leer)
+                {
+                    List<Col_Horarios> result = await service.MostrarDiasSemana(materiaId, cursoId);
+                    return Json(result);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MostrarHorariosForm(string dia, int materiaId, int cursoId)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                bool leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
+                if (leer)
+                {
+                    List<Horarios> result = await service.MostrarHorarios(dia, materiaId, cursoId);
+                    return Json(result);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        }
+        #endregion
     }
 }
