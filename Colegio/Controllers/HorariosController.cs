@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity.Validation;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -297,6 +298,52 @@ namespace Colegio.Controllers
                 if (leer)
                 {
                     List<Horarios> result = await service.MostrarHorarios(dia, materiaId, cursoId);
+                    return Json(result);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AgregarEnlaceProfesorHorario(int idHorario, string documento)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                bool crear = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Crear")).Any();
+                if (crear)
+                {
+                    ApiCallResult result = await service.AgregarEnlaceProfesorHorario(idHorario, documento);
+                    return Json(result);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MostrarEnlaceProfesorHorario(string documento)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                bool leer = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Leer")).Any();
+                if (leer)
+                {
+                    List<Horarios> result = await service.MostrarEnlaceProfesorHorario(documento);
                     return Json(result);
                 }
                 else

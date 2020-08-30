@@ -9,7 +9,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-user"></i></span>
                     </div>
-                    <select class="select2 form-control" id="nombre_curso">
+                    <select class="select2 form-control enlace-horario" id="nombre_curso">
                     </select>
                 </div>
             </div>
@@ -19,7 +19,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-user"></i></span>
                     </div>
-                    <select class="select2 form-control" id="nombre_materia" disabled>
+                    <select class="select2 form-control enlace-horario" id="nombre_materia" disabled>
                     </select>
                 </div>
             </div>
@@ -29,7 +29,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-user"></i></span>
                     </div>
-                    <select class="select2 form-control" id="dia_semana" disabled>
+                    <select class="select2 form-control enlace-horario" id="dia_semana" disabled>
                     </select>
                 </div>
             </div>
@@ -39,12 +39,15 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-user"></i></span>
                     </div>
-                    <select class="select2 form-control" id="horario_inicial_final" disabled>
+                    <select class="select2 form-control enlace-horario" id="horario_inicial_final" disabled>
                     </select>
                 </div>
             </div>
             <div class="col-md-2">
-                <button class="btn btn-primary" style="margin-top:14%;" disabled id="btn_agregar_materia_profesor">
+                <button class="btn btn-primary" 
+                        style="margin-top:14%;" disabled 
+                        id="btn_agregar_materia_profesor"
+                        onclick="agregarHorario();">
                     <span class="info-box-icon bg-primary" style="width: 54px; margin-top: 4px;"><i class="fas fa-plus"></i></span>
                 </button>
             </div>

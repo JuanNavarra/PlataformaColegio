@@ -21,5 +21,6 @@ namespace Colegio.Models.ModelHelper
         public string Horario { get; set; }
         public List<Horarios> horarios { get; set; }
         public List<Col_Cursos> Cursos { get; set; }
+        public string Dia { get; set; }
     }
 }

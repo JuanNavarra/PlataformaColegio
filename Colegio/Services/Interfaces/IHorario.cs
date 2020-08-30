@@ -19,5 +19,7 @@ namespace Colegio.Services.Interfaces
         public Task<Horarios> MostrarHorarios(int busqueda);
         public Task<List<Col_Horarios>> MostrarDiasSemana(int materiaId, int cursoId);
         public Task<List<Horarios>> MostrarHorarios(string dia, int materiaId, int cursoId);
+        public Task<ApiCallResult> AgregarEnlaceProfesorHorario(int idHorario, string documento);
+        public Task<List<Horarios>> MostrarEnlaceProfesorHorario(string documento);
     }
 }

@@ -55,13 +55,13 @@
             <div class="card-body" id="div_horarios_enlazados" style="display:none;">
                 @await Html.PartialAsync("_ProfesoresEnlaces")
             </div>
-            <div class="card-body" id="formulario_horarios_disponibles" style="display:none;">
+            <div class="card-header" id="formulario_horarios_disponibles" style="display:none;">
                 @await Html.PartialAsync("_FormularioHorarioDisponible")
             </div>
             <div class="card-body scrollbar" id="div_table_horarios_asignados" style="display:none">
                 <div class="row overflow">
                     <div class="card-body">
-                        <table id="tabla_horarios_profesores" class="table table-bordered" style="text-align:center">
+                        <table id="tabla_horarios_profesores" class="table table-bordered table-striped" style="text-align:center">
                             <thead>
                                 <tr>
                                     <th>#</th>
