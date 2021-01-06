@@ -2,6 +2,7 @@
 using Colegio.Models;
 using Colegio.Models.ModelHelper;
 using Colegio.Services.Interfaces;
+using Colegio.Utilities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -495,15 +496,7 @@ namespace Colegio.Services
         {
             try
             {
-                var diasSemana = new Dictionary<string, string>
-                {
-                    ["l"] = "Lunes",
-                    ["m"] = "Martes",
-                    ["x"] = "Miércoles",
-                    ["j"] = "Juéves",
-                    ["v"] = "Viernes",
-                    ["s"] = "Sábado",
-                };
+                var diasSemana = Diccionarios.MostrarDias();
                 var _dias = await (from t0 in context.Col_Materias
                                    join t1 in context.Col_Horarios on t0.MateriaId equals t1.MateriaId
                                    join t2 in context.Col_Cursos on t1.CursoId equals t2.CursoId
@@ -570,33 +563,7 @@ namespace Colegio.Services
         {
             try
             {
-                var horas = new Dictionary<string, string>
-                {
-                    ["6_30-AM"] = "6:30 AM",
-                    ["7_00-AM"] = "7:00 AM",
-                    ["7_30-AM"] = "7:30 AM",
-                    ["8_00-AM"] = "8:00 AM",
-                    ["8_30-AM"] = "8:30 AM",
-                    ["9_00-AM"] = "9:00 AM",
-                    ["9_30-AM"] = "9:30 AM",
-                    ["10_00-AM"] = "10:00 AM",
-                    ["10_30-AM"] = "10:30 AM",
-                    ["11_00-AM"] = "11:00 AM",
-                    ["11_30-AM"] = "11:30 AM",
-                    ["12_00-PM"] = "12:00 PM",
-                    ["12_30-PM"] = "12:30 PM",
-                    ["1_00-PM"] = "1:00 PM",
-                    ["1_30-PM"] = "1:30 PM",
-                    ["2_00-PM"] = "2:00 PM",
-                    ["2_30-PM"] = "2:30 PM",
-                    ["3_00-PM"] = "3:00 PM",
-                    ["3_30-PM"] = "3:30 PM",
-                    ["4_00-PM"] = "4:00 PM",
-                    ["4_30-PM"] = "4:30 PM",
-                    ["5_00-PM"] = "5:00 PM",
-                    ["5_30-PM"] = "5:30 PM",
-                    ["6_00-PM"] = "6:00 PM",
-                };
+                var horas = Diccionarios.MostrarHoras();
                 dia = dia.Equals("Miércoles") ? "x" : dia;
                 var _horarios = await (from t0 in context.Col_Cursos
                                        join t1 in context.Col_Horarios on t0.CursoId equals t1.CursoId
@@ -666,15 +633,19 @@ namespace Colegio.Services
         {
             try
             {
+                Dictionary<string, string> hora = Diccionarios.MostrarMilitar();
+
                 bool exiteProfesor = await context.Col_Horarios
                     .Where(w => w.HorarioId == idHorario && w.PersonaId != 0)
                     .AnyAsync();
+
                 if (!exiteProfesor)
                 {
                     var horario = await context.Col_Horarios
                         .Where(w => w.HorarioId == idHorario)
                         .FirstOrDefaultAsync();
                     horario.PersonaId = (await context.Col_Personas.Where(w => w.NumeroDocumento == documento).FirstOrDefaultAsync()).PersonaId;
+
                     context.Col_Horarios.Update(horario);
                     await context.SaveChangesAsync();
                     return new ApiCallResult
@@ -739,42 +710,8 @@ namespace Colegio.Services
         {
             try
             {
-                var horas = new Dictionary<string, string>
-                {
-                    ["6_30-AM"] = "6:30 AM",
-                    ["7_00-AM"] = "7:00 AM",
-                    ["7_30-AM"] = "7:30 AM",
-                    ["8_00-AM"] = "8:00 AM",
-                    ["8_30-AM"] = "8:30 AM",
-                    ["9_00-AM"] = "9:00 AM",
-                    ["9_30-AM"] = "9:30 AM",
-                    ["10_00-AM"] = "10:00 AM",
-                    ["10_30-AM"] = "10:30 AM",
-                    ["11_00-AM"] = "11:00 AM",
-                    ["11_30-AM"] = "11:30 AM",
-                    ["12_00-PM"] = "12:00 PM",
-                    ["12_30-PM"] = "12:30 PM",
-                    ["1_00-PM"] = "1:00 PM",
-                    ["1_30-PM"] = "1:30 PM",
-                    ["2_00-PM"] = "2:00 PM",
-                    ["2_30-PM"] = "2:30 PM",
-                    ["3_00-PM"] = "3:00 PM",
-                    ["3_30-PM"] = "3:30 PM",
-                    ["4_00-PM"] = "4:00 PM",
-                    ["4_30-PM"] = "4:30 PM",
-                    ["5_00-PM"] = "5:00 PM",
-                    ["5_30-PM"] = "5:30 PM",
-                    ["6_00-PM"] = "6:00 PM",
-                };
-                var diasSemana = new Dictionary<string, string>
-                {
-                    ["l"] = "Lunes",
-                    ["m"] = "Martes",
-                    ["x"] = "Miércoles",
-                    ["j"] = "Juéves",
-                    ["v"] = "Viernes",
-                    ["s"] = "Sábado",
-                };
+                var horas = Diccionarios.MostrarHoras();
+                var diasSemana = Diccionarios.MostrarDias();
                 var _horarios = await (from t0 in context.Col_Cursos
                                        join t1 in context.Col_Horarios on t0.CursoId equals t1.CursoId
                                        join t2 in context.Col_Materias on t1.MateriaId equals t2.MateriaId
@@ -786,6 +723,7 @@ namespace Colegio.Services
                                            Materia = t2.Nombre,
                                            HoraFin = t1.HoraFin,
                                            HoraIni = t1.HoraIni,
+                                           Id = t1.HorarioId
                                        }).ToListAsync();
                 List<Horarios> horarios = new List<Horarios>();
                 foreach (var temp in _horarios)
@@ -796,12 +734,68 @@ namespace Colegio.Services
                         Curso = temp.Curso,
                         Materia = temp.Materia,
                         Dia = diasSemana.Where(w => w.Key.StartsWith(temp.HoraIni.Substring(0, 1))).Select(s => s.Value).FirstOrDefault(),
-                        Horario = ($" {horas.Where(w => w.Key.Contains(temp.HoraIni.Substring(2))).Select(s => s.Value).FirstOrDefault()} -" +
-                                        $" {horas.Where(w => w.Key.Contains(temp.HoraFin.Substring(2))).Select(s => s.Value).FirstOrDefault()}")
+                        Horario = $" {horas.Where(w => w.Key.Contains(temp.HoraIni[2..])).Select(s => s.Value).FirstOrDefault()} -" +
+                                        $" {horas.Where(w => w.Key.Contains(temp.HoraFin[2..])).Select(s => s.Value).FirstOrDefault()}"
                     };
                     horarios.Add(_horario);
                 }
                 return horarios.OrderBy(o => o.Dia).ThenBy(t => t.Horario).ToList();
+            }
+            #region catch
+            catch (DbEntityValidationException e)
+            {
+                string err = "";
+                foreach (DbEntityValidationResult eve in e.EntityValidationErrors)
+                {
+                    Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    foreach (DbValidationError ve in eve.ValidationErrors)
+                    {
+                        err += ve.ErrorMessage;
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
+                    }
+                }
+                return null;
+            }
+
+            catch (Exception e)
+            {
+                string err = "";
+                if (e.InnerException != null)
+                {
+                    if (e.InnerException.Message != null)
+                    {
+                        err = (e.InnerException.Message);
+                        if (e.InnerException.InnerException != null)
+                        {
+                            err += e.InnerException.InnerException.Message;
+                        }
+                    }
+                }
+                else
+                {
+                    err = (e.Message);
+                }
+                return null;
+            }
+            #endregion  
+        }
+
+        public async Task<ApiCallResult> EliminarEnlaces(int enlaceId)
+        {
+            try
+            {
+                Col_Horarios horario = await context.Col_Horarios.Where(w => w.HorarioId == enlaceId).FirstOrDefaultAsync();
+                horario.PersonaId = 0;
+                context.Col_Horarios.Update(horario);
+                await context.SaveChangesAsync();
+                return new ApiCallResult
+                {
+                    Status = true,
+                    Title = "Exito",
+                    Message = "El horario ha sido elminado con exito"
+                };
             }
             #region catch
             catch (DbEntityValidationException e)

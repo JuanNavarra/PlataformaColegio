@@ -67,7 +67,6 @@ function mostrarMaterias() {
     })
 }
 
-
 function guardarMaterias(color) {
     if (validarCampos("materia-color")) {
         var materiaObj = new Object({

@@ -356,6 +356,29 @@ namespace Colegio.Controllers
                 return RedirectToAction("Index", "Login");
             }
         }
+
+        [HttpPut]
+        public async Task<IActionResult> EliminarEnlaces(int enlaceId)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                string permiso = Permisos("PermisoSubModulo").PSMAPB ? "PermisoSubModulo" : "PermisoModulo";
+                bool eliminar = Permisos(permiso).PMMAPL.Where(w => w.Value.Contains("Eliminar")).Any();
+                if (eliminar)
+                {
+                    ApiCallResult result = await service.EliminarEnlaces(enlaceId);
+                    return Json(result);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Login");
+            }
+        }
         #endregion
     }
 }

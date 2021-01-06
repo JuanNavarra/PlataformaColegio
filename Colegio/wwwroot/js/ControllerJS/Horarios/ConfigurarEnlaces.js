@@ -68,7 +68,7 @@ function buscarProfesor() {
             async: true,
             success: function (res) {
                 if (res != null) {
-                    mostrarInfoSuministros(busqueda);
+                    mostrarInfoProfesores(busqueda);
                     $("#card_horarios").empty();
                     $("#div_horarios_enlazados").removeAttr("style");
                     $("#div_table_horarios_asignados").removeAttr("style");
@@ -234,7 +234,7 @@ function agregarHorario() {
                     $("#nombre_materia").prop("disabled", true).select2('val', "0");
                     $("#dia_semana").prop("disabled", true).select2('val', "0");
                     $("#horario_inicial_final").prop("disabled", true).select2('val', "0");
-                    mostrarInfoSuministros(documento);
+                    mostrarInfoProfesores(documento);
                     toastr.success(res.message, res.title + ":");
                 } else {
                     toastr.error(res.message, res.title + ":");
@@ -258,8 +258,7 @@ function checkId(id) {
     return igual
 }
 
-
-function mostrarInfoSuministros(documento) {
+function mostrarInfoProfesores(documento) {
     $.ajax({
         type: "GET",
         url: "MostrarEnlaceProfesorHorario",
@@ -279,7 +278,7 @@ function mostrarInfoSuministros(documento) {
                     ca += "<td style='text-align:center'>" + item.dia + "</td>"
                     ca += "<td style='text-align:center'>" + item.horario + "</td>"
                     ca += "<td style='text-align:center'>"
-                    ca += "<a href='#' onclick=\"eliminarSuministros('" + item.id + "');\"><i class='fas fa-trash'></i></a>"
+                    ca += "<a href='#' onclick=\"eliminarEnlaces('" + item.id + "');\"><i class='fas fa-trash'></i></a>"
                     ca += "</td >"
                     ca += "</tr>"
                     $("#tbody_horarios_profesores").append(ca);
@@ -290,4 +289,41 @@ function mostrarInfoSuministros(documento) {
             console.log("No se ha podido obtener la información");
         }
     })
+}
+
+function eliminarEnlaces(enlaceId) {
+    swal({
+        title: "¿Está seguro que desea eliminar este enlace?",
+        buttons: {
+            cancel: "Cancelar",
+            catch: {
+                text: "Eliminar",
+                value: "catch",
+            },
+        },
+        icon: "warning",
+    }).then((value) => {
+        if (value == "catch") {
+            $.ajax({
+                type: "PUT",
+                url: "EliminarEnlaces",
+                data: {
+                    enlaceId: enlaceId
+                },
+                dataType: "json",
+                async: true,
+                success: function (res) {
+                    if (res.status) {
+                        toastr.success(res.message, res.title + ":");
+                        mostrarInfoProfesores($("#documento_profesor_enlace").val());
+                    } else {
+                        toastr.error(res.message, res.title + ":");
+                    }
+                },
+                error: function (error) {
+                    console.log("No se ha podido obtener la información");
+                }
+            })
+        }
+    });
 }
