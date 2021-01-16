@@ -36,6 +36,7 @@ namespace Colegio
             services.AddScoped<IContratacion, ContratacionService>();
             services.AddScoped<IAlmacen, AlmacenService>();
             services.AddScoped<IHorario, HorarioService>();
+            services.AddScoped<IBancario, BancarioService>();
             services.AddDistributedMemoryCache();
             services.AddSession(options => {
                 options.IdleTimeout = TimeSpan.FromMinutes(10);

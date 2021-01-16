@@ -1,0 +1,19 @@
+﻿<link rel="stylesheet" href="~/css/scroller.css">
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            @if (ViewBag.Crear)
+            {
+                @await Html.PartialAsync("_FormularioGuardarCuenta")
+            }
+        </div>
+        <div class="card">
+            @if (ViewBag.Leer)
+            {
+                @await Html.PartialAsync("_MostrarTablaCuentas")
+            }
+        </div>
+    </div>
+</div>
+
+<script src="~/js/ControllerJS/Bancario.js"></script>

@@ -135,6 +135,15 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            @if (PSMA.Where(w => w.Value.Contains("Bancario")).Any() || PSMA_PMA)
+                            {
+                                <li class="nav-item">
+                                    <a href="@Url.Action("Index","Bancario")" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Cuentas y Bancos</p>
+                                    </a>
+                                </li>
+                            }
                             @if (PSMA.Where(w => w.Value.Contains("Perfiles")).Any() || PSMA_PMA)
                             {
                                 <li class="nav-item">
@@ -183,6 +192,32 @@
                                             <a href="@Url.Action("MostrarEnlaces","Horarios")" class="nav-link">
                                                 <i class="far fa-circle nav-icon"></i>
                                                 <p>Enlazar Profesor - Horario</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                            @if (PSMA.Where(w => w.Value.Contains("Inscripciones")).Any() || PSMA_PMA)
+                            {
+                                <li class="nav-item has-treeview">
+                                    <a href="#" class="nav-link">
+                                        <i class="nav-icon fas fa-circle"></i>
+                                        <p>
+                                            Inscripciones
+                                            <i class="right fas fa-angle-left"></i>
+                                        </p>
+                                    </a>
+                                    <ul class="nav nav-treeview">
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("GenerarInscripccion","Inscripcion")" class="nav-link">
+                                                <i class="far fa-circle nav-icon"></i>
+                                                <p>Generar Inscripción</p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("Examen","ExamenAdmision")" class="nav-link">
+                                                <i class="far fa-circle nav-icon"></i>
+                                                <p>Examen de Admisiónw</p>
                                             </a>
                                         </li>
                                     </ul>
